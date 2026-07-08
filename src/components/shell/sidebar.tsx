@@ -5,7 +5,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = { to: string; label: string; icon: any; soon?: boolean };
+const nav: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/members", label: "Membership", icon: Users },
   { to: "/finance", label: "Finance", icon: Wallet, soon: true },
@@ -18,7 +19,7 @@ const nav = [
   { to: "/visitors", label: "Visitors", icon: UserPlus, soon: true },
   { to: "/events", label: "Events", icon: CalendarCheck2, soon: true },
   { to: "/inventory", label: "Inventory", icon: Package, soon: true },
-] as const;
+];
 
 export function Sidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
