@@ -120,7 +120,7 @@ export const updateMember = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     if (!data.id) throw new Error("id required");
     const { id, ...patch } = cleanEmpty(data);
-    const { error } = await context.supabase.from("members").update(patch).eq("id", id);
+    const { error } = await context.supabase.from("members").update(patch).eq("id", id as string);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
