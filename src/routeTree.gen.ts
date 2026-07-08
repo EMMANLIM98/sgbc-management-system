@@ -13,7 +13,11 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
+import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
+import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authenticated/members.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -34,10 +38,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedMembersRoute = AuthenticatedMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMembersIndexRoute =
+  AuthenticatedMembersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMembersRoute,
+  } as any)
+const AuthenticatedMembersNewRoute = AuthenticatedMembersNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthenticatedMembersRoute,
+} as any)
+const AuthenticatedMembersIdRoute = AuthenticatedMembersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedMembersRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -45,12 +70,19 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/members': typeof AuthenticatedMembersRouteWithChildren
+  '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/members/new': typeof AuthenticatedMembersNewRoute
+  '/members/': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/members/$id': typeof AuthenticatedMembersIdRoute
+  '/members/new': typeof AuthenticatedMembersNewRoute
+  '/members': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +91,31 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/members': typeof AuthenticatedMembersRouteWithChildren
+  '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
+  '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
+  '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/reset-password' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/members'
+    | '/members/$id'
+    | '/members/new'
+    | '/members/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/members/$id'
+    | '/members/new'
+    | '/members'
   id:
     | '__root__'
     | '/'
@@ -72,6 +123,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/dashboard'
+    | '/_authenticated/members'
+    | '/_authenticated/members/$id'
+    | '/_authenticated/members/new'
+    | '/_authenticated/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -111,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/members': {
+      id: '/_authenticated/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof AuthenticatedMembersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -118,15 +180,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/members/': {
+      id: '/_authenticated/members/'
+      path: '/'
+      fullPath: '/members/'
+      preLoaderRoute: typeof AuthenticatedMembersIndexRouteImport
+      parentRoute: typeof AuthenticatedMembersRoute
+    }
+    '/_authenticated/members/new': {
+      id: '/_authenticated/members/new'
+      path: '/new'
+      fullPath: '/members/new'
+      preLoaderRoute: typeof AuthenticatedMembersNewRouteImport
+      parentRoute: typeof AuthenticatedMembersRoute
+    }
+    '/_authenticated/members/$id': {
+      id: '/_authenticated/members/$id'
+      path: '/$id'
+      fullPath: '/members/$id'
+      preLoaderRoute: typeof AuthenticatedMembersIdRouteImport
+      parentRoute: typeof AuthenticatedMembersRoute
+    }
   }
 }
 
+interface AuthenticatedMembersRouteChildren {
+  AuthenticatedMembersIdRoute: typeof AuthenticatedMembersIdRoute
+  AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
+  AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
+}
+
+const AuthenticatedMembersRouteChildren: AuthenticatedMembersRouteChildren = {
+  AuthenticatedMembersIdRoute: AuthenticatedMembersIdRoute,
+  AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
+  AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
+}
+
+const AuthenticatedMembersRouteWithChildren =
+  AuthenticatedMembersRoute._addFileChildren(AuthenticatedMembersRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMembersRoute: typeof AuthenticatedMembersRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMembersRoute: AuthenticatedMembersRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
