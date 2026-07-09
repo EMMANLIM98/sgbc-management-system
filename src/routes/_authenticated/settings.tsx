@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — Church OS" }] }),
+  head: () => ({ meta: [{ title: "Settings — Shekinah Glory Baptist Church" }] }),
   component: SettingsLayout,
 });
 

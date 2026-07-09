@@ -1,4 +1,4 @@
-# Church OS — Phase 1 Foundation
+# Shekinah Glory Baptist Church — Phase 1 Foundation
 
 A production-grade, multi-tenant SaaS foundation you can deploy and use immediately. Later phases (Finance → Sunday School → Ministry → …) reuse everything built here.
 
@@ -136,7 +136,7 @@ Every route with a loader defines `errorComponent` and `notFoundComponent`. Rout
 
 ## SEO & metadata
 
-Root `head()` gets real title/description/OG for "Church OS — Centralized Church Management". Each protected route sets its own title. `sitemap.xml` and `robots.txt` per the template recipe (only public routes: `/`, `/auth`).
+Root `head()` gets real title/description/OG for "Shekinah Glory Baptist Church — Centralized Church Management". Each protected route sets its own title. `sitemap.xml` and `robots.txt` per the template recipe (only public routes: `/`, `/auth`).
 
 ## Definition of done for Phase 1
 

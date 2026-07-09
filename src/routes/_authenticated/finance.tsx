@@ -20,7 +20,7 @@ import { formatDistanceToNow } from "date-fns";
 export const Route = createFileRoute("/_authenticated/finance")({
   head: () => ({
     meta: [
-      { title: "Finance — Church OS" },
+      { title: "Finance — Shekinah Glory Baptist Church" },
       { name: "description", content: "Giving trends, expenses, and financial activity across your churches." },
     ],
   }),

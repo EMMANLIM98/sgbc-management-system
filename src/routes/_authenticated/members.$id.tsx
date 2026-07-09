@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { ArrowRightLeft, Archive } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/members/$id")({
-  head: () => ({ meta: [{ title: "Member — Church OS" }] }),
+  head: () => ({ meta: [{ title: "Member — Shekinah Glory Baptist Church" }] }),
   component: MemberPage,
   errorComponent: ({ error }) => (
     <div className="p-6 text-sm text-destructive">{error.message}</div>

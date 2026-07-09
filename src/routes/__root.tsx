@@ -79,10 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Church OS — Centralized Church Management" },
+      { title: "Shekinah Glory Baptist Church — Centralized Church Management" },
       { name: "description", content: "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more." },
-      { name: "author", content: "Church OS" },
-      { property: "og:title", content: "Church OS — Centralized Church Management" },
+      { name: "author", content: "EMMANLIM98" },
+      { property: "og:title", content: "Shekinah Glory Baptist Church — Centralized Church Management" },
       { property: "og:description", content: "One platform for every church in your network." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

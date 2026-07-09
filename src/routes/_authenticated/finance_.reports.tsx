@@ -14,7 +14,7 @@ import {
 export const Route = createFileRoute("/_authenticated/finance_/reports")({
   head: () => ({
     meta: [
-      { title: "Finance Reports — Church OS" },
+      { title: "Finance Reports — Shekinah Glory Baptist Church" },
       { name: "description", content: "Monthly and annual finance reports with export to PDF." },
     ],
   }),
@@ -138,7 +138,7 @@ function FinanceReportsPage() {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(140);
-      doc.text(`Church OS  ·  ${periodLabel}  ·  ${scopeLabel}`, marginX, doc.internal.pageSize.getHeight() - 20);
+      doc.text(`Shekinah Glory Baptist Church  ·  ${periodLabel}  ·  ${scopeLabel}`, marginX, doc.internal.pageSize.getHeight() - 20);
       doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - marginX, doc.internal.pageSize.getHeight() - 20, { align: "right" });
     }
 

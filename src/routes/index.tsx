@@ -10,9 +10,9 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Church OS — Centralized Church Management" },
+      { title: "Shekinah Glory Baptist Church — Centralized Church Management" },
       { name: "description", content: "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more." },
-      { property: "og:title", content: "Church OS — Centralized Church Management" },
+      { property: "og:title", content: "Shekinah Glory Baptist Church — Centralized Church Management" },
       { property: "og:description", content: "One platform for every church in your network." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -45,7 +45,7 @@ function Landing() {
       <header className="h-14 border-b border-border flex items-center px-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold">CO</div>
-          <div className="text-sm font-semibold tracking-tight">Church OS</div>
+          <div className="text-sm font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
         </div>
         <div className="ml-auto flex items-center gap-2">
           {signedIn ? (
@@ -88,7 +88,7 @@ function Landing() {
 
       <footer className="border-t border-border">
         <div className="max-w-6xl mx-auto px-6 py-6 text-[12px] text-muted-foreground flex items-center justify-between">
-          <div>© {new Date().getFullYear()} Church OS</div>
+          <div>© {new Date().getFullYear()} Shekinah Glory Baptist Church</div>
           <div>Built with Lovable</div>
         </div>
       </footer>

@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/shell/page-header";
 import { useCurrentChurch } from "@/hooks/use-current-church";
 
 export const Route = createFileRoute("/_authenticated/members/new")({
-  head: () => ({ meta: [{ title: "Add member — Church OS" }] }),
+  head: () => ({ meta: [{ title: "Add member — Shekinah Glory Baptist Church" }] }),
   component: NewMember,
 });
 

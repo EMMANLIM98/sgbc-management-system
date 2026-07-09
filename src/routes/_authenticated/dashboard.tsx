@@ -15,7 +15,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Church OS" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Shekinah Glory Baptist Church" }] }),
   component: Dashboard,
 });
 

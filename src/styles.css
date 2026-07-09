@@ -62,7 +62,7 @@
 }
 
 :root {
-  /* Church OS — Linear/Vercel monochrome. Near-black on off-white, single restrained blue accent. */
+  /* Shekinah Glory Baptist Church — Linear/Vercel monochrome. Near-black on off-white, single restrained blue accent. */
   --radius: 0.5rem;
   --background: oklch(0.99 0.002 250);
   --foreground: oklch(0.16 0.01 260);
@@ -145,8 +145,17 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  html, body {
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  html,
+  body {
+    font-family:
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      sans-serif;
   }
 
   .tabular {

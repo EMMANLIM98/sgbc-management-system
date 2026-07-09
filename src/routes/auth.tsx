@@ -11,8 +11,8 @@ import { Loader2 } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Church OS" },
-      { name: "description", content: "Sign in to Church OS to manage your churches." },
+      { title: "Sign in — Shekinah Glory Baptist Church" },
+      { name: "description", content: "Sign in to Shekinah Glory Baptist Church to manage your churches." },
     ],
   }),
   component: AuthPage,
@@ -86,7 +86,7 @@ function AuthPage() {
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-2 mb-8 justify-center">
           <div className="h-7 w-7 rounded-md bg-foreground text-background grid place-items-center text-[11px] font-semibold">CO</div>
-          <div className="text-base font-semibold tracking-tight">Church OS</div>
+          <div className="text-base font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
         </div>
 
         <div className="border border-border rounded-lg bg-card p-6">
