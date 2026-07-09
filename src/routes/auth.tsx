@@ -127,7 +127,7 @@ function AuthPage() {
                   <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required autoComplete="name" />
                 </Field>
                 <Field label="Organization name" hint="You can add churches after signup.">
-                  <Input value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="e.g. Shekinah Glory Network" />
+                  <Input value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="e.g. Shekinah Glory Baptist Church - Main" />
                 </Field>
               </>
             )}
