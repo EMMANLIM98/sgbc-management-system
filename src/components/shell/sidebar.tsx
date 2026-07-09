@@ -9,7 +9,7 @@ type NavItem = { to: string; label: string; icon: any; soon?: boolean };
 const nav: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/members", label: "Membership", icon: Users },
-  { to: "/finance", label: "Finance", icon: Wallet, soon: true },
+  { to: "/finance", label: "Finance", icon: Wallet },
   { to: "/sunday-school", label: "Sunday School", icon: GraduationCap, soon: true },
   { to: "/discipleship", label: "Discipleship", icon: HeartHandshake, soon: true },
   { to: "/ministry", label: "Ministry", icon: Sparkles, soon: true },
