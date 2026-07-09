@@ -26,6 +26,7 @@ import { Route as AuthenticatedSettingsOrganizationRouteImport } from './routes/
 import { Route as AuthenticatedSettingsChurchesRouteImport } from './routes/_authenticated/settings.churches'
 import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
 import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authenticated/members.$id'
+import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authenticated/finance_.reports'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -117,6 +118,12 @@ const AuthenticatedMembersIdRoute = AuthenticatedMembersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMembersRoute,
 } as any)
+const AuthenticatedFinanceReportsRoute =
+  AuthenticatedFinanceReportsRouteImport.update({
+    id: '/finance_/reports',
+    path: '/finance/reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/finance': typeof AuthenticatedFinanceRoute
   '/members': typeof AuthenticatedMembersRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
   '/settings/churches': typeof AuthenticatedSettingsChurchesRoute
@@ -143,6 +151,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
   '/settings/churches': typeof AuthenticatedSettingsChurchesRoute
@@ -163,6 +172,7 @@ export interface FileRoutesById {
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/members': typeof AuthenticatedMembersRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/_authenticated/finance_/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
   '/_authenticated/settings/churches': typeof AuthenticatedSettingsChurchesRoute
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/members'
     | '/settings'
+    | '/finance/reports'
     | '/members/$id'
     | '/members/new'
     | '/settings/churches'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard'
     | '/finance'
+    | '/finance/reports'
     | '/members/$id'
     | '/members/new'
     | '/settings/churches'
@@ -218,6 +230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance'
     | '/_authenticated/members'
     | '/_authenticated/settings'
+    | '/_authenticated/finance_/reports'
     | '/_authenticated/members/$id'
     | '/_authenticated/members/new'
     | '/_authenticated/settings/churches'
@@ -357,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMembersIdRouteImport
       parentRoute: typeof AuthenticatedMembersRoute
     }
+    '/_authenticated/finance_/reports': {
+      id: '/_authenticated/finance_/reports'
+      path: '/finance/reports'
+      fullPath: '/finance/reports'
+      preLoaderRoute: typeof AuthenticatedFinanceReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -402,6 +422,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
+  AuthenticatedFinanceReportsRoute: typeof AuthenticatedFinanceReportsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -409,6 +430,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
+  AuthenticatedFinanceReportsRoute: AuthenticatedFinanceReportsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
