@@ -50,6 +50,14 @@ function FinancePage() {
       <PageHeader
         title="Finance"
         description={`Giving & expenses — ${scopeLabel}`}
+        actions={
+          <Link
+            to="/finance/reports"
+            className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent"
+          >
+            <ReceiptText className="h-3.5 w-3.5" /> Reports
+          </Link>
+        }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
