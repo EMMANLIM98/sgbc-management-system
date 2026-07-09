@@ -186,6 +186,180 @@ export type Database = {
           },
         ]
       }
+      contributions: {
+        Row: {
+          amount: number
+          category_id: string | null
+          church_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          member_id: string | null
+          method: string | null
+          note: string | null
+          occurred_on: string
+          reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          church_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          member_id?: string | null
+          method?: string | null
+          note?: string | null
+          occurred_on?: string
+          reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          church_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          member_id?: string | null
+          method?: string | null
+          note?: string | null
+          occurred_on?: string
+          reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contributions_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contributions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category_id: string | null
+          church_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          method: string | null
+          note: string | null
+          occurred_on: string
+          payee: string | null
+          reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          church_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          method?: string | null
+          note?: string | null
+          occurred_on?: string
+          payee?: string | null
+          reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          church_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          method?: string | null
+          note?: string | null
+          occurred_on?: string
+          payee?: string | null
+          reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_categories: {
+        Row: {
+          church_id: string
+          color: string | null
+          created_at: string
+          id: string
+          is_archived: boolean
+          kind: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          church_id: string
+          color?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          kind: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          church_id?: string
+          color?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          kind?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_categories_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       member_documents: {
         Row: {
           filename: string
