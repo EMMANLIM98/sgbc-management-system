@@ -51,12 +51,20 @@ function FinancePage() {
         title="Finance"
         description={`Giving & expenses — ${scopeLabel}`}
         actions={
-          <Link
-            to="/finance/reports"
-            className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent"
-          >
-            <ReceiptText className="h-3.5 w-3.5" /> Reports
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/finance/reports"
+              className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent"
+            >
+              <ReceiptText className="h-3.5 w-3.5" /> Reports
+            </Link>
+            <Link
+              to="/finance/contributions"
+              className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md bg-foreground text-background hover:opacity-90"
+            >
+              <HandCoins className="h-3.5 w-3.5" /> Record giving
+            </Link>
+          </div>
         }
       />
 
