@@ -758,6 +758,10 @@ export type Database = {
       }
       is_org_admin: { Args: { _org: string; _user: string }; Returns: boolean }
       is_org_member: { Args: { _org: string; _user: string }; Returns: boolean }
+      seed_default_giving_categories: {
+        Args: { _church: string }
+        Returns: undefined
+      }
       user_church_ids: { Args: { _user: string }; Returns: string[] }
       user_org_ids: { Args: { _user: string }; Returns: string[] }
     }
