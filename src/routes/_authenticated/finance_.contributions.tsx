@@ -27,7 +27,7 @@ import {
 } from "@/modules/finance/contributions.functions";
 import { HandCoins, Plus, Search, Trash2, User, Users, ArrowLeft } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/finance/contributions")({
+export const Route = createFileRoute("/_authenticated/finance_/contributions")({
   head: () => ({
     meta: [
       { title: "Giving — Finance" },
