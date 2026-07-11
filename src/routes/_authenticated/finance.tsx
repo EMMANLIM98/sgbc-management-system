@@ -10,7 +10,7 @@ import {
 } from "@/modules/finance/finance.functions";
 import {
   Wallet, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Building2,
-  ArrowRight, ReceiptText, HandCoins,
+  ArrowRight, ReceiptText, HandCoins, HandHeart, Users,
 } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
@@ -52,6 +52,18 @@ function FinancePage() {
         description={`Giving & expenses — ${scopeLabel}`}
         actions={
           <div className="flex items-center gap-2">
+            <Link
+              to="/finance/pledges"
+              className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent"
+            >
+              <HandHeart className="h-3.5 w-3.5" /> Pledges
+            </Link>
+            <Link
+              to="/finance/member-reports"
+              className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent"
+            >
+              <Users className="h-3.5 w-3.5" /> Member report
+            </Link>
             <Link
               to="/finance/reports"
               className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent"
