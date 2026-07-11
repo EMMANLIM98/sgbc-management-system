@@ -112,12 +112,12 @@ export const getMemberGivingReport = createServerFn({ method: "GET" })
       const cat: any = (r as any).finance_categories;
       const catName = cat?.name ?? "Uncategorized";
       catNames.add(catName);
-      const cur = map.get(m.id) ?? {
+      const cur: MemberAgg = map.get(m.id) ?? {
         id: m.id,
         name: `${m.first_name} ${m.last_name}`,
         total: 0,
         count: 0,
-        by_category: {},
+        by_category: {} as Record<string, number>,
         last_gift: null,
       };
       const amt = Number((r as any).amount);
