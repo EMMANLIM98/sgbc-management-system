@@ -646,6 +646,82 @@ export type Database = {
         }
         Relationships: []
       }
+      pledges: {
+        Row: {
+          amount: number
+          campaign: string | null
+          category_id: string
+          church_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          end_date: string | null
+          frequency: string
+          id: string
+          member_id: string
+          notes: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          campaign?: string | null
+          category_id: string
+          church_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          member_id: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          campaign?: string | null
+          category_id?: string
+          church_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          member_id?: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pledges_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pledges_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pledges_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
