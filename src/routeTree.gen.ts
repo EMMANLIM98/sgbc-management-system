@@ -27,6 +27,7 @@ import { Route as AuthenticatedSettingsChurchesRouteImport } from './routes/_aut
 import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
 import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authenticated/members.$id'
 import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authenticated/finance_.reports'
+import { Route as AuthenticatedFinancePledgesRouteImport } from './routes/_authenticated/finance_.pledges'
 import { Route as AuthenticatedFinanceContributionsRouteImport } from './routes/_authenticated/finance_.contributions'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -125,6 +126,12 @@ const AuthenticatedFinanceReportsRoute =
     path: '/finance/reports',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinancePledgesRoute =
+  AuthenticatedFinancePledgesRouteImport.update({
+    id: '/finance_/pledges',
+    path: '/finance/pledges',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceContributionsRoute =
   AuthenticatedFinanceContributionsRouteImport.update({
     id: '/finance_/contributions',
@@ -142,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/members': typeof AuthenticatedMembersRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
+  '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -160,6 +168,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
+  '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
   '/finance/reports': typeof AuthenticatedFinanceReportsRoute
   '/members/$id': typeof AuthenticatedMembersIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -182,6 +191,7 @@ export interface FileRoutesById {
   '/_authenticated/members': typeof AuthenticatedMembersRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/finance_/contributions': typeof AuthenticatedFinanceContributionsRoute
+  '/_authenticated/finance_/pledges': typeof AuthenticatedFinancePledgesRoute
   '/_authenticated/finance_/reports': typeof AuthenticatedFinanceReportsRoute
   '/_authenticated/members/$id': typeof AuthenticatedMembersIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/members'
     | '/settings'
     | '/finance/contributions'
+    | '/finance/pledges'
     | '/finance/reports'
     | '/members/$id'
     | '/members/new'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/finance/contributions'
+    | '/finance/pledges'
     | '/finance/reports'
     | '/members/$id'
     | '/members/new'
@@ -243,6 +255,7 @@ export interface FileRouteTypes {
     | '/_authenticated/members'
     | '/_authenticated/settings'
     | '/_authenticated/finance_/contributions'
+    | '/_authenticated/finance_/pledges'
     | '/_authenticated/finance_/reports'
     | '/_authenticated/members/$id'
     | '/_authenticated/members/new'
@@ -390,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finance_/pledges': {
+      id: '/_authenticated/finance_/pledges'
+      path: '/finance/pledges'
+      fullPath: '/finance/pledges'
+      preLoaderRoute: typeof AuthenticatedFinancePledgesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/finance_/contributions': {
       id: '/_authenticated/finance_/contributions'
       path: '/finance/contributions'
@@ -443,6 +463,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedFinanceContributionsRoute: typeof AuthenticatedFinanceContributionsRoute
+  AuthenticatedFinancePledgesRoute: typeof AuthenticatedFinancePledgesRoute
   AuthenticatedFinanceReportsRoute: typeof AuthenticatedFinanceReportsRoute
 }
 
@@ -453,6 +474,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedFinanceContributionsRoute:
     AuthenticatedFinanceContributionsRoute,
+  AuthenticatedFinancePledgesRoute: AuthenticatedFinancePledgesRoute,
   AuthenticatedFinanceReportsRoute: AuthenticatedFinanceReportsRoute,
 }
 
