@@ -29,6 +29,7 @@ import { Route as AuthenticatedMembersIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authenticated/finance_.reports'
 import { Route as AuthenticatedFinancePledgesRouteImport } from './routes/_authenticated/finance_.pledges'
 import { Route as AuthenticatedFinanceContributionsRouteImport } from './routes/_authenticated/finance_.contributions'
+import { Route as AuthenticatedFinanceMembersIdRouteImport } from './routes/_authenticated/finance_.members.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -138,6 +139,12 @@ const AuthenticatedFinanceContributionsRoute =
     path: '/finance/contributions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinanceMembersIdRoute =
+  AuthenticatedFinanceMembersIdRouteImport.update({
+    id: '/finance_/members/$id',
+    path: '/finance/members/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/settings/team': typeof AuthenticatedSettingsTeamRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/finance/members/$id': typeof AuthenticatedFinanceMembersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -178,6 +186,7 @@ export interface FileRoutesByTo {
   '/settings/team': typeof AuthenticatedSettingsTeamRoute
   '/members': typeof AuthenticatedMembersIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/finance/members/$id': typeof AuthenticatedFinanceMembersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -201,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/team': typeof AuthenticatedSettingsTeamRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/finance_/members/$id': typeof AuthenticatedFinanceMembersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/settings/team'
     | '/members/'
     | '/settings/'
+    | '/finance/members/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/settings/team'
     | '/members'
     | '/settings'
+    | '/finance/members/$id'
   id:
     | '__root__'
     | '/'
@@ -265,6 +277,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/team'
     | '/_authenticated/members/'
     | '/_authenticated/settings/'
+    | '/_authenticated/finance_/members/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceContributionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finance_/members/$id': {
+      id: '/_authenticated/finance_/members/$id'
+      path: '/finance/members/$id'
+      fullPath: '/finance/members/$id'
+      preLoaderRoute: typeof AuthenticatedFinanceMembersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -465,6 +485,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceContributionsRoute: typeof AuthenticatedFinanceContributionsRoute
   AuthenticatedFinancePledgesRoute: typeof AuthenticatedFinancePledgesRoute
   AuthenticatedFinanceReportsRoute: typeof AuthenticatedFinanceReportsRoute
+  AuthenticatedFinanceMembersIdRoute: typeof AuthenticatedFinanceMembersIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -476,6 +497,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedFinanceContributionsRoute,
   AuthenticatedFinancePledgesRoute: AuthenticatedFinancePledgesRoute,
   AuthenticatedFinanceReportsRoute: AuthenticatedFinanceReportsRoute,
+  AuthenticatedFinanceMembersIdRoute: AuthenticatedFinanceMembersIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
