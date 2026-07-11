@@ -25,7 +25,9 @@ import {
   listGivingCategories, listMemberPicker, listContributions,
   createContribution, deleteContribution, getMemberGivingSummary,
 } from "@/modules/finance/contributions.functions";
-import { HandCoins, Plus, Search, Trash2, User, Users, ArrowLeft } from "lucide-react";
+import { downloadReceiptPdf } from "@/lib/receipt";
+import { toCsv, downloadCsv } from "@/lib/csv";
+import { HandCoins, Plus, Search, Trash2, User, Users, ArrowLeft, Download, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/finance_/contributions")({
   head: () => ({
@@ -103,18 +105,42 @@ function ContributionsPage() {
         title="Giving"
         description={`Tithes, offering, missions & grace giving — ${scopeLabel}`}
         actions={
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-8 gap-1.5">
-                <Plus className="h-3.5 w-3.5" /> Record giving
-              </Button>
-            </DialogTrigger>
-            <RecordGivingDialog
-              onClose={() => setOpen(false)}
-              defaultChurchId={currentChurchId ?? churches[0]?.id ?? ""}
-              churches={churches}
-            />
-          </Dialog>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const rows: (string | number)[][] = [
+                  ["Date", "Member", "Category", "Method", "Reference", "Amount", "Church", "Note"],
+                  ...((list?.rows ?? []) as any[]).map((r) => [
+                    r.occurred_on,
+                    r.members ? `${r.members.first_name} ${r.members.last_name}` : "Anonymous",
+                    r.finance_categories?.name ?? "",
+                    r.method ?? "",
+                    r.reference ?? "",
+                    Number(r.amount),
+                    r.churches?.name ?? "",
+                    r.note ?? "",
+                  ]),
+                ];
+                downloadCsv(`contributions-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
+              }}
+              disabled={!(list?.rows?.length)}
+              className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent disabled:opacity-50"
+            >
+              <Download className="h-3.5 w-3.5" /> Export CSV
+            </button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-8 gap-1.5">
+                  <Plus className="h-3.5 w-3.5" /> Record giving
+                </Button>
+              </DialogTrigger>
+              <RecordGivingDialog
+                onClose={() => setOpen(false)}
+                defaultChurchId={currentChurchId ?? churches[0]?.id ?? ""}
+                churches={churches}
+              />
+            </Dialog>
+          </div>
         }
       />
 
@@ -163,7 +189,7 @@ function ContributionsPage() {
                   <th className="text-left font-medium px-4 py-2">Method</th>
                   {!currentChurchId && <th className="text-left font-medium px-4 py-2">Church</th>}
                   <th className="text-right font-medium px-4 py-2">Amount</th>
-                  <th className="w-8"></th>
+                  <th className="w-16"></th>
                 </tr>
               </thead>
               <tbody>
@@ -193,7 +219,18 @@ function ContributionsPage() {
                     {!currentChurchId && <td className="px-4 py-2 text-muted-foreground">{r.churches?.name}</td>}
                     <td className="px-4 py-2 text-right font-medium tabular">{formatPHP(Number(r.amount))}</td>
                     <td className="px-2 py-2">
-                      <AlertDialog>
+                      <div className="flex items-center gap-0.5 justify-end">
+                        {r.members && (
+                          <button
+                            onClick={() => downloadReceiptPdf({ ...r, amount: Number(r.amount) })}
+                            className="p-1 text-muted-foreground hover:text-foreground"
+                            aria-label="Receipt"
+                            title="Download receipt"
+                          >
+                            <FileText className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <button className="p-1 text-muted-foreground hover:text-destructive" aria-label="Delete">
                             <Trash2 className="h-3.5 w-3.5" />
@@ -210,6 +247,7 @@ function ContributionsPage() {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -239,7 +277,7 @@ function ContributionsPage() {
                   <div className="h-6 w-6 rounded-full bg-accent grid place-items-center text-[11px] font-medium">
                     {i + 1}
                   </div>
-                  <Link to="/members/$id" params={{ id: g.id }} className="flex-1 min-w-0 truncate hover:underline">
+                    <Link to="/finance/members/$id" params={{ id: g.id }} className="flex-1 min-w-0 truncate hover:underline">
                     {g.name}
                   </Link>
                   <div className="text-right">
@@ -250,6 +288,11 @@ function ContributionsPage() {
               ))}
             </ul>
           )}
+            <div className="mt-3 pt-3 border-t border-border">
+              <Link to="/finance/member-reports" className="text-[12px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+                Full member giving report →
+              </Link>
+            </div>
         </div>
       </div>
     </div>
