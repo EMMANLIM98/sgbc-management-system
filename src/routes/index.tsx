@@ -89,7 +89,7 @@ function Landing() {
       <footer className="border-t border-border">
         <div className="max-w-6xl mx-auto px-6 py-6 text-[12px] text-muted-foreground flex items-center justify-between">
           <div>© {new Date().getFullYear()} Shekinah Glory Baptist Church</div>
-          <div>Built with Lovable</div>
+          <div>Built by ITM SGBC</div>
         </div>
       </footer>
     </div>
