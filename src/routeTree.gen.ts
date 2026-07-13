@@ -14,11 +14,18 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedVisitationRouteImport } from './routes/_authenticated/visitation'
 import { Route as AuthenticatedSundaySchoolRouteImport } from './routes/_authenticated/sunday-school'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedOutreachRouteImport } from './routes/_authenticated/outreach'
+import { Route as AuthenticatedMinistryRouteImport } from './routes/_authenticated/ministry'
 import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedDiscipleshipRouteImport } from './routes/_authenticated/discipleship'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCommitteeRouteImport } from './routes/_authenticated/committee'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedSettingsTeamRouteImport } from './routes/_authenticated/settings.team'
@@ -57,6 +64,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVisitationRoute = AuthenticatedVisitationRouteImport.update({
+  id: '/visitation',
+  path: '/visitation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSundaySchoolRoute =
   AuthenticatedSundaySchoolRouteImport.update({
     id: '/sunday-school',
@@ -68,9 +80,24 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOutreachRoute = AuthenticatedOutreachRouteImport.update({
+  id: '/outreach',
+  path: '/outreach',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMinistryRoute = AuthenticatedMinistryRouteImport.update({
+  id: '/ministry',
+  path: '/ministry',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMembersRoute = AuthenticatedMembersRouteImport.update({
   id: '/members',
   path: '/members',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
@@ -78,9 +105,25 @@ const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDiscipleshipRoute =
+  AuthenticatedDiscipleshipRouteImport.update({
+    id: '/discipleship',
+    path: '/discipleship',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCommitteeRoute = AuthenticatedCommitteeRouteImport.update({
+  id: '/committee',
+  path: '/committee',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsIndexRoute =
@@ -165,11 +208,18 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/committee': typeof AuthenticatedCommitteeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/discipleship': typeof AuthenticatedDiscipleshipRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
   '/members': typeof AuthenticatedMembersRouteWithChildren
+  '/ministry': typeof AuthenticatedMinistryRoute
+  '/outreach': typeof AuthenticatedOutreachRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
+  '/visitation': typeof AuthenticatedVisitationRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/finance/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -189,9 +239,16 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/committee': typeof AuthenticatedCommitteeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/discipleship': typeof AuthenticatedDiscipleshipRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/ministry': typeof AuthenticatedMinistryRoute
+  '/outreach': typeof AuthenticatedOutreachRoute
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
+  '/visitation': typeof AuthenticatedVisitationRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/finance/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -213,11 +270,18 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/committee': typeof AuthenticatedCommitteeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/discipleship': typeof AuthenticatedDiscipleshipRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/members': typeof AuthenticatedMembersRouteWithChildren
+  '/_authenticated/ministry': typeof AuthenticatedMinistryRoute
+  '/_authenticated/outreach': typeof AuthenticatedOutreachRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/sunday-school': typeof AuthenticatedSundaySchoolRoute
+  '/_authenticated/visitation': typeof AuthenticatedVisitationRoute
   '/_authenticated/finance_/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/_authenticated/finance_/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/_authenticated/finance_/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -239,11 +303,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/committee'
     | '/dashboard'
+    | '/discipleship'
+    | '/events'
     | '/finance'
+    | '/inventory'
     | '/members'
+    | '/ministry'
+    | '/outreach'
     | '/settings'
     | '/sunday-school'
+    | '/visitation'
     | '/finance/contributions'
     | '/finance/member-reports'
     | '/finance/pledges'
@@ -263,9 +334,16 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/committee'
     | '/dashboard'
+    | '/discipleship'
+    | '/events'
     | '/finance'
+    | '/inventory'
+    | '/ministry'
+    | '/outreach'
     | '/sunday-school'
+    | '/visitation'
     | '/finance/contributions'
     | '/finance/member-reports'
     | '/finance/pledges'
@@ -286,11 +364,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/_authenticated/committee'
     | '/_authenticated/dashboard'
+    | '/_authenticated/discipleship'
+    | '/_authenticated/events'
     | '/_authenticated/finance'
+    | '/_authenticated/inventory'
     | '/_authenticated/members'
+    | '/_authenticated/ministry'
+    | '/_authenticated/outreach'
     | '/_authenticated/settings'
     | '/_authenticated/sunday-school'
+    | '/_authenticated/visitation'
     | '/_authenticated/finance_/contributions'
     | '/_authenticated/finance_/member-reports'
     | '/_authenticated/finance_/pledges'
@@ -351,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/visitation': {
+      id: '/_authenticated/visitation'
+      path: '/visitation'
+      fullPath: '/visitation'
+      preLoaderRoute: typeof AuthenticatedVisitationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sunday-school': {
       id: '/_authenticated/sunday-school'
       path: '/sunday-school'
@@ -365,11 +457,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/outreach': {
+      id: '/_authenticated/outreach'
+      path: '/outreach'
+      fullPath: '/outreach'
+      preLoaderRoute: typeof AuthenticatedOutreachRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ministry': {
+      id: '/_authenticated/ministry'
+      path: '/ministry'
+      fullPath: '/ministry'
+      preLoaderRoute: typeof AuthenticatedMinistryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/members': {
       id: '/_authenticated/members'
       path: '/members'
       fullPath: '/members'
       preLoaderRoute: typeof AuthenticatedMembersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/finance': {
@@ -379,11 +492,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events': {
+      id: '/_authenticated/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/discipleship': {
+      id: '/_authenticated/discipleship'
+      path: '/discipleship'
+      fullPath: '/discipleship'
+      preLoaderRoute: typeof AuthenticatedDiscipleshipRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/committee': {
+      id: '/_authenticated/committee'
+      path: '/committee'
+      fullPath: '/committee'
+      preLoaderRoute: typeof AuthenticatedCommitteeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings/': {
@@ -518,11 +652,18 @@ const AuthenticatedSettingsRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCommitteeRoute: typeof AuthenticatedCommitteeRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiscipleshipRoute: typeof AuthenticatedDiscipleshipRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRouteWithChildren
+  AuthenticatedMinistryRoute: typeof AuthenticatedMinistryRoute
+  AuthenticatedOutreachRoute: typeof AuthenticatedOutreachRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedSundaySchoolRoute: typeof AuthenticatedSundaySchoolRoute
+  AuthenticatedVisitationRoute: typeof AuthenticatedVisitationRoute
   AuthenticatedFinanceContributionsRoute: typeof AuthenticatedFinanceContributionsRoute
   AuthenticatedFinanceMemberReportsRoute: typeof AuthenticatedFinanceMemberReportsRoute
   AuthenticatedFinancePledgesRoute: typeof AuthenticatedFinancePledgesRoute
@@ -531,11 +672,18 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCommitteeRoute: AuthenticatedCommitteeRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiscipleshipRoute: AuthenticatedDiscipleshipRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRouteWithChildren,
+  AuthenticatedMinistryRoute: AuthenticatedMinistryRoute,
+  AuthenticatedOutreachRoute: AuthenticatedOutreachRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedSundaySchoolRoute: AuthenticatedSundaySchoolRoute,
+  AuthenticatedVisitationRoute: AuthenticatedVisitationRoute,
   AuthenticatedFinanceContributionsRoute:
     AuthenticatedFinanceContributionsRoute,
   AuthenticatedFinanceMemberReportsRoute:
