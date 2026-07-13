@@ -819,6 +819,68 @@ export type Database = {
           },
         ]
       }
+      visitors: {
+        Row: {
+          address: string | null
+          age: number | null
+          can_visit: boolean
+          church_id: string
+          contact_number: string | null
+          created_at: string
+          created_by: string | null
+          full_name: string
+          id: string
+          invited_by: string | null
+          notes: string | null
+          source: Database["public"]["Enums"]["visitor_source"]
+          updated_at: string
+          visit_date: string
+          visit_when: string | null
+        }
+        Insert: {
+          address?: string | null
+          age?: number | null
+          can_visit?: boolean
+          church_id: string
+          contact_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          full_name: string
+          id?: string
+          invited_by?: string | null
+          notes?: string | null
+          source?: Database["public"]["Enums"]["visitor_source"]
+          updated_at?: string
+          visit_date?: string
+          visit_when?: string | null
+        }
+        Update: {
+          address?: string | null
+          age?: number | null
+          can_visit?: boolean
+          church_id?: string
+          contact_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          full_name?: string
+          id?: string
+          invited_by?: string | null
+          notes?: string | null
+          source?: Database["public"]["Enums"]["visitor_source"]
+          updated_at?: string
+          visit_date?: string
+          visit_when?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitors_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -869,6 +931,7 @@ export type Database = {
         | "inactive"
         | "transferred"
       sex_kind: "male" | "female"
+      visitor_source: "invited" | "walk_in"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1026,6 +1089,7 @@ export const Constants = {
         "transferred",
       ],
       sex_kind: ["male", "female"],
+      visitor_source: ["invited", "walk_in"],
     },
   },
 } as const
