@@ -44,7 +44,7 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="h-14 border-b border-border flex items-center px-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold">CO</div>
+          <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold">SGBC</div>
           <div className="text-sm font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
         </div>
         <div className="ml-auto flex items-center gap-2">
