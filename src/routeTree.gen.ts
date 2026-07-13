@@ -14,6 +14,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedVisitorsRouteImport } from './routes/_authenticated/visitors'
 import { Route as AuthenticatedVisitationRouteImport } from './routes/_authenticated/visitation'
 import { Route as AuthenticatedSundaySchoolRouteImport } from './routes/_authenticated/sunday-school'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -63,6 +64,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedVisitorsRoute = AuthenticatedVisitorsRouteImport.update({
+  id: '/visitors',
+  path: '/visitors',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVisitationRoute = AuthenticatedVisitationRouteImport.update({
   id: '/visitation',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/visitation': typeof AuthenticatedVisitationRoute
+  '/visitors': typeof AuthenticatedVisitorsRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/finance/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/outreach': typeof AuthenticatedOutreachRoute
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/visitation': typeof AuthenticatedVisitationRoute
+  '/visitors': typeof AuthenticatedVisitorsRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/finance/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/_authenticated/visitation': typeof AuthenticatedVisitationRoute
+  '/_authenticated/visitors': typeof AuthenticatedVisitorsRoute
   '/_authenticated/finance_/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/_authenticated/finance_/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/_authenticated/finance_/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sunday-school'
     | '/visitation'
+    | '/visitors'
     | '/finance/contributions'
     | '/finance/member-reports'
     | '/finance/pledges'
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/outreach'
     | '/sunday-school'
     | '/visitation'
+    | '/visitors'
     | '/finance/contributions'
     | '/finance/member-reports'
     | '/finance/pledges'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/sunday-school'
     | '/_authenticated/visitation'
+    | '/_authenticated/visitors'
     | '/_authenticated/finance_/contributions'
     | '/_authenticated/finance_/member-reports'
     | '/_authenticated/finance_/pledges'
@@ -435,6 +447,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/visitors': {
+      id: '/_authenticated/visitors'
+      path: '/visitors'
+      fullPath: '/visitors'
+      preLoaderRoute: typeof AuthenticatedVisitorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/visitation': {
       id: '/_authenticated/visitation'
@@ -664,6 +683,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedSundaySchoolRoute: typeof AuthenticatedSundaySchoolRoute
   AuthenticatedVisitationRoute: typeof AuthenticatedVisitationRoute
+  AuthenticatedVisitorsRoute: typeof AuthenticatedVisitorsRoute
   AuthenticatedFinanceContributionsRoute: typeof AuthenticatedFinanceContributionsRoute
   AuthenticatedFinanceMemberReportsRoute: typeof AuthenticatedFinanceMemberReportsRoute
   AuthenticatedFinancePledgesRoute: typeof AuthenticatedFinancePledgesRoute
@@ -684,6 +704,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedSundaySchoolRoute: AuthenticatedSundaySchoolRoute,
   AuthenticatedVisitationRoute: AuthenticatedVisitationRoute,
+  AuthenticatedVisitorsRoute: AuthenticatedVisitorsRoute,
   AuthenticatedFinanceContributionsRoute:
     AuthenticatedFinanceContributionsRoute,
   AuthenticatedFinanceMemberReportsRoute:
