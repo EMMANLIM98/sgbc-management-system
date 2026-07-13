@@ -78,13 +78,22 @@ export const getRecentActivities = createServerFn({ method: "GET" })
   .handler(async ({ context, data }) => {
     let q = context.supabase
       .from("activities")
-      .select("id, verb, subject_type, subject_id, meta, created_at, church_id, churches(name), profiles:actor_id(full_name)")
+      .select("id, verb, subject_type, subject_id, meta, created_at, church_id, actor_id, churches(name)")
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (data.church_id) q = q.eq("church_id", data.church_id);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    const actorIds = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+    let profileMap: Record<string, { full_name: string | null }> = {};
+    if (actorIds.length) {
+      const { data: profs } = await context.supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", actorIds);
+      for (const p of profs ?? []) profileMap[p.id] = { full_name: p.full_name };
+    }
+    return (rows ?? []).map((r: any) => ({ ...r, profiles: r.actor_id ? profileMap[r.actor_id] ?? null : null }));
   });
 
 export const getChurchesOverview = createServerFn({ method: "GET" })
