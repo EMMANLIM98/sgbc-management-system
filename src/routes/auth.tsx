@@ -85,7 +85,7 @@ function AuthPage() {
     <div className="min-h-screen grid place-items-center px-4 bg-background">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <div className="h-7 w-7 rounded-md bg-foreground text-background grid place-items-center text-[11px] font-semibold">CO</div>
+          <div className="h-7 w-7 rounded-md bg-foreground text-background grid place-items-center text-[11px] font-semibold">SGBC</div>
           <div className="text-base font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
         </div>
 
