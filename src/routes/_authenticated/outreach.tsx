@@ -11,10 +11,16 @@ export const Route = createFileRoute("/_authenticated/outreach")({
       icon={MapPin}
       tagline="Reach every corner."
       features={[
-        { title: "Outreach Events", description: "Plan crusades, evangelism, and community services." },
+        {
+          title: "Outreach Events",
+          description: "Plan crusades, evangelism, and community services.",
+        },
         { title: "Contacts", description: "Record contacts made and their status." },
         { title: "Follow-ups", description: "Convert contacts into visitors and members." },
-        { title: "Mission Fields", description: "Track partner locations and pastors on the field." },
+        {
+          title: "Mission Fields",
+          description: "Track partner locations and pastors on the field.",
+        },
       ]}
     />
   ),

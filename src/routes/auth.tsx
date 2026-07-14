@@ -12,7 +12,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Shekinah Glory Baptist Church" },
-      { name: "description", content: "Sign in to Shekinah Glory Baptist Church to manage your churches." },
+      {
+        name: "description",
+        content: "Sign in to Shekinah Glory Baptist Church to manage your churches.",
+      },
     ],
   }),
   component: AuthPage,
@@ -53,14 +56,17 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
-          email, password,
+          email,
+          password,
           options: {
             emailRedirectTo: window.location.origin,
             data: { full_name: fullName, organization_name: orgName || undefined },
           },
         });
         if (error) throw error;
-        toast.success("Account created", { description: "Check your email if confirmation is required." });
+        toast.success("Account created", {
+          description: "Check your email if confirmation is required.",
+        });
         navigate({ to: "/dashboard", replace: true });
       } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -85,20 +91,28 @@ function AuthPage() {
     <div className="min-h-screen grid place-items-center px-4 bg-background">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <div className="h-7 w-7 rounded-md bg-foreground text-background grid place-items-center text-[11px] font-semibold">SGBC</div>
-          <div className="text-base font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
+          <div className="h-7 w-7 rounded-md bg-foreground text-background grid place-items-center text-[11px] font-semibold">
+            SGBC
+          </div>
+          <div className="text-base font-semibold tracking-tight">
+            Shekinah Glory Baptist Church
+          </div>
         </div>
 
         <div className="border border-border rounded-lg bg-card p-6">
           <h1 className="text-lg font-semibold tracking-tight">
-            {mode === "signup" ? "Create your workspace" : mode === "forgot" ? "Reset password" : "Sign in"}
+            {mode === "signup"
+              ? "Create your workspace"
+              : mode === "forgot"
+                ? "Reset password"
+                : "Sign in"}
           </h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             {mode === "signup"
               ? "Set up your organization and first church."
               : mode === "forgot"
-              ? "We'll email you a reset link."
-              : "Welcome back."}
+                ? "We'll email you a reset link."
+                : "Welcome back."}
           </p>
 
           {mode !== "forgot" && (
@@ -124,48 +138,90 @@ function AuthPage() {
             {mode === "signup" && (
               <>
                 <Field label="Full name">
-                  <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required autoComplete="name" />
+                  <Input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    autoComplete="name"
+                  />
                 </Field>
                 <Field label="Organization name" hint="You can add churches after signup.">
-                  <Input value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="e.g. Shekinah Glory Baptist Church - Main" />
+                  <Input
+                    value={orgName}
+                    onChange={(e) => setOrgName(e.target.value)}
+                    placeholder="e.g. Shekinah Glory Baptist Church - Main"
+                  />
                 </Field>
               </>
             )}
             <Field label="Email">
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
             </Field>
             {mode !== "forgot" && (
               <Field label="Password">
-                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                />
               </Field>
             )}
             <Button type="submit" className="w-full h-9" disabled={busy}>
               {busy && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {mode === "signup" ? "Create workspace" : mode === "forgot" ? "Send reset link" : "Sign in"}
+              {mode === "signup"
+                ? "Create workspace"
+                : mode === "forgot"
+                  ? "Send reset link"
+                  : "Sign in"}
             </Button>
           </form>
 
           <div className="mt-4 flex items-center justify-between text-[12px] text-muted-foreground">
             {mode === "signin" ? (
               <>
-                <button className="hover:text-foreground" onClick={() => setMode("forgot")}>Forgot password?</button>
-                <button className="hover:text-foreground" onClick={() => setMode("signup")}>Create account</button>
+                <button className="hover:text-foreground" onClick={() => setMode("forgot")}>
+                  Forgot password?
+                </button>
+                <button className="hover:text-foreground" onClick={() => setMode("signup")}>
+                  Create account
+                </button>
               </>
             ) : (
-              <button className="hover:text-foreground" onClick={() => setMode("signin")}>← Back to sign in</button>
+              <button className="hover:text-foreground" onClick={() => setMode("signin")}>
+                ← Back to sign in
+              </button>
             )}
           </div>
         </div>
 
         <p className="text-center text-[11px] text-muted-foreground mt-4">
-          <Link to="/" className="hover:text-foreground">← Back to home</Link>
+          <Link to="/" className="hover:text-foreground">
+            ← Back to home
+          </Link>
         </p>
       </div>
     </div>
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <Label className="text-[12px]">{label}</Label>
@@ -178,10 +234,22 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 function GoogleIcon() {
   return (
     <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" aria-hidden>
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.56c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.56-2.77c-.99.67-2.26 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.52H2.18v2.84A11 11 0 0 0 12 23z"/>
-      <path fill="#FBBC05" d="M5.84 14.12A6.6 6.6 0 0 1 5.48 12c0-.74.13-1.45.36-2.12V7.04H2.18a11 11 0 0 0 0 9.92l3.66-2.84z"/>
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.2 1.65l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.04l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.56c2.08-1.92 3.28-4.74 3.28-8.1z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.56-2.77c-.99.67-2.26 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.52H2.18v2.84A11 11 0 0 0 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.12A6.6 6.6 0 0 1 5.48 12c0-.74.13-1.45.36-2.12V7.04H2.18a11 11 0 0 0 0 9.92l3.66-2.84z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.2 1.65l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.04l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"
+      />
     </svg>
   );
 }

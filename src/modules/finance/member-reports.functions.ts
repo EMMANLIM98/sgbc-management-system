@@ -8,11 +8,13 @@ const scope = z.object({ church_id: z.string().uuid().nullable().optional() });
 export const getMemberContributionHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      member_id: z.string().uuid(),
-      from: z.string().optional(),
-      to: z.string().optional(),
-    }).parse(d),
+    z
+      .object({
+        member_id: z.string().uuid(),
+        from: z.string().optional(),
+        to: z.string().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     let q = context.supabase
@@ -29,12 +31,21 @@ export const getMemberContributionHistory = createServerFn({ method: "GET" })
     const list = rows ?? [];
 
     // Breakdown by category
-    const catMap = new Map<string, { id: string; name: string; color: string | null; total: number; count: number }>();
+    const catMap = new Map<
+      string,
+      { id: string; name: string; color: string | null; total: number; count: number }
+    >();
     let total = 0;
     for (const r of list) {
       const c = (r as any).finance_categories;
       const key = c?.id ?? "uncat";
-      const cur = catMap.get(key) ?? { id: key, name: c?.name ?? "Uncategorized", color: c?.color ?? null, total: 0, count: 0 };
+      const cur = catMap.get(key) ?? {
+        id: key,
+        name: c?.name ?? "Uncategorized",
+        color: c?.color ?? null,
+        total: 0,
+        count: 0,
+      };
       cur.total += Number((r as any).amount);
       cur.count += 1;
       catMap.set(key, cur);
@@ -54,7 +65,9 @@ export const getMemberContributionHistory = createServerFn({ method: "GET" })
       total,
       count: list.length,
       by_category: Array.from(catMap.values()).sort((a, b) => b.total - a.total),
-      by_year: Array.from(yearMap.entries()).map(([year, total]) => ({ year, total })).sort((a, b) => (a.year < b.year ? 1 : -1)),
+      by_year: Array.from(yearMap.entries())
+        .map(([year, total]) => ({ year, total }))
+        .sort((a, b) => (a.year < b.year ? 1 : -1)),
       rows: list,
     };
   });
@@ -79,16 +92,20 @@ export const getContribution = createServerFn({ method: "GET" })
 export const getMemberGivingReport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    scope.extend({
-      from: z.string().optional(),
-      to: z.string().optional(),
-      limit: z.number().int().min(1).max(500).default(200),
-    }).parse(d),
+    scope
+      .extend({
+        from: z.string().optional(),
+        to: z.string().optional(),
+        limit: z.number().int().min(1).max(500).default(200),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     let q = context.supabase
       .from("contributions")
-      .select("amount, member_id, category_id, occurred_on, members(id, first_name, last_name), finance_categories(id, name)")
+      .select(
+        "amount, member_id, category_id, occurred_on, members(id, first_name, last_name), finance_categories(id, name)",
+      )
       .not("member_id", "is", null);
     if (data.church_id) q = q.eq("church_id", data.church_id);
     if (data.from) q = q.gte("occurred_on", data.from);
@@ -124,11 +141,14 @@ export const getMemberGivingReport = createServerFn({ method: "GET" })
       cur.total += amt;
       cur.count += 1;
       cur.by_category[catName] = (cur.by_category[catName] ?? 0) + amt;
-      if (!cur.last_gift || (r as any).occurred_on > cur.last_gift) cur.last_gift = (r as any).occurred_on;
+      if (!cur.last_gift || (r as any).occurred_on > cur.last_gift)
+        cur.last_gift = (r as any).occurred_on;
       map.set(m.id, cur);
     }
     const categories = Array.from(catNames).sort();
-    const list = Array.from(map.values()).sort((a, b) => b.total - a.total).slice(0, data.limit);
+    const list = Array.from(map.values())
+      .sort((a, b) => b.total - a.total)
+      .slice(0, data.limit);
     const grand_total = list.reduce((a, m) => a + m.total, 0);
     return { categories, members: list, grand_total, count: list.length };
   });

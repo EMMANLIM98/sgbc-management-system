@@ -11,8 +11,14 @@ export const Route = createFileRoute("/_authenticated/committee")({
       icon={ClipboardList}
       tagline="Govern with clarity."
       features={[
-        { title: "Committees", description: "Deacons, Trustees, Finance, Missions committees and more." },
-        { title: "Members & Roles", description: "Chair, secretary, and member assignments per term." },
+        {
+          title: "Committees",
+          description: "Deacons, Trustees, Finance, Missions committees and more.",
+        },
+        {
+          title: "Members & Roles",
+          description: "Chair, secretary, and member assignments per term.",
+        },
         { title: "Meeting Minutes", description: "Record agendas, decisions and action items." },
         { title: "Resolutions", description: "Track motions passed and their follow-through." },
       ]}

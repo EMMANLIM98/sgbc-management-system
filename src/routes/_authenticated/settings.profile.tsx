@@ -22,18 +22,34 @@ function ProfileSettings() {
   });
   const mut = useMutation({
     mutationFn: (v: any) => fn({ data: v }),
-    onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["me-context"] }); },
+    onSuccess: () => {
+      toast.success("Saved");
+      qc.invalidateQueries({ queryKey: ["me-context"] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
   return (
-    <form onSubmit={handleSubmit((v) => mut.mutate(v))} className="border border-border rounded-lg bg-card p-5 space-y-4 max-w-lg">
+    <form
+      onSubmit={handleSubmit((v) => mut.mutate(v))}
+      className="border border-border rounded-lg bg-card p-5 space-y-4 max-w-lg"
+    >
       <div>
         <h2 className="text-[14px] font-medium">Your profile</h2>
         <p className="text-[12px] text-muted-foreground">{data?.user.email}</p>
       </div>
-      <div className="space-y-1.5"><Label className="text-[12px]">Full name</Label><Input {...register("full_name", { required: true })} /></div>
-      <div className="space-y-1.5"><Label className="text-[12px]">Phone</Label><Input {...register("phone")} /></div>
-      <div className="flex justify-end"><Button type="submit" disabled={mut.isPending}>Save</Button></div>
+      <div className="space-y-1.5">
+        <Label className="text-[12px]">Full name</Label>
+        <Input {...register("full_name", { required: true })} />
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-[12px]">Phone</Label>
+        <Input {...register("phone")} />
+      </div>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={mut.isPending}>
+          Save
+        </Button>
+      </div>
     </form>
   );
 }

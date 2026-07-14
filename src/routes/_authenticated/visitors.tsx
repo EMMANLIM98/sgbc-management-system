@@ -10,20 +10,38 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { UserPlus, Search, Pencil, Trash2, Phone, MapPin } from "lucide-react";
 import {
-  listVisitors, createVisitor, updateVisitor, deleteVisitor,
+  listVisitors,
+  createVisitor,
+  updateVisitor,
+  deleteVisitor,
 } from "@/modules/visitors/visitors.functions";
 import { format } from "date-fns";
 
@@ -113,17 +131,28 @@ function VisitorsPage() {
 
   const createM = useMutation({
     mutationFn: (payload: any) => createFn({ data: payload }),
-    onSuccess: () => { invalidate(); setOpen(false); toast.success("Visitor added"); },
+    onSuccess: () => {
+      invalidate();
+      setOpen(false);
+      toast.success("Visitor added");
+    },
     onError: (e: any) => toast.error(e?.message ?? "Failed to save visitor"),
   });
   const updateM = useMutation({
     mutationFn: (payload: any) => updateFn({ data: payload }),
-    onSuccess: () => { invalidate(); setOpen(false); toast.success("Visitor updated"); },
+    onSuccess: () => {
+      invalidate();
+      setOpen(false);
+      toast.success("Visitor updated");
+    },
     onError: (e: any) => toast.error(e?.message ?? "Failed to update visitor"),
   });
   const deleteM = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { id } }),
-    onSuccess: () => { invalidate(); toast.success("Visitor deleted"); },
+    onSuccess: () => {
+      invalidate();
+      toast.success("Visitor deleted");
+    },
     onError: (e: any) => toast.error(e?.message ?? "Failed to delete visitor"),
   });
 
@@ -132,7 +161,10 @@ function VisitorsPage() {
     [currentChurchId, churches],
   );
 
-  const openCreate = () => { setForm(emptyForm()); setOpen(true); };
+  const openCreate = () => {
+    setForm(emptyForm());
+    setOpen(true);
+  };
   const openEdit = (r: VisitorRow) => {
     setForm({
       id: r.id,
@@ -164,7 +196,7 @@ function VisitorsPage() {
       address: form.address || null,
       contact_number: form.contact_number || null,
       source: form.source,
-      invited_by: form.source === "invited" ? (form.invited_by || null) : null,
+      invited_by: form.source === "invited" ? form.invited_by || null : null,
       can_visit: form.can_visit,
       visit_when: form.can_visit && form.visit_when ? form.visit_when : null,
       notes: form.notes || null,
@@ -173,7 +205,9 @@ function VisitorsPage() {
     else createM.mutate(payload);
   };
 
-  const scopeLabel = currentChurchId ? currentChurch?.name ?? "Church" : `All Churches (${churches.length})`;
+  const scopeLabel = currentChurchId
+    ? (currentChurch?.name ?? "Church")
+    : `All Churches (${churches.length})`;
   const disableCreate = !targetChurchId;
 
   return (
@@ -210,7 +244,9 @@ function VisitorsPage() {
           />
         </div>
         <Select value={source} onValueChange={(v) => setSource(v as any)}>
-          <SelectTrigger className="h-9 w-[160px]"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 w-[160px]">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All sources</SelectItem>
             <SelectItem value="invited">Invited</SelectItem>
@@ -235,81 +271,112 @@ function VisitorsPage() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">Loading…</td></tr>
-            ) : !rows?.length ? (
-              <tr><td colSpan={8} className="px-3 py-12 text-center text-muted-foreground">
-                No visitors yet. Click <span className="text-foreground font-medium">Add visitor</span> to record the first one.
-              </td></tr>
-            ) : rows.map((r) => (
-              <tr key={r.id} className="border-t border-border hover:bg-muted/30">
-                <td className="px-3 py-2 tabular-nums">{format(new Date(r.visit_date), "MMM d, yyyy")}</td>
-                <td className="px-3 py-2">
-                  <div className="font-medium">{r.full_name}</div>
-                  {r.address && (
-                    <div className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <MapPin className="h-3 w-3" /> {r.address}
-                    </div>
-                  )}
-                </td>
-                <td className="px-3 py-2 tabular-nums">{r.age ?? "—"}</td>
-                <td className="px-3 py-2">
-                  {r.contact_number ? (
-                    <div className="inline-flex items-center gap-1 text-[12px]">
-                      <Phone className="h-3 w-3 text-muted-foreground" /> {r.contact_number}
-                    </div>
-                  ) : <span className="text-muted-foreground">—</span>}
-                </td>
-                <td className="px-3 py-2">
-                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] border ${r.source === "invited" ? "border-foreground/20 bg-foreground/5" : "border-border text-muted-foreground"}`}>
-                    {r.source === "invited" ? "Invited" : "Walk-in"}
-                  </span>
-                  {r.source === "invited" && r.invited_by && (
-                    <div className="text-[11px] text-muted-foreground mt-0.5">by {r.invited_by}</div>
-                  )}
-                </td>
-                <td className="px-3 py-2">
-                  {r.can_visit ? (
-                    <div>
-                      <div className="text-foreground">Yes</div>
-                      {r.visit_when && (
-                        <div className="text-[11px] text-muted-foreground">
-                          {format(new Date(r.visit_when), "MMM d, yyyy")}
-                        </div>
-                      )}
-                    </div>
-                  ) : <span className="text-muted-foreground">No</span>}
-                </td>
-                {!currentChurchId && (
-                  <td className="px-3 py-2 text-muted-foreground">{r.churches?.name ?? "—"}</td>
-                )}
-                <td className="px-3 py-2">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(r)}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete visitor?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will permanently remove {r.full_name} from visitors.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteM.mutate(r.id)}>Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+              <tr>
+                <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
+                  Loading…
                 </td>
               </tr>
-            ))}
+            ) : !rows?.length ? (
+              <tr>
+                <td colSpan={8} className="px-3 py-12 text-center text-muted-foreground">
+                  No visitors yet. Click{" "}
+                  <span className="text-foreground font-medium">Add visitor</span> to record the
+                  first one.
+                </td>
+              </tr>
+            ) : (
+              rows.map((r) => (
+                <tr key={r.id} className="border-t border-border hover:bg-muted/30">
+                  <td className="px-3 py-2 tabular-nums">
+                    {format(new Date(r.visit_date), "MMM d, yyyy")}
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="font-medium">{r.full_name}</div>
+                    {r.address && (
+                      <div className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <MapPin className="h-3 w-3" /> {r.address}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 tabular-nums">{r.age ?? "—"}</td>
+                  <td className="px-3 py-2">
+                    {r.contact_number ? (
+                      <div className="inline-flex items-center gap-1 text-[12px]">
+                        <Phone className="h-3 w-3 text-muted-foreground" /> {r.contact_number}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] border ${r.source === "invited" ? "border-foreground/20 bg-foreground/5" : "border-border text-muted-foreground"}`}
+                    >
+                      {r.source === "invited" ? "Invited" : "Walk-in"}
+                    </span>
+                    {r.source === "invited" && r.invited_by && (
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        by {r.invited_by}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3 py-2">
+                    {r.can_visit ? (
+                      <div>
+                        <div className="text-foreground">Yes</div>
+                        {r.visit_when && (
+                          <div className="text-[11px] text-muted-foreground">
+                            {format(new Date(r.visit_when), "MMM d, yyyy")}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">No</span>
+                    )}
+                  </td>
+                  {!currentChurchId && (
+                    <td className="px-3 py-2 text-muted-foreground">{r.churches?.name ?? "—"}</td>
+                  )}
+                  <td className="px-3 py-2">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => openEdit(r)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete visitor?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently remove {r.full_name} from visitors.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteM.mutate(r.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -324,7 +391,11 @@ function VisitorsPage() {
 }
 
 function VisitorFormDialog({
-  form, setForm, onSubmit, saving, editing,
+  form,
+  setForm,
+  onSubmit,
+  saving,
+  editing,
 }: {
   form: FormState;
   setForm: (f: FormState) => void;
@@ -341,23 +412,50 @@ function VisitorFormDialog({
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="visit_date">Date</Label>
-          <Input id="visit_date" type="date" value={form.visit_date} onChange={(e) => set("visit_date", e.target.value)} />
+          <Input
+            id="visit_date"
+            type="date"
+            value={form.visit_date}
+            onChange={(e) => set("visit_date", e.target.value)}
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="full_name">Name</Label>
-          <Input id="full_name" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} placeholder="Juan Dela Cruz" />
+          <Input
+            id="full_name"
+            value={form.full_name}
+            onChange={(e) => set("full_name", e.target.value)}
+            placeholder="Juan Dela Cruz"
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="age">Age</Label>
-          <Input id="age" type="number" min={0} max={150} value={form.age} onChange={(e) => set("age", e.target.value)} />
+          <Input
+            id="age"
+            type="number"
+            min={0}
+            max={150}
+            value={form.age}
+            onChange={(e) => set("age", e.target.value)}
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="contact_number">Contact number</Label>
-          <Input id="contact_number" value={form.contact_number} onChange={(e) => set("contact_number", e.target.value)} placeholder="+63 917 000 0000" />
+          <Input
+            id="contact_number"
+            value={form.contact_number}
+            onChange={(e) => set("contact_number", e.target.value)}
+            placeholder="+63 917 000 0000"
+          />
         </div>
         <div className="space-y-1.5 col-span-2">
           <Label htmlFor="address">Address</Label>
-          <Textarea id="address" rows={2} value={form.address} onChange={(e) => set("address", e.target.value)} />
+          <Textarea
+            id="address"
+            rows={2}
+            value={form.address}
+            onChange={(e) => set("address", e.target.value)}
+          />
         </div>
 
         <div className="space-y-1.5 col-span-2">
@@ -383,16 +481,18 @@ function VisitorFormDialog({
         {form.source === "invited" && (
           <div className="space-y-1.5 col-span-2">
             <Label htmlFor="invited_by">Who invited you?</Label>
-            <Input id="invited_by" value={form.invited_by} onChange={(e) => set("invited_by", e.target.value)} placeholder="Member name" />
+            <Input
+              id="invited_by"
+              value={form.invited_by}
+              onChange={(e) => set("invited_by", e.target.value)}
+              placeholder="Member name"
+            />
           </div>
         )}
 
         <div className="space-y-1.5 col-span-2">
           <label className="flex items-center gap-2 text-sm">
-            <Checkbox
-              checked={form.can_visit}
-              onCheckedChange={(v) => set("can_visit", !!v)}
-            />
+            <Checkbox checked={form.can_visit} onCheckedChange={(v) => set("can_visit", !!v)} />
             Can we visit you?
           </label>
         </div>
@@ -400,17 +500,30 @@ function VisitorFormDialog({
         {form.can_visit && (
           <div className="space-y-1.5 col-span-2">
             <Label htmlFor="visit_when">When?</Label>
-            <Input id="visit_when" type="date" value={form.visit_when} onChange={(e) => set("visit_when", e.target.value)} />
+            <Input
+              id="visit_when"
+              type="date"
+              value={form.visit_when}
+              onChange={(e) => set("visit_when", e.target.value)}
+            />
           </div>
         )}
 
         <div className="space-y-1.5 col-span-2">
           <Label htmlFor="notes">Notes</Label>
-          <Textarea id="notes" rows={3} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Prayer requests, follow-up notes…" />
+          <Textarea
+            id="notes"
+            rows={3}
+            value={form.notes}
+            onChange={(e) => set("notes", e.target.value)}
+            placeholder="Prayer requests, follow-up notes…"
+          />
         </div>
       </div>
       <DialogFooter>
-        <Button onClick={onSubmit} disabled={saving}>{saving ? "Saving…" : editing ? "Save changes" : "Add visitor"}</Button>
+        <Button onClick={onSubmit} disabled={saving}>
+          {saving ? "Saving…" : editing ? "Save changes" : "Add visitor"}
+        </Button>
       </DialogFooter>
     </DialogContent>
   );

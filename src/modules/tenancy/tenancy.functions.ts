@@ -27,7 +27,11 @@ export const getMyContext = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
 
     const [{ data: profile }, { data: userOrgs }, { data: roles }] = await Promise.all([
-      supabase.from("profiles").select("id,email,full_name,avatar_url").eq("id", userId).maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("id,email,full_name,avatar_url")
+        .eq("id", userId)
+        .maybeSingle(),
       supabase
         .from("user_organizations")
         .select("is_org_admin, organizations(id,name,slug)")
@@ -64,7 +68,11 @@ export const getMyContext = createServerFn({ method: "GET" })
 const createChurchSchema = z.object({
   organization_id: z.string().uuid(),
   name: z.string().min(1).max(120),
-  slug: z.string().min(1).max(60).regex(/^[a-z0-9-]+$/, "lowercase, digits, dashes"),
+  slug: z
+    .string()
+    .min(1)
+    .max(60)
+    .regex(/^[a-z0-9-]+$/, "lowercase, digits, dashes"),
   city: z.string().max(120).optional().nullable(),
   address: z.string().max(240).optional().nullable(),
   currency: z.string().min(3).max(3).default("PHP"),
@@ -74,7 +82,11 @@ export const createChurch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => createChurchSchema.parse(d))
   .handler(async ({ context, data }) => {
-    const { data: row, error } = await context.supabase.from("churches").insert(data).select().single();
+    const { data: row, error } = await context.supabase
+      .from("churches")
+      .insert(data)
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return row;
   });
@@ -103,7 +115,9 @@ export const updateOrganization = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => updateOrgSchema.parse(d))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
-      .from("organizations").update({ name: data.name }).eq("id", data.id);
+      .from("organizations")
+      .update({ name: data.name })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

@@ -21,12 +21,18 @@ function OrgSettings() {
   const { register, handleSubmit } = useForm({ values: { name: org?.name ?? "" } });
   const mut = useMutation({
     mutationFn: (v: { name: string }) => fn({ data: { id: org!.id, name: v.name } }),
-    onSuccess: () => { toast.success("Saved"); qc.invalidateQueries({ queryKey: ["me-context"] }); },
+    onSuccess: () => {
+      toast.success("Saved");
+      qc.invalidateQueries({ queryKey: ["me-context"] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
   if (!org) return null;
   return (
-    <form onSubmit={handleSubmit((v) => mut.mutate(v))} className="border border-border rounded-lg bg-card p-5 space-y-4 max-w-lg">
+    <form
+      onSubmit={handleSubmit((v) => mut.mutate(v))}
+      className="border border-border rounded-lg bg-card p-5 space-y-4 max-w-lg"
+    >
       <div>
         <h2 className="text-[14px] font-medium">Organization</h2>
         <p className="text-[12px] text-muted-foreground">Parent of all your churches.</p>
@@ -36,7 +42,9 @@ function OrgSettings() {
         <Input {...register("name", { required: true })} />
       </div>
       <div className="flex justify-end">
-        <Button type="submit" disabled={mut.isPending}>Save changes</Button>
+        <Button type="submit" disabled={mut.isPending}>
+          Save changes
+        </Button>
       </div>
     </form>
   );

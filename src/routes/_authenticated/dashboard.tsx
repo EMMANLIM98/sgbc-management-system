@@ -4,13 +4,32 @@ import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/shell/page-header";
 import { useCurrentChurch } from "@/hooks/use-current-church";
 import {
-  getKpis, getMembershipGrowth, getRecentActivities, getChurchesOverview,
+  getKpis,
+  getMembershipGrowth,
+  getRecentActivities,
+  getChurchesOverview,
 } from "@/modules/dashboard/dashboard.functions";
 import { formatNumber, formatPHP } from "@/lib/money";
-import { Users, UserCheck, UserPlus, Building2, TrendingUp, ArrowRight, Plus, DollarSign, Calendar } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  UserPlus,
+  Building2,
+  TrendingUp,
+  ArrowRight,
+  Plus,
+  DollarSign,
+  Calendar,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 import { formatDistanceToNow } from "date-fns";
 
@@ -46,7 +65,9 @@ function Dashboard() {
     enabled: !currentChurchId,
   });
 
-  const scopeLabel = currentChurchId ? currentChurch?.name ?? "Church" : `All Churches (${churches.length})`;
+  const scopeLabel = currentChurchId
+    ? (currentChurch?.name ?? "Church")
+    : `All Churches (${churches.length})`;
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
@@ -54,19 +75,29 @@ function Dashboard() {
         title="Dashboard"
         description={`Overview — ${scopeLabel}`}
         actions={
-          <Button asChild size="sm"><Link to="/members"><Plus className="h-4 w-4 mr-1.5" />Add member</Link></Button>
+          <Button asChild size="sm">
+            <Link to="/members">
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add member
+            </Link>
+          </Button>
         }
       />
 
       {!currentChurchId && overview && overview.length > 0 && (
         <div className="mb-6">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Our churches</div>
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+            Our churches
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
             {overview.map((c) => (
               <div key={c.id} className="border border-border rounded-md p-3 bg-card">
                 <div className="text-[13px] font-medium truncate">{c.name}</div>
                 <div className="text-[11px] text-muted-foreground">{c.city || "—"}</div>
-                <div className="mt-2 text-sm tabular">{formatNumber(c.members)} <span className="text-[11px] text-muted-foreground">members</span></div>
+                <div className="mt-2 text-sm tabular">
+                  {formatNumber(c.members)}{" "}
+                  <span className="text-[11px] text-muted-foreground">members</span>
+                </div>
               </div>
             ))}
           </div>
@@ -74,7 +105,12 @@ function Dashboard() {
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <KPI icon={Users} label="Total members" value={formatNumber(kpis?.total_members)} sub={`+${kpis?.new_last_30 ?? 0} in last 30d`} />
+        <KPI
+          icon={Users}
+          label="Total members"
+          value={formatNumber(kpis?.total_members)}
+          sub={`+${kpis?.new_last_30 ?? 0} in last 30d`}
+        />
         <KPI icon={UserCheck} label="Active" value={formatNumber(kpis?.active_members)} />
         <KPI icon={UserPlus} label="Visitors" value={formatNumber(kpis?.visitors)} />
         <KPI icon={Building2} label="Churches" value={formatNumber(kpis?.churches)} />
@@ -93,10 +129,27 @@ function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={growth ?? []} margin={{ left: -20, right: 8, top: 8, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.005 260)" />
-                <XAxis dataKey="label" fontSize={11} stroke="oklch(0.5 0.01 260)" tickLine={false} axisLine={false} />
-                <YAxis fontSize={11} stroke="oklch(0.5 0.01 260)" tickLine={false} axisLine={false} />
+                <XAxis
+                  dataKey="label"
+                  fontSize={11}
+                  stroke="oklch(0.5 0.01 260)"
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  fontSize={11}
+                  stroke="oklch(0.5 0.01 260)"
+                  tickLine={false}
+                  axisLine={false}
+                />
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
-                <Line type="monotone" dataKey="count" stroke="oklch(0.55 0.18 258)" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="oklch(0.55 0.18 258)"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -160,7 +213,17 @@ function Dashboard() {
   );
 }
 
-function KPI({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub?: string }) {
+function KPI({
+  icon: Icon,
+  label,
+  value,
+  sub,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  sub?: string;
+}) {
   return (
     <div className="border border-border rounded-lg bg-card p-4">
       <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -175,7 +238,10 @@ function KPI({ icon: Icon, label, value, sub }: { icon: any; label: string; valu
 
 function QuickLink({ to, icon: Icon, label }: { to: string; icon: any; label: string }) {
   return (
-    <Link to={to as any} className="flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] hover:bg-accent">
+    <Link
+      to={to as any}
+      className="flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] hover:bg-accent"
+    >
       <Icon className="h-4 w-4 text-muted-foreground" />
       <span className="flex-1">{label}</span>
       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />

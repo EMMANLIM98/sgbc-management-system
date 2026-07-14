@@ -1,8 +1,14 @@
 import type { ReactNode } from "react";
 
 export function PageHeader({
-  title, description, actions,
-}: { title: string; description?: string; actions?: ReactNode }) {
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
   return (
     <div className="flex items-start justify-between gap-4 mb-6">
       <div className="min-w-0">

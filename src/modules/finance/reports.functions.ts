@@ -17,18 +17,25 @@ async function buildReport(sb: any, data: z.infer<typeof input>) {
     ? new Date(Date.UTC(data.year, (data.month ?? 1) - 1, 1))
     : new Date(Date.UTC(data.year, 0, 1));
   const end = isMonthly
-    ? new Date(Date.UTC(data.year, (data.month ?? 1), 1))
+    ? new Date(Date.UTC(data.year, data.month ?? 1, 1))
     : new Date(Date.UTC(data.year + 1, 0, 1));
   const startS = start.toISOString().slice(0, 10);
   const endS = end.toISOString().slice(0, 10);
 
-  let cq = sb.from("contributions")
+  let cq = sb
+    .from("contributions")
     .select("amount, occurred_on, currency, churches(name), finance_categories(name)")
-    .gte("occurred_on", startS).lt("occurred_on", endS);
-  let eq = sb.from("expenses")
+    .gte("occurred_on", startS)
+    .lt("occurred_on", endS);
+  let eq = sb
+    .from("expenses")
     .select("amount, occurred_on, currency, churches(name), finance_categories(name)")
-    .gte("occurred_on", startS).lt("occurred_on", endS);
-  if (data.church_id) { cq = cq.eq("church_id", data.church_id); eq = eq.eq("church_id", data.church_id); }
+    .gte("occurred_on", startS)
+    .lt("occurred_on", endS);
+  if (data.church_id) {
+    cq = cq.eq("church_id", data.church_id);
+    eq = eq.eq("church_id", data.church_id);
+  }
   const [{ data: cRows, error: cErr }, { data: eRows, error: eErr }] = await Promise.all([cq, eq]);
   if (cErr) throw new Error(cErr.message);
   if (eErr) throw new Error(eErr.message);
@@ -54,24 +61,55 @@ async function buildReport(sb: any, data: z.infer<typeof input>) {
   if (isMonthly) {
     // daily buckets
     const days = Math.round((end.getTime() - start.getTime()) / 86400000);
-    const buckets: Record<string, { label: string; key: string; giving: number; expenses: number }> = {};
+    const buckets: Record<
+      string,
+      { label: string; key: string; giving: number; expenses: number }
+    > = {};
     for (let i = 0; i < days; i++) {
       const d = new Date(start.getTime() + i * 86400000);
       const key = d.toISOString().slice(0, 10);
       buckets[key] = { key, label: String(d.getUTCDate()), giving: 0, expenses: 0 };
     }
-    for (const r of cRows ?? []) { const k = (r.occurred_on as string).slice(0, 10); if (buckets[k]) buckets[k].giving += Number(r.amount); }
-    for (const r of eRows ?? []) { const k = (r.occurred_on as string).slice(0, 10); if (buckets[k]) buckets[k].expenses += Number(r.amount); }
+    for (const r of cRows ?? []) {
+      const k = (r.occurred_on as string).slice(0, 10);
+      if (buckets[k]) buckets[k].giving += Number(r.amount);
+    }
+    for (const r of eRows ?? []) {
+      const k = (r.occurred_on as string).slice(0, 10);
+      if (buckets[k]) buckets[k].expenses += Number(r.amount);
+    }
     trend = Object.values(buckets);
   } else {
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const buckets: Record<string, { label: string; key: string; giving: number; expenses: number }> = {};
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const buckets: Record<
+      string,
+      { label: string; key: string; giving: number; expenses: number }
+    > = {};
     for (let m = 0; m < 12; m++) {
       const key = `${data.year}-${String(m + 1).padStart(2, "0")}`;
       buckets[key] = { key, label: months[m], giving: 0, expenses: 0 };
     }
-    for (const r of cRows ?? []) { const k = (r.occurred_on as string).slice(0, 7); if (buckets[k]) buckets[k].giving += Number(r.amount); }
-    for (const r of eRows ?? []) { const k = (r.occurred_on as string).slice(0, 7); if (buckets[k]) buckets[k].expenses += Number(r.amount); }
+    for (const r of cRows ?? []) {
+      const k = (r.occurred_on as string).slice(0, 7);
+      if (buckets[k]) buckets[k].giving += Number(r.amount);
+    }
+    for (const r of eRows ?? []) {
+      const k = (r.occurred_on as string).slice(0, 7);
+      if (buckets[k]) buckets[k].expenses += Number(r.amount);
+    }
     trend = Object.values(buckets);
   }
 
@@ -82,15 +120,22 @@ async function buildReport(sb: any, data: z.infer<typeof input>) {
     for (const r of cRows ?? []) {
       const n = (r as any).churches?.name ?? "—";
       const cur = map.get(n) ?? { giving: 0, expenses: 0 };
-      cur.giving += Number(r.amount); map.set(n, cur);
+      cur.giving += Number(r.amount);
+      map.set(n, cur);
     }
     for (const r of eRows ?? []) {
       const n = (r as any).churches?.name ?? "—";
       const cur = map.get(n) ?? { giving: 0, expenses: 0 };
-      cur.expenses += Number(r.amount); map.set(n, cur);
+      cur.expenses += Number(r.amount);
+      map.set(n, cur);
     }
     byChurch = Array.from(map.entries())
-      .map(([name, v]) => ({ name, giving: v.giving, expenses: v.expenses, net: v.giving - v.expenses }))
+      .map(([name, v]) => ({
+        name,
+        giving: v.giving,
+        expenses: v.expenses,
+        net: v.giving - v.expenses,
+      }))
       .sort((a, b) => b.giving - a.giving);
   }
 

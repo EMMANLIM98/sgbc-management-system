@@ -4,12 +4,14 @@ import { Check, ChevronsUpDown, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel,
-  DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover, PopoverContent, PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCurrentChurch } from "@/hooks/use-current-church";
 import type { MyContext } from "@/modules/tenancy/tenancy.functions";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,7 +24,13 @@ export function Topbar({ ctx }: { ctx: MyContext }) {
 
   const initials = useMemo(() => {
     const n = ctx.user.full_name ?? ctx.user.email ?? "?";
-    return n.split(/\s+/).map((s) => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+    return n
+      .split(/\s+/)
+      .map((s) => s[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
   }, [ctx.user]);
 
   async function handleSignOut() {
@@ -42,7 +50,9 @@ export function Topbar({ ctx }: { ctx: MyContext }) {
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[13px] font-medium">
-              {currentChurchId ? currentChurch?.name ?? "Church" : `All Churches (${churches.length})`}
+              {currentChurchId
+                ? (currentChurch?.name ?? "Church")
+                : `All Churches (${churches.length})`}
               <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground" />
             </Button>
           </PopoverTrigger>
@@ -63,7 +73,9 @@ export function Topbar({ ctx }: { ctx: MyContext }) {
                   onClick={() => setCurrentChurchId(c.id)}
                   className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] hover:bg-accent text-left"
                 >
-                  <Check className={"h-3.5 w-3.5 " + (currentChurchId === c.id ? "" : "opacity-0")} />
+                  <Check
+                    className={"h-3.5 w-3.5 " + (currentChurchId === c.id ? "" : "opacity-0")}
+                  />
                   <span className="flex-1 truncate">{c.name}</span>
                   {c.city && <span className="text-[11px] text-muted-foreground">{c.city}</span>}
                 </button>
@@ -71,7 +83,9 @@ export function Topbar({ ctx }: { ctx: MyContext }) {
               {churches.length === 0 && (
                 <div className="px-2 py-3 text-[12px] text-muted-foreground">
                   No churches yet.{" "}
-                  <Link to="/settings/churches" className="underline">Create one</Link>
+                  <Link to="/settings/churches" className="underline">
+                    Create one
+                  </Link>
                 </div>
               )}
             </div>
@@ -98,10 +112,14 @@ export function Topbar({ ctx }: { ctx: MyContext }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/settings/profile"><User className="mr-2 h-4 w-4" />Profile</Link>
+              <Link to="/settings/profile">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />Sign out
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

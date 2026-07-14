@@ -10,7 +10,12 @@ export async function downloadReceiptPdf(row: {
   occurred_on: string;
   finance_categories?: { name?: string } | null;
   churches?: { name?: string } | null;
-  members?: { first_name?: string; last_name?: string; email?: string | null; phone?: string | null } | null;
+  members?: {
+    first_name?: string;
+    last_name?: string;
+    email?: string | null;
+    phone?: string | null;
+  } | null;
 }) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a5" });
@@ -43,7 +48,12 @@ export async function downloadReceiptPdf(row: {
   y += 18;
 
   const rows: [string, string][] = [
-    ["Received from", row.members ? `${row.members.first_name ?? ""} ${row.members.last_name ?? ""}`.trim() : "Anonymous"],
+    [
+      "Received from",
+      row.members
+        ? `${row.members.first_name ?? ""} ${row.members.last_name ?? ""}`.trim()
+        : "Anonymous",
+    ],
     ["Date", new Date(row.occurred_on).toLocaleDateString()],
     ["Category", row.finance_categories?.name ?? "—"],
     ["Method", row.method ?? "—"],

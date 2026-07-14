@@ -11,9 +11,15 @@ export const Route = createFileRoute("/_authenticated/inventory")({
       icon={Package}
       tagline="Know what you have, where it is."
       features={[
-        { title: "Items & Categories", description: "Chairs, instruments, media gear, curriculum and more." },
+        {
+          title: "Items & Categories",
+          description: "Chairs, instruments, media gear, curriculum and more.",
+        },
         { title: "Locations", description: "Rooms, buildings, and campuses." },
-        { title: "Stock & Movements", description: "Track quantities, borrow, return and disposal." },
+        {
+          title: "Stock & Movements",
+          description: "Track quantities, borrow, return and disposal.",
+        },
         { title: "Maintenance", description: "Schedule service and repairs for equipment." },
       ]}
     />

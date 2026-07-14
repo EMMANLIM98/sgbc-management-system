@@ -11,7 +11,11 @@ import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { formatNumber } from "@/lib/money";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/members/")({
@@ -19,7 +23,11 @@ export const Route = createFileRoute("/_authenticated/members/")({
 });
 
 const STATUS_LABEL: Record<string, string> = {
-  visitor: "Visitor", regular: "Regular", member: "Member", inactive: "Inactive", transferred: "Transferred",
+  visitor: "Visitor",
+  regular: "Regular",
+  member: "Member",
+  inactive: "Inactive",
+  transferred: "Transferred",
 };
 
 function MembersList() {
@@ -48,7 +56,9 @@ function MembersList() {
   const rows = data?.rows ?? [];
   const total = data?.count ?? 0;
   const pages = Math.max(1, Math.ceil(total / pageSize));
-  const scopeLabel = currentChurchId ? currentChurch?.name ?? "Church" : `All Churches (${churches.length})`;
+  const scopeLabel = currentChurchId
+    ? (currentChurch?.name ?? "Church")
+    : `All Churches (${churches.length})`;
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
@@ -57,7 +67,10 @@ function MembersList() {
         description={`${formatNumber(total)} people — ${scopeLabel}`}
         actions={
           <Button asChild size="sm">
-            <Link to="/members/new"><Plus className="h-4 w-4 mr-1.5" />Add member</Link>
+            <Link to="/members/new">
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add member
+            </Link>
           </Button>
         }
       />
@@ -67,13 +80,24 @@ function MembersList() {
           <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
-            onChange={(e) => { setQ(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
             placeholder="Search name or email…"
             className="pl-8 h-9"
           />
         </div>
-        <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
-          <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+        <Select
+          value={status}
+          onValueChange={(v) => {
+            setStatus(v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="h-9 w-40">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="visitor">Visitor</SelectItem>
@@ -98,17 +122,31 @@ function MembersList() {
           </thead>
           <tbody className="divide-y divide-border">
             {isLoading && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">Loading…</td></tr>
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  Loading…
+                </td>
+              </tr>
             )}
             {!isLoading && rows.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
-                No members yet. <Link to="/members/new" className="underline">Add your first</Link>.
-              </td></tr>
+              <tr>
+                <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
+                  No members yet.{" "}
+                  <Link to="/members/new" className="underline">
+                    Add your first
+                  </Link>
+                  .
+                </td>
+              </tr>
             )}
             {rows.map((m: any) => (
               <tr key={m.id} className="hover:bg-accent/40">
                 <td className="px-4 py-2">
-                  <Link to="/members/$id" params={{ id: m.id }} className="font-medium hover:underline">
+                  <Link
+                    to="/members/$id"
+                    params={{ id: m.id }}
+                    className="font-medium hover:underline"
+                  >
                     {m.last_name}, {m.first_name}
                   </Link>
                 </td>
@@ -134,10 +172,20 @@ function MembersList() {
             Page {page} of {pages} · {formatNumber(total)} total
           </div>
           <div className="flex gap-1">
-            <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" disabled={page === pages} onClick={() => setPage((p) => p + 1)}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === pages}
+              onClick={() => setPage((p) => p + 1)}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -156,7 +204,12 @@ function StatusPill({ status }: { status: string }) {
     transferred: "bg-muted text-muted-foreground border-border",
   };
   return (
-    <span className={"inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] " + (map[status] ?? "")}>
+    <span
+      className={
+        "inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] " +
+        (map[status] ?? "")
+      }
+    >
       {STATUS_LABEL[status] ?? status}
     </span>
   );

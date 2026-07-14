@@ -11,10 +11,19 @@ export const Route = createFileRoute("/_authenticated/visitation")({
       icon={Home}
       tagline="Care in every home."
       features={[
-        { title: "Visit Requests", description: "Log requests from members, visitors, or referrals." },
-        { title: "Assignments", description: "Assign visits to pastors, deacons, or ministry teams." },
+        {
+          title: "Visit Requests",
+          description: "Log requests from members, visitors, or referrals.",
+        },
+        {
+          title: "Assignments",
+          description: "Assign visits to pastors, deacons, or ministry teams.",
+        },
         { title: "Visit Notes", description: "Record outcomes, prayer needs, and follow-ups." },
-        { title: "Follow-up Schedule", description: "Track next visit dates and pending care items." },
+        {
+          title: "Follow-up Schedule",
+          description: "Track next visit dates and pending care items.",
+        },
       ]}
     />
   ),

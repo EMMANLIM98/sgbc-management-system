@@ -21,7 +21,9 @@ function TeamSettings() {
     <div className="space-y-4 max-w-2xl">
       <div>
         <h2 className="text-[14px] font-medium">Team</h2>
-        <p className="text-[12px] text-muted-foreground">People with access to your organization. Invite flow ships next.</p>
+        <p className="text-[12px] text-muted-foreground">
+          People with access to your organization. Invite flow ships next.
+        </p>
       </div>
       <div className="border border-border rounded-lg bg-card divide-y divide-border">
         {(team ?? []).map((m: any) => (

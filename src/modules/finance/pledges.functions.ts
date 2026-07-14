@@ -21,10 +21,12 @@ const pledgeInput = z.object({
 export const listPledges = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    scope.extend({
-      status: z.enum(["all", "active", "fulfilled", "cancelled"]).default("all"),
-      member_id: z.string().uuid().nullable().optional(),
-    }).parse(d),
+    scope
+      .extend({
+        status: z.enum(["all", "active", "fulfilled", "cancelled"]).default("all"),
+        member_id: z.string().uuid().nullable().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     let q = context.supabase
@@ -83,9 +85,7 @@ export const createPledge = createServerFn({ method: "POST" })
 
 export const updatePledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    pledgeInput.partial().extend({ id: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: unknown) => pledgeInput.partial().extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { id, ...patch } = data;
     const { error } = await context.supabase.from("pledges").update(patch).eq("id", id);

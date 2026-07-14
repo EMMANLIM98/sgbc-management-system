@@ -7,15 +7,19 @@ const scope = z.object({ church_id: z.string().uuid().nullable().optional() });
 export const listVisitors = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    scope.extend({
-      q: z.string().max(120).optional().default(""),
-      source: z.enum(["invited", "walk_in"]).nullable().optional(),
-    }).parse(d),
+    scope
+      .extend({
+        q: z.string().max(120).optional().default(""),
+        source: z.enum(["invited", "walk_in"]).nullable().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     let q = context.supabase
       .from("visitors")
-      .select("id, church_id, visit_date, full_name, age, address, contact_number, source, invited_by, can_visit, visit_when, notes, created_at, churches(name)")
+      .select(
+        "id, church_id, visit_date, full_name, age, address, contact_number, source, invited_by, can_visit, visit_when, notes, created_at, churches(name)",
+      )
       .order("visit_date", { ascending: false })
       .order("created_at", { ascending: false });
     if (data.church_id) q = q.eq("church_id", data.church_id);

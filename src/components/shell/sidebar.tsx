@@ -1,7 +1,18 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, Wallet, GraduationCap, HeartHandshake, Sparkles,
-  ClipboardList, Home as HomeIcon, MapPin, UserPlus, CalendarCheck2, Package, Settings,
+  LayoutDashboard,
+  Users,
+  Wallet,
+  GraduationCap,
+  HeartHandshake,
+  Sparkles,
+  ClipboardList,
+  Home as HomeIcon,
+  MapPin,
+  UserPlus,
+  CalendarCheck2,
+  Package,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +38,9 @@ export function Sidebar() {
     <aside className="hidden md:flex md:w-60 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
       <div className="h-14 px-4 flex items-center border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold tabular">CO</div>
+          <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold tabular">
+            CO
+          </div>
           <div className="text-sm font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
         </div>
       </div>
@@ -37,17 +50,25 @@ export function Sidebar() {
           return (
             <Link
               key={to}
-              to={soon ? "/dashboard" : to as any}
-              onClick={(e) => { if (soon) e.preventDefault(); }}
+              to={soon ? "/dashboard" : (to as any)}
+              onClick={(e) => {
+                if (soon) e.preventDefault();
+              }}
               className={cn(
                 "group flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] transition-colors",
-                active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                active
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 soon && "opacity-60 cursor-not-allowed",
               )}
             >
               <Icon className="h-4 w-4" />
               <span className="flex-1">{label}</span>
-              {soon && <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">soon</span>}
+              {soon && (
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                  soon
+                </span>
+              )}
             </Link>
           );
         })}

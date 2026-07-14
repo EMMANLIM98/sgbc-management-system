@@ -23,7 +23,12 @@ export const listGivingCategories = createServerFn({ method: "GET" })
 export const listMemberPicker = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    scope.extend({ q: z.string().max(120).optional().default(""), limit: z.number().int().min(1).max(50).default(20) }).parse(d),
+    scope
+      .extend({
+        q: z.string().max(120).optional().default(""),
+        limit: z.number().int().min(1).max(50).default(20),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     let query = context.supabase
@@ -141,10 +146,17 @@ export const getMemberGivingSummary = createServerFn({ method: "GET" })
     for (const r of rows ?? []) {
       const m: any = (r as any).members;
       if (!m) continue;
-      const cur = map.get(m.id) ?? { id: m.id, name: `${m.first_name} ${m.last_name}`, total: 0, count: 0 };
+      const cur = map.get(m.id) ?? {
+        id: m.id,
+        name: `${m.first_name} ${m.last_name}`,
+        total: 0,
+        count: 0,
+      };
       cur.total += Number((r as any).amount);
       cur.count += 1;
       map.set(m.id, cur);
     }
-    return Array.from(map.values()).sort((a, b) => b.total - a.total).slice(0, data.limit);
+    return Array.from(map.values())
+      .sort((a, b) => b.total - a.total)
+      .slice(0, data.limit);
   });

@@ -10,30 +10,62 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import {
-  listGivingCategories, listMemberPicker, listContributions,
-  createContribution, deleteContribution, getMemberGivingSummary,
+  listGivingCategories,
+  listMemberPicker,
+  listContributions,
+  createContribution,
+  deleteContribution,
+  getMemberGivingSummary,
 } from "@/modules/finance/contributions.functions";
 import { downloadReceiptPdf } from "@/lib/receipt";
 import { toCsv, downloadCsv } from "@/lib/csv";
-import { HandCoins, Plus, Search, Trash2, User, Users, ArrowLeft, Download, FileText } from "lucide-react";
+import {
+  HandCoins,
+  Plus,
+  Search,
+  Trash2,
+  User,
+  Users,
+  ArrowLeft,
+  Download,
+  FileText,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/finance_/contributions")({
   head: () => ({
     meta: [
       { title: "Giving — Finance" },
-      { name: "description", content: "Track member giving: tithes, offering, missions & grace commitments." },
+      {
+        name: "description",
+        content: "Track member giving: tithes, offering, missions & grace commitments.",
+      },
     ],
   }),
   component: ContributionsPage,
@@ -64,13 +96,14 @@ function ContributionsPage() {
   });
   const { data: list } = useQuery({
     queryKey: ["contributions", currentChurchId, categoryId, memberId],
-    queryFn: () => listFn({
-      data: {
-        church_id: currentChurchId,
-        category_id: categoryId === "all" ? null : categoryId,
-        member_id: memberId === "all" ? null : memberId,
-      },
-    }),
+    queryFn: () =>
+      listFn({
+        data: {
+          church_id: currentChurchId,
+          category_id: categoryId === "all" ? null : categoryId,
+          member_id: memberId === "all" ? null : memberId,
+        },
+      }),
   });
   const { data: topGivers } = useQuery({
     queryKey: ["top-givers", currentChurchId],
@@ -88,7 +121,9 @@ function ContributionsPage() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  const scopeLabel = currentChurchId ? currentChurch?.name ?? "Church" : `All Churches (${churches.length})`;
+  const scopeLabel = currentChurchId
+    ? (currentChurch?.name ?? "Church")
+    : `All Churches (${churches.length})`;
   const totalShown = useMemo(
     () => (list?.rows ?? []).reduce((a: number, r: any) => a + Number(r.amount), 0),
     [list],
@@ -97,7 +132,10 @@ function ContributionsPage() {
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
       <div className="mb-2">
-        <Link to="/finance" className="text-[12px] text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+        <Link
+          to="/finance"
+          className="text-[12px] text-muted-foreground inline-flex items-center gap-1 hover:text-foreground"
+        >
           <ArrowLeft className="h-3.5 w-3.5" /> Finance
         </Link>
       </div>
@@ -121,9 +159,12 @@ function ContributionsPage() {
                     r.note ?? "",
                   ]),
                 ];
-                downloadCsv(`contributions-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
+                downloadCsv(
+                  `contributions-${new Date().toISOString().slice(0, 10)}.csv`,
+                  toCsv(rows),
+                );
               }}
-              disabled={!(list?.rows?.length)}
+              disabled={!list?.rows?.length}
               className="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] rounded-md border border-border hover:bg-accent disabled:opacity-50"
             >
               <Download className="h-3.5 w-3.5" /> Export CSV
@@ -157,25 +198,34 @@ function ContributionsPage() {
               />
             </div>
             <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="h-8 w-[180px] text-[13px]"><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectTrigger className="h-8 w-[180px] text-[13px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
                 {(cats ?? []).map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={memberId} onValueChange={setMemberId}>
-              <SelectTrigger className="h-8 w-[200px] text-[13px]"><SelectValue placeholder="Member" /></SelectTrigger>
+              <SelectTrigger className="h-8 w-[200px] text-[13px]">
+                <SelectValue placeholder="Member" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All members</SelectItem>
                 {(members ?? []).map((m: any) => (
-                  <SelectItem key={m.id} value={m.id}>{m.first_name} {m.last_name}</SelectItem>
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.first_name} {m.last_name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <div className="ml-auto text-[12px] text-muted-foreground">
-              {list?.count ?? 0} entries · <span className="font-medium text-foreground tabular">{formatPHP(totalShown)}</span>
+              {list?.count ?? 0} entries ·{" "}
+              <span className="font-medium text-foreground tabular">{formatPHP(totalShown)}</span>
             </div>
           </div>
 
@@ -194,8 +244,13 @@ function ContributionsPage() {
               </thead>
               <tbody>
                 {(list?.rows ?? []).map((r: any) => (
-                  <tr key={r.id} className="border-b border-border last:border-0 hover:bg-accent/40">
-                    <td className="px-4 py-2 whitespace-nowrap">{new Date(r.occurred_on).toLocaleDateString()}</td>
+                  <tr
+                    key={r.id}
+                    className="border-b border-border last:border-0 hover:bg-accent/40"
+                  >
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {new Date(r.occurred_on).toLocaleDateString()}
+                    </td>
                     <td className="px-4 py-2">
                       {r.members ? (
                         <span className="inline-flex items-center gap-1.5">
@@ -210,14 +265,23 @@ function ContributionsPage() {
                       <span className="inline-flex items-center gap-1.5">
                         <span
                           className="h-2 w-2 rounded-full"
-                          style={{ background: r.finance_categories?.color ?? "hsl(var(--muted-foreground))" }}
+                          style={{
+                            background:
+                              r.finance_categories?.color ?? "hsl(var(--muted-foreground))",
+                          }}
                         />
                         {r.finance_categories?.name ?? "—"}
                       </span>
                     </td>
-                    <td className="px-4 py-2 capitalize text-muted-foreground">{r.method ?? "—"}</td>
-                    {!currentChurchId && <td className="px-4 py-2 text-muted-foreground">{r.churches?.name}</td>}
-                    <td className="px-4 py-2 text-right font-medium tabular">{formatPHP(Number(r.amount))}</td>
+                    <td className="px-4 py-2 capitalize text-muted-foreground">
+                      {r.method ?? "—"}
+                    </td>
+                    {!currentChurchId && (
+                      <td className="px-4 py-2 text-muted-foreground">{r.churches?.name}</td>
+                    )}
+                    <td className="px-4 py-2 text-right font-medium tabular">
+                      {formatPHP(Number(r.amount))}
+                    </td>
                     <td className="px-2 py-2">
                       <div className="flex items-center gap-0.5 justify-end">
                         {r.members && (
@@ -231,30 +295,42 @@ function ContributionsPage() {
                           </button>
                         )}
                         <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button className="p-1 text-muted-foreground hover:text-destructive" aria-label="Delete">
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete this giving entry?</AlertDialogTitle>
-                            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => delMut.mutate(r.id)}>Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              className="p-1 text-muted-foreground hover:text-destructive"
+                              aria-label="Delete"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this giving entry?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => delMut.mutate(r.id)}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </td>
                   </tr>
                 ))}
                 {(list?.rows ?? []).length === 0 && (
                   <tr>
-                    <td colSpan={currentChurchId ? 6 : 7} className="px-4 py-12 text-center text-muted-foreground text-[13px]">
-                      No giving recorded yet. Click <span className="font-medium text-foreground">Record giving</span> to add the first entry.
+                    <td
+                      colSpan={currentChurchId ? 6 : 7}
+                      className="px-4 py-12 text-center text-muted-foreground text-[13px]"
+                    >
+                      No giving recorded yet. Click{" "}
+                      <span className="font-medium text-foreground">Record giving</span> to add the
+                      first entry.
                     </td>
                   </tr>
                 )}
@@ -267,9 +343,13 @@ function ContributionsPage() {
           <div className="flex items-center gap-2 text-[13px] font-medium">
             <Users className="h-3.5 w-3.5" /> Top givers (YTD)
           </div>
-          <div className="text-[11px] text-muted-foreground mb-3">By total contributions this year</div>
+          <div className="text-[11px] text-muted-foreground mb-3">
+            By total contributions this year
+          </div>
           {(topGivers ?? []).length === 0 ? (
-            <div className="text-[12px] text-muted-foreground py-6 text-center">No named giving recorded yet.</div>
+            <div className="text-[12px] text-muted-foreground py-6 text-center">
+              No named giving recorded yet.
+            </div>
           ) : (
             <ul className="space-y-2">
               {(topGivers ?? []).map((g: any, i: number) => (
@@ -277,7 +357,11 @@ function ContributionsPage() {
                   <div className="h-6 w-6 rounded-full bg-accent grid place-items-center text-[11px] font-medium">
                     {i + 1}
                   </div>
-                    <Link to="/finance/members/$id" params={{ id: g.id }} className="flex-1 min-w-0 truncate hover:underline">
+                  <Link
+                    to="/finance/members/$id"
+                    params={{ id: g.id }}
+                    className="flex-1 min-w-0 truncate hover:underline"
+                  >
                     {g.name}
                   </Link>
                   <div className="text-right">
@@ -288,11 +372,14 @@ function ContributionsPage() {
               ))}
             </ul>
           )}
-            <div className="mt-3 pt-3 border-t border-border">
-              <Link to="/finance/member-reports" className="text-[12px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-                Full member giving report →
-              </Link>
-            </div>
+          <div className="mt-3 pt-3 border-t border-border">
+            <Link
+              to="/finance/member-reports"
+              className="text-[12px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            >
+              Full member giving report →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -300,7 +387,9 @@ function ContributionsPage() {
 }
 
 function RecordGivingDialog({
-  onClose, defaultChurchId, churches,
+  onClose,
+  defaultChurchId,
+  churches,
 }: {
   onClose: () => void;
   defaultChurchId: string;
@@ -376,9 +465,15 @@ function RecordGivingDialog({
           <div className="col-span-2">
             <Label className="text-[12px]">Church</Label>
             <Select value={churchId} onValueChange={setChurchId}>
-              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {churches.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
+                {churches.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -387,12 +482,17 @@ function RecordGivingDialog({
         <div className="col-span-2">
           <Label className="text-[12px]">Category</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger className="h-9"><SelectValue placeholder="Tithes, Offering, Missions…" /></SelectTrigger>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Tithes, Offering, Missions…" />
+            </SelectTrigger>
             <SelectContent>
               {(cats ?? []).map((c: any) => (
                 <SelectItem key={c.id} value={c.id}>
                   <span className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full" style={{ background: c.color ?? "currentColor" }} />
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ background: c.color ?? "currentColor" }}
+                    />
                     {c.name}
                   </span>
                 </SelectItem>
@@ -410,11 +510,15 @@ function RecordGivingDialog({
             className="h-8 mb-2"
           />
           <Select value={memberId} onValueChange={setMemberId}>
-            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="anonymous">Anonymous / unnamed</SelectItem>
               {(members ?? []).map((m: any) => (
-                <SelectItem key={m.id} value={m.id}>{m.first_name} {m.last_name}</SelectItem>
+                <SelectItem key={m.id} value={m.id}>
+                  {m.first_name} {m.last_name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -423,19 +527,31 @@ function RecordGivingDialog({
         <div>
           <Label className="text-[12px]">Amount (₱)</Label>
           <Input
-            type="number" min="0" step="0.01" inputMode="decimal"
-            value={amount} onChange={(e) => setAmount(e.target.value)} className="h-9"
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-9"
           />
         </div>
         <div>
           <Label className="text-[12px]">Date</Label>
-          <Input type="date" value={occurredOn} onChange={(e) => setOccurredOn(e.target.value)} className="h-9" />
+          <Input
+            type="date"
+            value={occurredOn}
+            onChange={(e) => setOccurredOn(e.target.value)}
+            className="h-9"
+          />
         </div>
 
         <div>
           <Label className="text-[12px]">Method</Label>
           <Select value={method} onValueChange={setMethod}>
-            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="cash">Cash</SelectItem>
               <SelectItem value="check">Check</SelectItem>
@@ -447,7 +563,12 @@ function RecordGivingDialog({
         </div>
         <div>
           <Label className="text-[12px]">Reference</Label>
-          <Input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="OR # / txn id" className="h-9" />
+          <Input
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="OR # / txn id"
+            className="h-9"
+          />
         </div>
 
         <div className="col-span-2">
@@ -457,7 +578,9 @@ function RecordGivingDialog({
       </div>
 
       <DialogFooter>
-        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
         <Button disabled={!canSubmit || createMut.isPending} onClick={() => createMut.mutate()}>
           {createMut.isPending ? "Saving…" : "Save giving"}
         </Button>

@@ -14,10 +14,16 @@ export const getKpis = createServerFn({ method: "GET" })
     const [total, active, visitors, churches] = await Promise.all([
       filterChurch(sb.from("members").select("id", { count: "exact", head: true })),
       filterChurch(
-        sb.from("members").select("id", { count: "exact", head: true }).in("membership_status", ["member", "regular"]),
+        sb
+          .from("members")
+          .select("id", { count: "exact", head: true })
+          .in("membership_status", ["member", "regular"]),
       ),
       filterChurch(
-        sb.from("members").select("id", { count: "exact", head: true }).eq("membership_status", "visitor"),
+        sb
+          .from("members")
+          .select("id", { count: "exact", head: true })
+          .eq("membership_status", "visitor"),
       ),
       data.church_id
         ? Promise.resolve({ count: 1 })
@@ -25,9 +31,13 @@ export const getKpis = createServerFn({ method: "GET" })
     ]);
 
     // Membership growth vs 30 days ago
-    const thirty = new Date(); thirty.setDate(thirty.getDate() - 30);
+    const thirty = new Date();
+    thirty.setDate(thirty.getDate() - 30);
     const growthQ = filterChurch(
-      sb.from("members").select("id", { count: "exact", head: true }).gte("created_at", thirty.toISOString()),
+      sb
+        .from("members")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", thirty.toISOString()),
     );
     const { count: growth } = await growthQ;
 
@@ -45,7 +55,9 @@ export const getKpis = createServerFn({ method: "GET" })
 
 export const getMembershipGrowth = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => scope.extend({ months: z.number().int().min(3).max(24).default(6) }).parse(d))
+  .inputValidator((d: unknown) =>
+    scope.extend({ months: z.number().int().min(3).max(24).default(6) }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     let q = context.supabase.from("members").select("created_at, church_id");
     if (data.church_id) q = q.eq("church_id", data.church_id);
@@ -74,11 +86,15 @@ export const getMembershipGrowth = createServerFn({ method: "GET" })
 
 export const getRecentActivities = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => scope.extend({ limit: z.number().int().min(1).max(50).default(10) }).parse(d))
+  .inputValidator((d: unknown) =>
+    scope.extend({ limit: z.number().int().min(1).max(50).default(10) }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     let q = context.supabase
       .from("activities")
-      .select("id, verb, subject_type, subject_id, meta, created_at, church_id, actor_id, churches(name)")
+      .select(
+        "id, verb, subject_type, subject_id, meta, created_at, church_id, actor_id, churches(name)",
+      )
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (data.church_id) q = q.eq("church_id", data.church_id);
@@ -93,7 +109,10 @@ export const getRecentActivities = createServerFn({ method: "GET" })
         .in("id", actorIds);
       for (const p of profs ?? []) profileMap[p.id] = { full_name: p.full_name };
     }
-    return (rows ?? []).map((r: any) => ({ ...r, profiles: r.actor_id ? profileMap[r.actor_id] ?? null : null }));
+    return (rows ?? []).map((r: any) => ({
+      ...r,
+      profiles: r.actor_id ? (profileMap[r.actor_id] ?? null) : null,
+    }));
   });
 
 export const getChurchesOverview = createServerFn({ method: "GET" })

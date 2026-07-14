@@ -11,10 +11,22 @@ export const Route = createFileRoute("/_authenticated/discipleship")({
       icon={HeartHandshake}
       tagline="Walk with every disciple."
       features={[
-        { title: "Growth Tracks", description: "Define paths: New believer, Baptism, Membership, Leadership." },
-        { title: "Mentor Assignments", description: "Pair mentors with disciples and track progress." },
-        { title: "Small Groups", description: "Manage cell groups, life groups and their meetings." },
-        { title: "Milestones", description: "Record baptisms, commitments, and completion of courses." },
+        {
+          title: "Growth Tracks",
+          description: "Define paths: New believer, Baptism, Membership, Leadership.",
+        },
+        {
+          title: "Mentor Assignments",
+          description: "Pair mentors with disciples and track progress.",
+        },
+        {
+          title: "Small Groups",
+          description: "Manage cell groups, life groups and their meetings.",
+        },
+        {
+          title: "Milestones",
+          description: "Record baptisms, commitments, and completion of courses.",
+        },
       ]}
     />
   ),

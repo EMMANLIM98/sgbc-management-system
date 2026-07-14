@@ -8,10 +8,7 @@ const scopeSchema = z.object({
 
 const listSchema = scopeSchema.extend({
   q: z.string().max(120).optional().default(""),
-  status: z
-    .enum(["visitor", "regular", "member", "inactive", "transferred"])
-    .nullable()
-    .optional(),
+  status: z.enum(["visitor", "regular", "member", "inactive", "transferred"]).nullable().optional(),
   page: z.number().int().min(1).default(1),
   page_size: z.number().int().min(1).max(100).default(25),
   sort: z.enum(["name_asc", "name_desc", "created_desc", "created_asc"]).default("name_asc"),
@@ -34,10 +31,18 @@ export const listMembers = createServerFn({ method: "GET" })
       query = query.or(`first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like}`);
     }
     switch (data.sort) {
-      case "name_asc": query = query.order("last_name").order("first_name"); break;
-      case "name_desc": query = query.order("last_name", { ascending: false }); break;
-      case "created_desc": query = query.order("created_at", { ascending: false }); break;
-      case "created_asc": query = query.order("created_at", { ascending: true }); break;
+      case "name_asc":
+        query = query.order("last_name").order("first_name");
+        break;
+      case "name_desc":
+        query = query.order("last_name", { ascending: false });
+        break;
+      case "created_desc":
+        query = query.order("created_at", { ascending: false });
+        break;
+      case "created_asc":
+        query = query.order("created_at", { ascending: true });
+        break;
     }
     const from = (data.page - 1) * data.page_size;
     const to = from + data.page_size - 1;
@@ -61,7 +66,9 @@ export const getMember = createServerFn({ method: "GET" })
     const [{ data: family }, { data: docs }, { data: transfers }] = await Promise.all([
       context.supabase
         .from("member_family_links")
-        .select("id, relation, related_member_id, members!member_family_links_related_member_id_fkey(id,first_name,last_name)")
+        .select(
+          "id, relation, related_member_id, members!member_family_links_related_member_id_fkey(id,first_name,last_name)",
+        )
         .eq("member_id", data.id),
       context.supabase
         .from("member_documents")
@@ -70,7 +77,9 @@ export const getMember = createServerFn({ method: "GET" })
         .order("uploaded_at", { ascending: false }),
       context.supabase
         .from("member_transfers")
-        .select("*, from:churches!member_transfers_from_church_id_fkey(name), to:churches!member_transfers_to_church_id_fkey(name)")
+        .select(
+          "*, from:churches!member_transfers_from_church_id_fkey(name), to:churches!member_transfers_to_church_id_fkey(name)",
+        )
         .eq("member_id", data.id)
         .order("transferred_at", { ascending: false }),
     ]);
@@ -86,11 +95,16 @@ const memberInputSchema = z.object({
   suffix: z.string().max(20).nullable().optional(),
   sex: z.enum(["male", "female"]).nullable().optional(),
   birthdate: z.string().nullable().optional(),
-  civil_status: z.enum(["single", "married", "widowed", "separated", "divorced"]).nullable().optional(),
+  civil_status: z
+    .enum(["single", "married", "widowed", "separated", "divorced"])
+    .nullable()
+    .optional(),
   email: z.string().email().nullable().optional().or(z.literal("")),
   phone: z.string().max(40).nullable().optional(),
   address: z.string().max(240).nullable().optional(),
-  membership_status: z.enum(["visitor", "regular", "member", "inactive", "transferred"]).default("visitor"),
+  membership_status: z
+    .enum(["visitor", "regular", "member", "inactive", "transferred"])
+    .default("visitor"),
   joined_at: z.string().nullable().optional(),
   baptism_date: z.string().nullable().optional(),
   baptism_church: z.string().max(160).nullable().optional(),
@@ -109,7 +123,11 @@ export const createMember = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => memberInputSchema.parse(d))
   .handler(async ({ context, data }) => {
     const payload = cleanEmpty({ ...data, created_by: context.userId });
-    const { data: row, error } = await context.supabase.from("members").insert(payload).select().single();
+    const { data: row, error } = await context.supabase
+      .from("members")
+      .insert(payload)
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return row;
   });
@@ -120,7 +138,10 @@ export const updateMember = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     if (!data.id) throw new Error("id required");
     const { id, ...patch } = cleanEmpty(data);
-    const { error } = await context.supabase.from("members").update(patch).eq("id", id as string);
+    const { error } = await context.supabase
+      .from("members")
+      .update(patch)
+      .eq("id", id as string);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -147,7 +168,10 @@ export const transferMember = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => transferSchema.parse(d))
   .handler(async ({ context, data }) => {
     const { data: current, error: e1 } = await context.supabase
-      .from("members").select("church_id").eq("id", data.id).single();
+      .from("members")
+      .select("church_id")
+      .eq("id", data.id)
+      .single();
     if (e1) throw new Error(e1.message);
     const { error: e2 } = await context.supabase.from("member_transfers").insert({
       member_id: data.id,

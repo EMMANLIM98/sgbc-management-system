@@ -31,7 +31,8 @@ export function ModuleLanding({
             </div>
             <h2 className="text-2xl font-semibold tracking-tight">{tagline}</h2>
             <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-              This module is being prepared. Below is a preview of what it will offer once available.
+              This module is being prepared. Below is a preview of what it will offer once
+              available.
             </p>
           </div>
         </div>

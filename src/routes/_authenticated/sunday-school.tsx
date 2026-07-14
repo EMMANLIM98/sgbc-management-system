@@ -11,7 +11,10 @@ export const Route = createFileRoute("/_authenticated/sunday-school")({
       icon={GraduationCap}
       tagline="Organize every class and every learner."
       features={[
-        { title: "Classes & Departments", description: "Group learners by age, level, or program." },
+        {
+          title: "Classes & Departments",
+          description: "Group learners by age, level, or program.",
+        },
         { title: "Enrollment", description: "Add students, assign teachers, track promotions." },
         { title: "Attendance", description: "Weekly attendance with per-class summaries." },
         { title: "Lesson Plans", description: "Store lessons, memory verses, and resources." },

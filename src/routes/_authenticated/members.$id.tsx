@@ -3,16 +3,29 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { PageHeader } from "@/components/shell/page-header";
-import { getMember, archiveMember, transferMember } from "@/modules/membership/membership.functions";
+import {
+  getMember,
+  archiveMember,
+  transferMember,
+} from "@/modules/membership/membership.functions";
 import { MemberForm } from "@/modules/membership/ui/member-form";
 import { useCurrentChurch } from "@/hooks/use-current-church";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,7 +84,10 @@ function MemberPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="text-[12px] text-muted-foreground mb-2">
-        <Link to="/members" className="hover:underline">Members</Link> / {m.first_name} {m.last_name}
+        <Link to="/members" className="hover:underline">
+          Members
+        </Link>{" "}
+        / {m.first_name} {m.last_name}
       </div>
       <PageHeader
         title={`${m.first_name} ${m.last_name}`}
@@ -80,19 +96,30 @@ function MemberPage() {
           <>
             <Dialog open={transferOpen} onOpenChange={setTransferOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm"><ArrowRightLeft className="h-4 w-4 mr-1.5" />Transfer</Button>
+                <Button variant="outline" size="sm">
+                  <ArrowRightLeft className="h-4 w-4 mr-1.5" />
+                  Transfer
+                </Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader><DialogTitle>Transfer member</DialogTitle></DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Transfer member</DialogTitle>
+                </DialogHeader>
                 <div className="space-y-3">
                   <div>
                     <Label className="text-[12px]">Destination church</Label>
                     <Select value={toChurch} onValueChange={setToChurch}>
-                      <SelectTrigger><SelectValue placeholder="Choose church" /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose church" />
+                      </SelectTrigger>
                       <SelectContent>
-                        {churches.filter((c) => c.id !== m.church_id).map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
+                        {churches
+                          .filter((c) => c.id !== m.church_id)
+                          .map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -102,13 +129,26 @@ function MemberPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setTransferOpen(false)}>Cancel</Button>
-                  <Button onClick={() => transfer.mutate()} disabled={!toChurch || transfer.isPending}>Transfer</Button>
+                  <Button variant="outline" onClick={() => setTransferOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => transfer.mutate()}
+                    disabled={!toChurch || transfer.isPending}
+                  >
+                    Transfer
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <Button variant="outline" size="sm" onClick={() => archive.mutate()} disabled={archive.isPending}>
-              <Archive className="h-4 w-4 mr-1.5" />Archive
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => archive.mutate()}
+              disabled={archive.isPending}
+            >
+              <Archive className="h-4 w-4 mr-1.5" />
+              Archive
             </Button>
           </>
         }
@@ -129,7 +169,14 @@ function MemberPage() {
             <Info label="Civil status" value={m.civil_status} />
             <Info label="Sex" value={m.sex} />
             <Info label="Joined" value={m.joined_at} />
-            <Info label="Baptism" value={m.baptism_date ? `${m.baptism_date}${m.baptism_church ? " · " + m.baptism_church : ""}` : null} />
+            <Info
+              label="Baptism"
+              value={
+                m.baptism_date
+                  ? `${m.baptism_date}${m.baptism_church ? " · " + m.baptism_church : ""}`
+                  : null
+              }
+            />
           </div>
           {m.notes && (
             <div className="mt-4 border border-border rounded-md p-3 bg-card text-[13px] whitespace-pre-wrap">
@@ -152,18 +199,29 @@ function MemberPage() {
           <div className="border border-border rounded-lg bg-card">
             <table className="w-full text-[13px]">
               <thead className="bg-muted/40 text-muted-foreground">
-                <tr className="text-left"><th className="px-4 py-2 font-medium">From</th><th className="px-4 py-2 font-medium">To</th><th className="px-4 py-2 font-medium">Reason</th><th className="px-4 py-2 font-medium">Date</th></tr>
+                <tr className="text-left">
+                  <th className="px-4 py-2 font-medium">From</th>
+                  <th className="px-4 py-2 font-medium">To</th>
+                  <th className="px-4 py-2 font-medium">Reason</th>
+                  <th className="px-4 py-2 font-medium">Date</th>
+                </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {data.transfers.length === 0 && (
-                  <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">No transfers yet.</td></tr>
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                      No transfers yet.
+                    </td>
+                  </tr>
                 )}
                 {data.transfers.map((t: any) => (
                   <tr key={t.id}>
                     <td className="px-4 py-2">{t.from?.name ?? "—"}</td>
                     <td className="px-4 py-2">{t.to?.name ?? "—"}</td>
                     <td className="px-4 py-2 text-muted-foreground">{t.reason ?? "—"}</td>
-                    <td className="px-4 py-2 text-muted-foreground tabular">{new Date(t.transferred_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-2 text-muted-foreground tabular">
+                      {new Date(t.transferred_at).toLocaleDateString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

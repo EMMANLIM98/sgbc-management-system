@@ -10,22 +10,38 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { listGivingCategories, listMemberPicker } from "@/modules/finance/contributions.functions";
 import {
-  listGivingCategories, listMemberPicker,
-} from "@/modules/finance/contributions.functions";
-import {
-  listPledges, createPledge, updatePledge, deletePledge,
+  listPledges,
+  createPledge,
+  updatePledge,
+  deletePledge,
 } from "@/modules/finance/pledges.functions";
 import { ArrowLeft, HandHeart, Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
 
@@ -81,7 +97,9 @@ function PledgesPage() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  const scopeLabel = currentChurchId ? currentChurch?.name ?? "Church" : `All Churches (${churches.length})`;
+  const scopeLabel = currentChurchId
+    ? (currentChurch?.name ?? "Church")
+    : `All Churches (${churches.length})`;
   const totals = (rows ?? []).reduce(
     (a, r: any) => ({
       pledged: a.pledged + Number(r.amount),
@@ -94,7 +112,10 @@ function PledgesPage() {
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
       <div className="mb-2">
-        <Link to="/finance" className="text-[12px] text-muted-foreground inline-flex items-center gap-1 hover:text-foreground">
+        <Link
+          to="/finance"
+          className="text-[12px] text-muted-foreground inline-flex items-center gap-1 hover:text-foreground"
+        >
           <ArrowLeft className="h-3.5 w-3.5" /> Finance
         </Link>
       </div>
@@ -162,24 +183,38 @@ function PledgesPage() {
                   </td>
                   <td className="px-4 py-2">
                     <div className="inline-flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ background: r.finance_categories?.color ?? "currentColor" }} />
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ background: r.finance_categories?.color ?? "currentColor" }}
+                      />
                       {r.finance_categories?.name ?? "—"}
                     </div>
-                    {r.campaign && <div className="text-[11px] text-muted-foreground">{r.campaign}</div>}
+                    {r.campaign && (
+                      <div className="text-[11px] text-muted-foreground">{r.campaign}</div>
+                    )}
                   </td>
-                  <td className="px-4 py-2 text-muted-foreground">{FREQ_LABEL[r.frequency] ?? r.frequency}</td>
+                  <td className="px-4 py-2 text-muted-foreground">
+                    {FREQ_LABEL[r.frequency] ?? r.frequency}
+                  </td>
                   <td className="px-4 py-2 text-muted-foreground whitespace-nowrap">
                     {new Date(r.start_date).toLocaleDateString()}
                     {r.end_date ? ` → ${new Date(r.end_date).toLocaleDateString()}` : ""}
                   </td>
-                  <td className="px-4 py-2 text-right tabular font-medium">{formatPHP(Number(r.amount))}</td>
+                  <td className="px-4 py-2 text-right tabular font-medium">
+                    {formatPHP(Number(r.amount))}
+                  </td>
                   <td className="px-4 py-2 text-right tabular">{formatPHP(Number(r.paid))}</td>
                   <td className="px-4 py-2">
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 flex-1 bg-accent rounded-full overflow-hidden">
-                        <div className="h-full bg-foreground/70" style={{ width: `${r.progress_pct}%` }} />
+                        <div
+                          className="h-full bg-foreground/70"
+                          style={{ width: `${r.progress_pct}%` }}
+                        />
                       </div>
-                      <span className="text-[11px] tabular text-muted-foreground w-8 text-right">{r.progress_pct}%</span>
+                      <span className="text-[11px] tabular text-muted-foreground w-8 text-right">
+                        {r.progress_pct}%
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-2">
@@ -207,7 +242,9 @@ function PledgesPage() {
                       )}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <button className="p-1 text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                          <button className="p-1 text-muted-foreground hover:text-destructive">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
@@ -216,7 +253,9 @@ function PledgesPage() {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => delMut.mutate(r.id)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => delMut.mutate(r.id)}>
+                              Delete
+                            </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -226,8 +265,13 @@ function PledgesPage() {
               ))}
               {(rows ?? []).length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground text-[13px]">
-                    No pledges yet. Click <span className="font-medium text-foreground">New pledge</span> to record a commitment.
+                  <td
+                    colSpan={9}
+                    className="px-4 py-12 text-center text-muted-foreground text-[13px]"
+                  >
+                    No pledges yet. Click{" "}
+                    <span className="font-medium text-foreground">New pledge</span> to record a
+                    commitment.
                   </td>
                 </tr>
               )}
@@ -255,15 +299,21 @@ function StatusBadge({ status }: { status: string }) {
     status === "active"
       ? "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300"
       : status === "fulfilled"
-      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-      : "bg-muted text-muted-foreground";
+        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+        : "bg-muted text-muted-foreground";
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] capitalize ${cls}`}>{status}</span>
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] capitalize ${cls}`}
+    >
+      {status}
+    </span>
   );
 }
 
 function PledgeDialog({
-  onClose, defaultChurchId, churches,
+  onClose,
+  defaultChurchId,
+  churches,
 }: {
   onClose: () => void;
   defaultChurchId: string;
@@ -276,7 +326,9 @@ function PledgeDialog({
   const [categoryId, setCategoryId] = useState<string>("");
   const [campaign, setCampaign] = useState("");
   const [amount, setAmount] = useState("");
-  const [frequency, setFrequency] = useState<"one_time" | "weekly" | "monthly" | "quarterly" | "annually">("one_time");
+  const [frequency, setFrequency] = useState<
+    "one_time" | "weekly" | "monthly" | "quarterly" | "annually"
+  >("one_time");
   const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [endDate, setEndDate] = useState("");
   const [notes, setNotes] = useState("");
@@ -326,28 +378,45 @@ function PledgeDialog({
   return (
     <DialogContent className="max-w-lg">
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2"><HandHeart className="h-4 w-4" /> New pledge</DialogTitle>
+        <DialogTitle className="flex items-center gap-2">
+          <HandHeart className="h-4 w-4" /> New pledge
+        </DialogTitle>
       </DialogHeader>
       <div className="grid grid-cols-2 gap-3">
         {churches.length > 1 && (
           <div className="col-span-2">
             <Label className="text-[12px]">Church</Label>
             <Select value={churchId} onValueChange={setChurchId}>
-              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {churches.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
+                {churches.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         )}
         <div className="col-span-2">
           <Label className="text-[12px]">Member</Label>
-          <Input placeholder="Search…" value={memberQ} onChange={(e) => setMemberQ(e.target.value)} className="h-8 mb-2" />
+          <Input
+            placeholder="Search…"
+            value={memberQ}
+            onChange={(e) => setMemberQ(e.target.value)}
+            className="h-8 mb-2"
+          />
           <Select value={memberId} onValueChange={setMemberId}>
-            <SelectTrigger className="h-9"><SelectValue placeholder="Choose member" /></SelectTrigger>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Choose member" />
+            </SelectTrigger>
             <SelectContent>
               {(members ?? []).map((m: any) => (
-                <SelectItem key={m.id} value={m.id}>{m.first_name} {m.last_name}</SelectItem>
+                <SelectItem key={m.id} value={m.id}>
+                  {m.first_name} {m.last_name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -355,26 +424,44 @@ function PledgeDialog({
         <div className="col-span-2">
           <Label className="text-[12px]">Category</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger className="h-9"><SelectValue placeholder="Tithes, Missions, Grace giving…" /></SelectTrigger>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Tithes, Missions, Grace giving…" />
+            </SelectTrigger>
             <SelectContent>
               {(cats ?? []).map((c: any) => (
-                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="col-span-2">
           <Label className="text-[12px]">Campaign (optional)</Label>
-          <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder="e.g. New Building Fund" className="h-9" />
+          <Input
+            value={campaign}
+            onChange={(e) => setCampaign(e.target.value)}
+            placeholder="e.g. New Building Fund"
+            className="h-9"
+          />
         </div>
         <div>
           <Label className="text-[12px]">Amount (₱)</Label>
-          <Input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="h-9" />
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-9"
+          />
         </div>
         <div>
           <Label className="text-[12px]">Frequency</Label>
           <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
-            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="one_time">One time</SelectItem>
               <SelectItem value="weekly">Weekly</SelectItem>
@@ -386,11 +473,21 @@ function PledgeDialog({
         </div>
         <div>
           <Label className="text-[12px]">Start date</Label>
-          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="h-9" />
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="h-9"
+          />
         </div>
         <div>
           <Label className="text-[12px]">End date (optional)</Label>
-          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="h-9" />
+          <Input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="h-9"
+          />
         </div>
         <div className="col-span-2">
           <Label className="text-[12px]">Notes</Label>
@@ -398,7 +495,9 @@ function PledgeDialog({
         </div>
       </div>
       <DialogFooter>
-        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
         <Button disabled={!canSubmit || mut.isPending} onClick={() => mut.mutate()}>
           {mut.isPending ? "Saving…" : "Save pledge"}
         </Button>
