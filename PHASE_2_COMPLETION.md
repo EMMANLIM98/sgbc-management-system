@@ -11,6 +11,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 ### 1. **UI Components** (5 files, ~1,200 LOC)
 
 #### [QR Code Display Component](src/modules/events/ui/qr-code-display.tsx)
+
 - Displays QR codes for event registration check-in
 - Download as PNG functionality
 - Print-friendly formatting
@@ -18,6 +19,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 - Secure token display with warning
 
 #### [Event Registration Form](src/modules/events/ui/event-registration-form.tsx)
+
 - React Hook Form + Zod validation
 - Supports member and guest registration
 - Fields: names, email, phone, age category, gender, membership status, leadership role
@@ -26,6 +28,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 - **Email Integration**: Sends confirmation & QR code emails on successful registration
 
 #### [QR Code Scanner](src/modules/events/ui/qr-code-scanner.tsx)
+
 - Camera-based QR code scanning with Html5QrCode library
 - Real-time attendee feedback
 - Success/error state management
@@ -33,6 +36,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 - **Email Integration**: Sends attendance confirmation emails on check-in
 
 #### [Event Analytics Dashboard](src/modules/events/ui/event-analytics-dashboard.tsx)
+
 - Real-time KPI cards (registered, checked-in, attendance %, remaining)
 - Demographic breakdowns via Recharts:
   - Age category distribution (bar chart)
@@ -43,6 +47,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 - Error handling and loading states
 
 #### [Event Listing Component](src/modules/events/ui/event-listing.tsx)
+
 - Lists upcoming events with status badges
 - Date and location display
 - Event status filtering (draft, scheduled, active, completed)
@@ -51,17 +56,20 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 ### 2. **Routes** (3 files)
 
 #### [Events Index Page](src/routes/_authenticated/events/index.tsx)
+
 - Event listing with filtering
 - Quick access to register for events
 - Navigation to event details
 
 #### [Event Registration Page](src/routes/_authenticated/events/register.tsx)
+
 - Event selection dropdown
 - Dynamic form display based on selected event
 - Registration success state with QR display
 - Multi-person registration capability
 
 #### [Event Detail Page](src/routes/_authenticated/events/$id.tsx)
+
 - Tabbed interface: Analytics & Check-In
 - Real-time analytics dashboard
 - QR code scanner for check-in
@@ -70,7 +78,9 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 ### 3. **Server Functions Integration** (2 functions updated)
 
 #### `registerForEvent` Function Enhancement
+
 **Location**: [src/modules/events/events.functions.ts](src/modules/events/events.functions.ts#L158-L206)
+
 - Added email service integration
 - Sends on registration:
   1. `sendEventRegistrationConfirmation()` - Registration receipt
@@ -78,7 +88,9 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 - Error logging without registration failure
 
 #### `checkInWithQR` Function Enhancement
+
 **Location**: [src/modules/events/events.functions.ts](src/modules/events/events.functions.ts#L258-L291)
+
 - Added email service integration
 - Sends on successful check-in:
   1. `sendAttendanceConfirmation()` - Attendance receipt
@@ -87,6 +99,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 ### 4. **Utilities** (1 file)
 
 #### Added `formatDate` Function
+
 - [src/lib/utils.ts](src/lib/utils.ts)
 - Formats dates for event display
 - Locale-aware formatting (en-US)
@@ -98,6 +111,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 ### Automatic Email Triggers
 
 1. **On Event Registration**
+
    ```typescript
    await emailService.sendEventRegistrationConfirmation({
      recipientEmail: attendeeEmail,
@@ -105,7 +119,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
      eventDate: eventDate,
      registrationId: registration.id,
    });
-   
+
    await emailService.sendEventQRCode({
      recipientEmail: attendeeEmail,
      eventName: event.title,
@@ -114,6 +128,7 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
    ```
 
 2. **On QR Check-in**
+
    ```typescript
    await emailService.sendAttendanceConfirmation({
      recipientEmail: registration.attendeeEmail,
@@ -148,7 +163,9 @@ All Phase 2 deliverables have been implemented, integrated with the email servic
 ## 🏗️ Architecture & Patterns
 
 ### Component Pattern
+
 All components follow existing codebase patterns:
+
 - React Hook Form for form management
 - Zod for validation schemas
 - `useServerFn` + `useMutation` for API calls
@@ -157,12 +174,14 @@ All components follow existing codebase patterns:
 - Sonner for toast notifications
 
 ### Error Handling
+
 - Email failures don't block core operations
 - User-friendly error messages
 - Server-side error logging
 - Graceful fallbacks
 
 ### Security
+
 - RLS policies enforced via server functions
 - Authentication required on all functions
 - QR tokens validated server-side
@@ -182,6 +201,7 @@ All components follow existing codebase patterns:
 ```
 
 ### Build Output
+
 - Client assets: 563.57 kB (162.16 kB gzip)
 - Server ready for deployment
 - No TypeScript errors in new code
@@ -192,6 +212,7 @@ All components follow existing codebase patterns:
 ## 🎯 What's Ready to Go
 
 ### ✅ Complete Features
+
 1. Event registration with QR code generation
 2. Real-time attendance analytics
 3. QR code check-in scanning
@@ -201,6 +222,7 @@ All components follow existing codebase patterns:
 7. Error handling and user feedback
 
 ### ⚡ Quick Start for Testing
+
 ```bash
 # Build and run
 npm run build
@@ -211,6 +233,7 @@ http://localhost:3000/events
 ```
 
 ### 📊 Features Ready for Integration
+
 - Raffle drawing system (backend ready, UI pending)
 - Advanced filters (pre-built infrastructure)
 - Export functionality (can use existing patterns)
@@ -278,6 +301,7 @@ src/routes/_authenticated/
 ## 📋 Test Scenarios
 
 ### Registration Flow
+
 ```
 1. User navigates to /events/register
 2. Selects event from dropdown
@@ -289,6 +313,7 @@ src/routes/_authenticated/
 ```
 
 ### Check-In Flow
+
 ```
 1. Admin navigates to /events/[id]
 2. Opens "Check-In" tab
@@ -301,6 +326,7 @@ src/routes/_authenticated/
 ```
 
 ### Analytics Flow
+
 ```
 1. Admin navigates to /events/[id]
 2. Opens "Analytics" tab
@@ -324,6 +350,7 @@ src/routes/_authenticated/
 - **Code formatted**: Consistent style across all files
 
 The Event Registration System is now a fully functional module with:
+
 - ✅ QR code generation & display
 - ✅ Event registration forms
 - ✅ QR code scanner with camera
