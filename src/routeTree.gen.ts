@@ -29,6 +29,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCommitteeRouteImport } from './routes/_authenticated/committee'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
+import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events/index'
 import { Route as AuthenticatedSettingsTeamRouteImport } from './routes/_authenticated/settings.team'
 import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings.profile'
 import { Route as AuthenticatedSettingsOrganizationRouteImport } from './routes/_authenticated/settings.organization'
@@ -39,6 +40,8 @@ import { Route as AuthenticatedFinanceReportsRouteImport } from './routes/_authe
 import { Route as AuthenticatedFinancePledgesRouteImport } from './routes/_authenticated/finance_.pledges'
 import { Route as AuthenticatedFinanceMemberReportsRouteImport } from './routes/_authenticated/finance_.member-reports'
 import { Route as AuthenticatedFinanceContributionsRouteImport } from './routes/_authenticated/finance_.contributions'
+import { Route as AuthenticatedEventsRegisterRouteImport } from './routes/_authenticated/events/register'
+import { Route as AuthenticatedEventsIdRouteImport } from './routes/_authenticated/events/$id'
 import { Route as AuthenticatedFinanceMembersIdRouteImport } from './routes/_authenticated/finance_.members.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -144,6 +147,12 @@ const AuthenticatedMembersIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMembersRoute,
   } as any)
+const AuthenticatedEventsIndexRoute =
+  AuthenticatedEventsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedEventsRoute,
+  } as any)
 const AuthenticatedSettingsTeamRoute =
   AuthenticatedSettingsTeamRouteImport.update({
     id: '/team',
@@ -202,6 +211,17 @@ const AuthenticatedFinanceContributionsRoute =
     path: '/finance/contributions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEventsRegisterRoute =
+  AuthenticatedEventsRegisterRouteImport.update({
+    id: '/register',
+    path: '/register',
+    getParentRoute: () => AuthenticatedEventsRoute,
+  } as any)
+const AuthenticatedEventsIdRoute = AuthenticatedEventsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedEventsRoute,
+} as any)
 const AuthenticatedFinanceMembersIdRoute =
   AuthenticatedFinanceMembersIdRouteImport.update({
     id: '/finance_/members/$id',
@@ -217,7 +237,7 @@ export interface FileRoutesByFullPath {
   '/committee': typeof AuthenticatedCommitteeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discipleship': typeof AuthenticatedDiscipleshipRoute
-  '/events': typeof AuthenticatedEventsRoute
+  '/events': typeof AuthenticatedEventsRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/members': typeof AuthenticatedMembersRouteWithChildren
@@ -227,6 +247,8 @@ export interface FileRoutesByFullPath {
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/visitation': typeof AuthenticatedVisitationRoute
   '/visitors': typeof AuthenticatedVisitorsRoute
+  '/events/$id': typeof AuthenticatedEventsIdRoute
+  '/events/register': typeof AuthenticatedEventsRegisterRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/finance/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -237,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/settings/organization': typeof AuthenticatedSettingsOrganizationRoute
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/settings/team': typeof AuthenticatedSettingsTeamRoute
+  '/events/': typeof AuthenticatedEventsIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/finance/members/$id': typeof AuthenticatedFinanceMembersIdRoute
@@ -249,7 +272,6 @@ export interface FileRoutesByTo {
   '/committee': typeof AuthenticatedCommitteeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discipleship': typeof AuthenticatedDiscipleshipRoute
-  '/events': typeof AuthenticatedEventsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/ministry': typeof AuthenticatedMinistryRoute
@@ -257,6 +279,8 @@ export interface FileRoutesByTo {
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/visitation': typeof AuthenticatedVisitationRoute
   '/visitors': typeof AuthenticatedVisitorsRoute
+  '/events/$id': typeof AuthenticatedEventsIdRoute
+  '/events/register': typeof AuthenticatedEventsRegisterRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/finance/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/finance/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -267,6 +291,7 @@ export interface FileRoutesByTo {
   '/settings/organization': typeof AuthenticatedSettingsOrganizationRoute
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/settings/team': typeof AuthenticatedSettingsTeamRoute
+  '/events': typeof AuthenticatedEventsIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/finance/members/$id': typeof AuthenticatedFinanceMembersIdRoute
@@ -281,7 +306,7 @@ export interface FileRoutesById {
   '/_authenticated/committee': typeof AuthenticatedCommitteeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discipleship': typeof AuthenticatedDiscipleshipRoute
-  '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/members': typeof AuthenticatedMembersRouteWithChildren
@@ -291,6 +316,8 @@ export interface FileRoutesById {
   '/_authenticated/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/_authenticated/visitation': typeof AuthenticatedVisitationRoute
   '/_authenticated/visitors': typeof AuthenticatedVisitorsRoute
+  '/_authenticated/events/$id': typeof AuthenticatedEventsIdRoute
+  '/_authenticated/events/register': typeof AuthenticatedEventsRegisterRoute
   '/_authenticated/finance_/contributions': typeof AuthenticatedFinanceContributionsRoute
   '/_authenticated/finance_/member-reports': typeof AuthenticatedFinanceMemberReportsRoute
   '/_authenticated/finance_/pledges': typeof AuthenticatedFinancePledgesRoute
@@ -301,6 +328,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/organization': typeof AuthenticatedSettingsOrganizationRoute
   '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/_authenticated/settings/team': typeof AuthenticatedSettingsTeamRoute
+  '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/finance_/members/$id': typeof AuthenticatedFinanceMembersIdRoute
@@ -325,6 +353,8 @@ export interface FileRouteTypes {
     | '/sunday-school'
     | '/visitation'
     | '/visitors'
+    | '/events/$id'
+    | '/events/register'
     | '/finance/contributions'
     | '/finance/member-reports'
     | '/finance/pledges'
@@ -335,6 +365,7 @@ export interface FileRouteTypes {
     | '/settings/organization'
     | '/settings/profile'
     | '/settings/team'
+    | '/events/'
     | '/members/'
     | '/settings/'
     | '/finance/members/$id'
@@ -347,7 +378,6 @@ export interface FileRouteTypes {
     | '/committee'
     | '/dashboard'
     | '/discipleship'
-    | '/events'
     | '/finance'
     | '/inventory'
     | '/ministry'
@@ -355,6 +385,8 @@ export interface FileRouteTypes {
     | '/sunday-school'
     | '/visitation'
     | '/visitors'
+    | '/events/$id'
+    | '/events/register'
     | '/finance/contributions'
     | '/finance/member-reports'
     | '/finance/pledges'
@@ -365,6 +397,7 @@ export interface FileRouteTypes {
     | '/settings/organization'
     | '/settings/profile'
     | '/settings/team'
+    | '/events'
     | '/members'
     | '/settings'
     | '/finance/members/$id'
@@ -388,6 +421,8 @@ export interface FileRouteTypes {
     | '/_authenticated/sunday-school'
     | '/_authenticated/visitation'
     | '/_authenticated/visitors'
+    | '/_authenticated/events/$id'
+    | '/_authenticated/events/register'
     | '/_authenticated/finance_/contributions'
     | '/_authenticated/finance_/member-reports'
     | '/_authenticated/finance_/pledges'
@@ -398,6 +433,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/organization'
     | '/_authenticated/settings/profile'
     | '/_authenticated/settings/team'
+    | '/_authenticated/events/'
     | '/_authenticated/members/'
     | '/_authenticated/settings/'
     | '/_authenticated/finance_/members/$id'
@@ -553,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMembersIndexRouteImport
       parentRoute: typeof AuthenticatedMembersRoute
     }
+    '/_authenticated/events/': {
+      id: '/_authenticated/events/'
+      path: '/'
+      fullPath: '/events/'
+      preLoaderRoute: typeof AuthenticatedEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedEventsRoute
+    }
     '/_authenticated/settings/team': {
       id: '/_authenticated/settings/team'
       path: '/team'
@@ -623,6 +666,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceContributionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/register': {
+      id: '/_authenticated/events/register'
+      path: '/register'
+      fullPath: '/events/register'
+      preLoaderRoute: typeof AuthenticatedEventsRegisterRouteImport
+      parentRoute: typeof AuthenticatedEventsRoute
+    }
+    '/_authenticated/events/$id': {
+      id: '/_authenticated/events/$id'
+      path: '/$id'
+      fullPath: '/events/$id'
+      preLoaderRoute: typeof AuthenticatedEventsIdRouteImport
+      parentRoute: typeof AuthenticatedEventsRoute
+    }
     '/_authenticated/finance_/members/$id': {
       id: '/_authenticated/finance_/members/$id'
       path: '/finance/members/$id'
@@ -632,6 +689,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedEventsRouteChildren {
+  AuthenticatedEventsIdRoute: typeof AuthenticatedEventsIdRoute
+  AuthenticatedEventsRegisterRoute: typeof AuthenticatedEventsRegisterRoute
+  AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
+}
+
+const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
+  AuthenticatedEventsIdRoute: AuthenticatedEventsIdRoute,
+  AuthenticatedEventsRegisterRoute: AuthenticatedEventsRegisterRoute,
+  AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
+}
+
+const AuthenticatedEventsRouteWithChildren =
+  AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
 interface AuthenticatedMembersRouteChildren {
   AuthenticatedMembersIdRoute: typeof AuthenticatedMembersIdRoute
@@ -674,7 +746,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommitteeRoute: typeof AuthenticatedCommitteeRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscipleshipRoute: typeof AuthenticatedDiscipleshipRoute
-  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRouteWithChildren
@@ -695,7 +767,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommitteeRoute: AuthenticatedCommitteeRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscipleshipRoute: AuthenticatedDiscipleshipRoute,
-  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRouteWithChildren,

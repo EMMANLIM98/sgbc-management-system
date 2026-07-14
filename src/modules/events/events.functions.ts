@@ -14,6 +14,7 @@ import { RegistrationService } from "@/modules/events/application/registration.s
 import { CheckInService } from "@/modules/events/application/checkin.service";
 import { AttendanceAnalyticsService } from "@/modules/events/application/attendance-analytics.service";
 import { RaffleService } from "@/modules/events/application/raffle.service";
+import { emailService } from "@/lib/email";
 
 // ============ SCHEMAS ============
 
@@ -177,7 +178,40 @@ export const registerForEvent = createServerFn({ method: "POST" })
       createdBy: context.supabase.auth.session()?.user.id || "",
     });
 
-    return { id: registration.id, message: "Registration successful" };
+    // Send confirmation emails if email is provided
+    if (data.attendeeEmail) {
+      try {
+        // Get event details for email
+        const event = await eventService.getEventById(data.eventId);
+        if (event) {
+          // Send registration confirmation email
+          await emailService.sendEventRegistrationConfirmation({
+            recipientEmail: data.attendeeEmail,
+            recipientName: `${data.attendeeFirstName} ${data.attendeeLastName}`,
+            eventName: event.title,
+            eventDate: event.eventDate.toISOString().split("T")[0],
+            registrationId: registration.id,
+          });
+
+          // Send QR code email
+          await emailService.sendEventQRCode({
+            recipientEmail: data.attendeeEmail,
+            recipientName: `${data.attendeeFirstName} ${data.attendeeLastName}`,
+            eventName: event.title,
+            qrToken: (registration as any).qrCode?.token || "",
+          });
+        }
+      } catch (emailError) {
+        // Log email error but don't fail the registration
+        console.error("Failed to send confirmation emails:", emailError);
+      }
+    }
+
+    return {
+      id: registration.id,
+      message: "Registration successful",
+      qrToken: (registration as any).qrCode?.token,
+    };
   });
 
 export const getEventRegistrations = createServerFn({ method: "GET" })
@@ -244,6 +278,24 @@ export const checkInWithQR = createServerFn({ method: "POST" })
 
     if (!result.success) {
       throw new Error(result.message);
+    }
+
+    // Send attendance confirmation email
+    if (result.registration?.attendeeEmail) {
+      try {
+        const event = await eventService.getEventById(data.eventId);
+        if (event) {
+          await emailService.sendAttendanceConfirmation({
+            recipientEmail: result.registration.attendeeEmail,
+            recipientName: result.registration.attendeeName,
+            eventName: event.title,
+            checkedInTime: new Date().toISOString(),
+          });
+        }
+      } catch (emailError) {
+        // Log email error but don't fail the check-in
+        console.error("Failed to send attendance confirmation email:", emailError);
+      }
     }
 
     return {
