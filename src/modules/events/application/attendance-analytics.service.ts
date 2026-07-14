@@ -66,6 +66,14 @@ export interface ChurchAttendance {
   checkedInCount: number;
 }
 
+type RegistrationAggregateRow = {
+  age_category: AttendanceCategory | null;
+  visitor_status: VisitorMembership | null;
+  leadership_role: LeadershipRole | null;
+  sex: "male" | "female" | null;
+  status: string;
+};
+
 /**
  * AttendanceAnalyticsService
  *
@@ -77,6 +85,20 @@ export interface ChurchAttendance {
  */
 export class AttendanceAnalyticsService {
   constructor(private supabase: SupabaseClient<Database>) {}
+
+  private async getCheckedInAggregateRows(eventId: string): Promise<RegistrationAggregateRow[]> {
+    const { data, error } = await this.supabase
+      .from("event_registrations")
+      .select("age_category, visitor_status, leadership_role, sex, status")
+      .eq("event_id", eventId)
+      .eq("status", "checked_in");
+
+    if (error) {
+      throw new Error(`Failed to fetch attendance aggregate rows: ${error.message}`);
+    }
+
+    return (data ?? []) as RegistrationAggregateRow[];
+  }
 
   /**
    * Get overall event attendance metrics
@@ -118,23 +140,12 @@ export class AttendanceAnalyticsService {
    * Get attendance breakdown by age category
    */
   async getAttendanceByCategory(eventId: string): Promise<AttendanceByCategory[]> {
-    const { data, error } = await this.supabase
-      .from("event_registrations")
-      .select("age_category, count(*)")
-      .eq("event_id", eventId)
-      .eq("status", "checked_in")
-      .group_by("age_category");
-
-    if (error) {
-      throw new Error(`Failed to fetch category breakdown: ${error.message}`);
-    }
-
-    const total = (data ?? []).reduce((sum: number, row: any) => sum + (row.count || 0), 0);
+    const rows = await this.getCheckedInAggregateRows(eventId);
+    const total = rows.length;
     const categories = ["children", "youth", "young_adults", "adults", "seniors"];
 
     return categories.map((cat) => {
-      const row = (data ?? []).find((r: any) => r.age_category === cat);
-      const count = row?.count || 0;
+      const count = rows.filter((row) => row.age_category === cat).length;
 
       return {
         category: cat as AttendanceCategory,
@@ -148,23 +159,12 @@ export class AttendanceAnalyticsService {
    * Get attendance breakdown by membership status
    */
   async getAttendanceByMembership(eventId: string): Promise<AttendanceByMembership[]> {
-    const { data, error } = await this.supabase
-      .from("event_registrations")
-      .select("visitor_status, count(*)")
-      .eq("event_id", eventId)
-      .eq("status", "checked_in")
-      .group_by("visitor_status");
-
-    if (error) {
-      throw new Error(`Failed to fetch membership breakdown: ${error.message}`);
-    }
-
-    const total = (data ?? []).reduce((sum: number, row: any) => sum + (row.count || 0), 0);
+    const rows = await this.getCheckedInAggregateRows(eventId);
+    const total = rows.length;
     const statuses = ["member", "visitor", "first_time_guest"];
 
     return statuses.map((status) => {
-      const row = (data ?? []).find((r: any) => r.visitor_status === status);
-      const count = row?.count || 0;
+      const count = rows.filter((row) => row.visitor_status === status).length;
 
       return {
         membership: status as VisitorMembership,
@@ -178,24 +178,21 @@ export class AttendanceAnalyticsService {
    * Get attendance breakdown by leadership role
    */
   async getAttendanceByLeadership(eventId: string): Promise<AttendanceByLeadership[]> {
-    const { data, error } = await this.supabase
-      .from("event_registrations")
-      .select("leadership_role, count(*)")
-      .eq("event_id", eventId)
-      .eq("status", "checked_in")
-      .group_by("leadership_role");
+    const rows = await this.getCheckedInAggregateRows(eventId);
+    const total = rows.length;
+    const roleCountMap = new Map<LeadershipRole, number>();
 
-    if (error) {
-      throw new Error(`Failed to fetch leadership breakdown: ${error.message}`);
+    for (const row of rows) {
+      if (!row.leadership_role) continue;
+      const current = roleCountMap.get(row.leadership_role) ?? 0;
+      roleCountMap.set(row.leadership_role, current + 1);
     }
 
-    const total = (data ?? []).reduce((sum: number, row: any) => sum + (row.count || 0), 0);
-
-    return ((data ?? []) as any[])
-      .map((row) => ({
-        role: row.leadership_role as LeadershipRole,
-        count: row.count || 0,
-        percentage: total > 0 ? Math.round((row.count / total) * 100) : 0,
+    return Array.from(roleCountMap.entries())
+      .map(([role, count]) => ({
+        role,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100) : 0,
       }))
       .filter((item) => item.role !== "none" || item.count > 0)
       .sort((a, b) => b.count - a.count);
@@ -205,26 +202,20 @@ export class AttendanceAnalyticsService {
    * Get attendance breakdown by gender
    */
   async getAttendanceByGender(eventId: string): Promise<AttendanceByGender[]> {
-    const { data, error } = await this.supabase
-      .from("event_registrations")
-      .select("sex, count(*)")
-      .eq("event_id", eventId)
-      .eq("status", "checked_in")
-      .group_by("sex");
+    const rows = await this.getCheckedInAggregateRows(eventId);
+    const total = rows.length;
+    const genders: Array<"male" | "female"> = ["male", "female"];
 
-    if (error) {
-      throw new Error(`Failed to fetch gender breakdown: ${error.message}`);
-    }
-
-    const total = (data ?? []).reduce((sum: number, row: any) => sum + (row.count || 0), 0);
-
-    return ((data ?? []) as any[])
-      .filter((row) => row.sex !== null)
-      .map((row) => ({
-        gender: row.sex as "male" | "female",
-        count: row.count || 0,
-        percentage: total > 0 ? Math.round((row.count / total) * 100) : 0,
-      }));
+    return genders
+      .map((gender) => {
+        const count = rows.filter((row) => row.sex === gender).length;
+        return {
+          gender,
+          count,
+          percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+        };
+      })
+      .filter((row) => row.count > 0);
   }
 
   /**

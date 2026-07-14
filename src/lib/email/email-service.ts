@@ -52,10 +52,20 @@ export class ResendEmailService implements IEmailService {
     this.fromEmail = fromEmail;
   }
 
+  /** Throws a descriptive error if Resend is not configured; caught by each method's try/catch */
+  private get mailer() {
+    if (!resendClient) {
+      throw new Error(
+        "Email service not configured. Add RESEND_API_KEY to your .env file to enable email sending.",
+      );
+    }
+    return resendClient;
+  }
+
   async sendAccountVerification(data: AccountVerificationEmail): Promise<EmailSendResult> {
     try {
       const html = renderAccountVerificationEmail(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: "Verify Your Email Address",
@@ -79,7 +89,7 @@ export class ResendEmailService implements IEmailService {
   async sendWelcome(data: WelcomeEmail): Promise<EmailSendResult> {
     try {
       const html = renderWelcomeEmail(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: "Welcome to Church Management System",
@@ -103,7 +113,7 @@ export class ResendEmailService implements IEmailService {
   async sendPasswordReset(data: PasswordResetEmail): Promise<EmailSendResult> {
     try {
       const html = renderPasswordResetEmail(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: "Reset Your Password",
@@ -127,7 +137,7 @@ export class ResendEmailService implements IEmailService {
   async sendChangeEmailConfirmation(data: ChangeEmailConfirmation): Promise<EmailSendResult> {
     try {
       const html = renderChangeEmailConfirmation(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: "Confirm Your Email Change",
@@ -153,7 +163,7 @@ export class ResendEmailService implements IEmailService {
   ): Promise<EmailSendResult> {
     try {
       const html = renderEventRegistrationConfirmation(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: `Event Registration Confirmed: ${data.eventName}`,
@@ -177,7 +187,7 @@ export class ResendEmailService implements IEmailService {
   async sendEventQRCode(data: EventQRCodeDelivery): Promise<EmailSendResult> {
     try {
       const html = renderEventQRCodeDelivery(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: `Your QR Code: ${data.eventName}`,
@@ -201,7 +211,7 @@ export class ResendEmailService implements IEmailService {
   async sendEventReminder(data: EventReminder): Promise<EmailSendResult> {
     try {
       const html = renderEventReminder(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: `Reminder: ${data.eventName}`,
@@ -225,7 +235,7 @@ export class ResendEmailService implements IEmailService {
   async sendAttendanceConfirmation(data: AttendanceConfirmation): Promise<EmailSendResult> {
     try {
       const html = renderAttendanceConfirmation(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: `Check-in Confirmed: ${data.eventName}`,
@@ -249,7 +259,7 @@ export class ResendEmailService implements IEmailService {
   async sendRaffleWinnerNotification(data: RaffleWinnerNotification): Promise<EmailSendResult> {
     try {
       const html = renderRaffleWinnerNotification(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: `🎉 You Won a Prize!`,
@@ -273,7 +283,7 @@ export class ResendEmailService implements IEmailService {
   async sendChurchAnnouncement(data: ChurchAnnouncement): Promise<EmailSendResult> {
     try {
       const html = renderChurchAnnouncement(data);
-      const result = await resendClient.emails.send({
+      const result = await this.mailer.emails.send({
         from: this.fromEmail,
         to: data.to,
         subject: data.announcementTitle,
@@ -297,7 +307,7 @@ export class ResendEmailService implements IEmailService {
   async sendBulk(recipients: string[], subject: string, html: string): Promise<EmailSendResult[]> {
     try {
       const promises = recipients.map((to) =>
-        resendClient.emails.send({
+        this.mailer.emails.send({
           from: this.fromEmail,
           to,
           subject,
@@ -326,3 +336,4 @@ export class ResendEmailService implements IEmailService {
  * Export default instance
  */
 export const emailService = new ResendEmailService();
+

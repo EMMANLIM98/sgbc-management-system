@@ -61,7 +61,7 @@ export class EventService {
       endTime: input.endTime,
       location: input.location,
       maxCapacity: input.maxCapacity,
-      status: "draft",
+      status: "scheduled",
       allowMultipleCheckins: input.allowMultipleCheckins || false,
       createdBy: input.createdBy,
     });
@@ -100,7 +100,7 @@ export class EventService {
    * List events for a church
    */
   async listEventsByChurch(
-    churchId: string,
+    churchId: string | undefined,
     options?: {
       status?: EventStatus;
       futureOnly?: boolean;
@@ -108,10 +108,12 @@ export class EventService {
       offset?: number;
     },
   ): Promise<{ events: Event[]; total: number }> {
-    let query = this.supabase
-      .from("events")
-      .select("*", { count: "exact" })
-      .eq("church_id", churchId);
+    let query = this.supabase.from("events").select("*", { count: "exact" });
+
+    // Apply church filter only when specified; RLS handles access scoping
+    if (churchId) {
+      query = query.eq("church_id", churchId);
+    }
 
     if (options?.status) {
       query = query.eq("status", options.status);

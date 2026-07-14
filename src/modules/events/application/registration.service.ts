@@ -42,6 +42,11 @@ export interface UpdateRegistrationInput {
   leadershipRole?: LeadershipRole;
 }
 
+export interface RegistrationWithQRCode {
+  registration: EventRegistration;
+  qrCode: QRCode;
+}
+
 /**
  * RegistrationService
  *
@@ -60,7 +65,7 @@ export class RegistrationService {
   /**
    * Register a member or guest for an event
    */
-  async registerForEvent(input: RegisterForEventInput): Promise<EventRegistration> {
+  async registerForEvent(input: RegisterForEventInput): Promise<RegistrationWithQRCode> {
     // Check if event exists and can accept registrations
     const event = await this.eventService.getEventById(input.eventId);
 
@@ -115,9 +120,13 @@ export class RegistrationService {
     }
 
     // Generate QR code for registration
-    await this.generateQRCodeForRegistration(registration.id, input.eventId, input.churchId);
+    const qrCode = await this.generateQRCodeForRegistration(
+      registration.id,
+      input.eventId,
+      input.churchId,
+    );
 
-    return registration;
+    return { registration, qrCode };
   }
 
   /**

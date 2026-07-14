@@ -2,9 +2,10 @@
  * Event Registration Page
  */
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { z } from "zod";
 import { PageHeader } from "@/components/shell/page-header";
 import { EventRegistrationForm } from "@/modules/events/ui/event-registration-form";
 import { QRCodeDisplay } from "@/modules/events/ui/qr-code-display";
@@ -16,15 +17,25 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/events/register")({
   head: () => ({ meta: [{ title: "Register for Event — Shekinah Glory Baptist Church" }] }),
+  validateSearch: (search) =>
+    z
+      .object({
+        eventId: z.string().uuid().optional(),
+      })
+      .parse(search),
   component: EventRegister,
 });
 
 function EventRegister() {
-  const nav = useNavigate();
-  const { currentChurchId, currentOrganizationId } = useCurrentChurch();
+  const search = Route.useSearch();
+  const { currentChurchId, currentChurch, churches } = useCurrentChurch();
   const listEventsFn = useServerFn(listEvents);
-  const [registered, setRegistered] = useState<any>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const [registered, setRegistered] = useState<{
+    id: string;
+    attendeeName: string;
+    qrToken: string;
+  } | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string>(search.eventId ?? "");
 
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ["events", currentChurchId],
@@ -40,6 +51,10 @@ function EventRegister() {
 
   const events = eventsData?.events || [];
   const selectedEvent = events.find((e: any) => e.id === selectedEventId);
+  const organizationId =
+    currentChurch?.organization_id ||
+    churches.find((church) => church.id === currentChurchId)?.organization_id ||
+    "";
 
   if (!currentChurchId) {
     return (
@@ -62,7 +77,7 @@ function EventRegister() {
         <QRCodeDisplay
           token={registered.qrToken}
           eventName={selectedEvent?.title || "Event"}
-          attendeeName={`${registered.firstName} ${registered.lastName}`}
+          attendeeName={registered.attendeeName}
           registrationId={registered.id}
         />
 
@@ -118,14 +133,13 @@ function EventRegister() {
             <EventRegistrationForm
               eventId={selectedEventId}
               churchId={currentChurchId}
-              organizationId={currentOrganizationId || ""}
+              organizationId={organizationId}
               eventName={selectedEvent.title}
-              onRegistered={(id) => {
+              onRegistered={(result) => {
                 setRegistered({
-                  id,
-                  firstName: "Attendee",
-                  lastName: "Name",
-                  qrToken: id, // In real implementation, this comes from response
+                  id: result.id,
+                  attendeeName: result.attendeeName,
+                  qrToken: result.qrToken,
                 });
               }}
             />

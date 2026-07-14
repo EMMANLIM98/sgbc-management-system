@@ -229,10 +229,21 @@ export class RaffleService {
     // Select random winner
     const winner = entries[Math.floor(Math.random() * entries.length)];
 
+    const { data: eventData, error: eventError } = await this.supabase
+      .from("events")
+      .select("church_id")
+      .eq("id", eventId)
+      .maybeSingle();
+
+    if (eventError || !eventData) {
+      throw new Error("Event not found for raffle draw");
+    }
+
     // Record draw
     const { error: drawError } = await this.supabase.from("raffle_draws").insert([
       {
         event_id: eventId,
+        church_id: eventData.church_id,
         winner_id: winner.id,
         prize_name: prizeName,
         drawn_by: drawnBy,
@@ -385,7 +396,9 @@ export class RaffleService {
   async getRaffleWinners(eventId: string): Promise<RaffleDrawRecord[]> {
     const { data, error } = await this.supabase
       .from("raffle_draws")
-      .select("id, event_id, winner_id, participant_name, prize_name, draw_time, drawn_by")
+      .select(
+        "id, event_id, winner_id, prize_name, draw_time, drawn_by, raffle_entries(participant_name)",
+      )
       .eq("event_id", eventId)
       .order("draw_time", { ascending: false });
 
@@ -397,7 +410,7 @@ export class RaffleService {
       id: record.id,
       eventId: record.event_id,
       winnerId: record.winner_id,
-      participantName: record.participant_name,
+      participantName: record.raffle_entries?.participant_name || "Unknown",
       prizeName: record.prize_name,
       drawnAt: new Date(record.draw_time),
       drawnBy: record.drawn_by,

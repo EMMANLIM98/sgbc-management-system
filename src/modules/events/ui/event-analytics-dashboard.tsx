@@ -24,7 +24,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Users, CheckCircle, TrendingUp, Loader2 } from "lucide-react";
-import { getEventAnalytics, getAttendanceMetrics } from "@/modules/events/events.functions";
+import { getEventAnalytics } from "@/modules/events/events.functions";
 
 export interface EventAnalyticsDashboardProps {
   eventId: string;
@@ -61,8 +61,10 @@ export function EventAnalyticsDashboard({ eventId }: EventAnalyticsDashboardProp
   const metrics = data.metrics;
   const byCategory = data.byCategory || [];
   const byMembership = data.byMembership || [];
+  const byLeadership = data.byLeadership || [];
   const byGender = data.byGender || [];
   const hourlyArrivals = data.hourlyArrivals || [];
+  const perChurch = data.perChurch || [];
 
   return (
     <div className="space-y-6">
@@ -106,6 +108,33 @@ export function EventAnalyticsDashboard({ eventId }: EventAnalyticsDashboardProp
             </div>
             <Users className="w-8 h-8 text-yellow-600 opacity-20" />
           </div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Visitors</p>
+          <p className="text-xl font-semibold">{metrics.visitorCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Members</p>
+          <p className="text-xl font-semibold">{metrics.memberCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Children</p>
+          <p className="text-xl font-semibold">{metrics.childrenCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Youth</p>
+          <p className="text-xl font-semibold">{metrics.youthCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Adults</p>
+          <p className="text-xl font-semibold">{metrics.adultsCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Seniors</p>
+          <p className="text-xl font-semibold">{metrics.seniorsCount}</p>
         </Card>
       </div>
 
@@ -153,6 +182,21 @@ export function EventAnalyticsDashboard({ eventId }: EventAnalyticsDashboardProp
         )}
       </div>
 
+      {byLeadership.length > 0 && (
+        <Card className="p-4">
+          <h3 className="font-semibold mb-4">Leadership Attendance</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={byLeadership}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="role" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#8B5CF6" name="Checked In" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
+
       {/* Hourly Arrivals */}
       {hourlyArrivals.length > 0 && (
         <Card className="p-4">
@@ -171,6 +215,23 @@ export function EventAnalyticsDashboard({ eventId }: EventAnalyticsDashboardProp
                 name="Check-ins"
               />
             </LineChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
+
+      {perChurch.length > 0 && (
+        <Card className="p-4">
+          <h3 className="font-semibold mb-4">Church Attendance Comparison</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={perChurch}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="churchName" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="registrationCount" fill="#94A3B8" name="Registered" />
+              <Bar dataKey="checkedInCount" fill="#10B981" name="Checked In" />
+            </BarChart>
           </ResponsiveContainer>
         </Card>
       )}

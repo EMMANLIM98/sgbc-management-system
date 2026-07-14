@@ -26,6 +26,7 @@ export interface CheckInResult {
   message: string;
   registration?: EventRegistration;
   qrCode?: QRCode;
+  checkedInAt?: string;
   error?: string;
 }
 
@@ -58,6 +59,14 @@ export class CheckInService {
           success: false,
           message: "Invalid QR code",
           error: "QR_NOT_FOUND",
+        };
+      }
+
+      if (qrCode.eventId !== input.eventId) {
+        return {
+          success: false,
+          message: "QR code is not valid for this event",
+          error: "QR_EVENT_MISMATCH",
         };
       }
 
@@ -99,6 +108,24 @@ export class CheckInService {
         };
       }
 
+      if (registration.eventId !== input.eventId) {
+        return {
+          success: false,
+          message: "Registration does not belong to this event",
+          error: "REGISTRATION_EVENT_MISMATCH",
+        };
+      }
+
+      if (registration.churchId !== input.churchId) {
+        return {
+          success: false,
+          message: "Registration does not belong to this church",
+          error: "REGISTRATION_CHURCH_MISMATCH",
+        };
+      }
+
+      const checkedInAt = new Date();
+
       // 4. Check if already checked in (unless multiple check-ins allowed)
       if (registration.isCheckedIn() && !event.allowMultipleCheckins) {
         return {
@@ -137,6 +164,7 @@ export class CheckInService {
         deviceId: input.deviceId,
         deviceName: input.deviceName,
         location: input.location,
+        checkedInAt,
       });
 
       // 7. Update registration status
@@ -151,7 +179,7 @@ export class CheckInService {
         .from("event_registrations")
         .update({
           status: "checked_in",
-          checked_in_at: new Date(),
+          checked_in_at: checkedInAt,
           checked_in_by: input.checkedInBy,
           device_id: input.deviceId || null,
           device_name: input.deviceName || null,
@@ -171,7 +199,7 @@ export class CheckInService {
         .from("qr_codes")
         .update({
           is_scanned: true,
-          scanned_at: new Date(),
+          scanned_at: checkedInAt,
           scanned_by: input.checkedInBy,
           updated_at: new Date(),
         })
@@ -186,6 +214,7 @@ export class CheckInService {
         message: `Successfully checked in ${registration.attendeeName}`,
         registration,
         qrCode,
+        checkedInAt: checkedInAt.toISOString(),
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -251,6 +280,7 @@ export class CheckInService {
     deviceId?: string;
     deviceName?: string;
     location?: string;
+    checkedInAt: Date;
   }): Promise<void> {
     const { error } = await this.supabase.from("event_checkins").insert([
       {
@@ -258,7 +288,7 @@ export class CheckInService {
         event_id: input.eventId,
         qr_code_id: input.qrCodeId,
         church_id: input.churchId,
-        checked_in_at: new Date(),
+        checked_in_at: input.checkedInAt,
         checked_in_by: input.checkedInBy,
         device_id: input.deviceId || null,
         device_name: input.deviceName || null,

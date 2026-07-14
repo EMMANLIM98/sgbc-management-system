@@ -22,7 +22,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { registerForEvent, validateQRCode } from "@/modules/events/events.functions";
+import { registerForEvent } from "@/modules/events/events.functions";
 
 const registrationSchema = z.object({
   eventId: z.string().uuid(),
@@ -67,7 +67,7 @@ export interface EventRegistrationFormProps {
   memberId?: string;
   memberName?: string;
   memberEmail?: string;
-  onRegistered?: (registrationId: string) => void;
+  onRegistered?: (result: { id: string; qrToken: string; attendeeName: string }) => void;
 }
 
 export function EventRegistrationForm({
@@ -113,7 +113,11 @@ export function EventRegistrationForm({
     },
     onSuccess: (result: any) => {
       toast.success(`Successfully registered for ${eventName}!`);
-      onRegistered?.(result.id);
+      onRegistered?.({
+        id: result.id,
+        qrToken: result.qrToken,
+        attendeeName: result.attendeeName,
+      });
       reset();
     },
     onError: (error: any) => {

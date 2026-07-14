@@ -2,17 +2,19 @@
  * Event Detail Page
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeScanner } from "@/modules/events/ui/qr-code-scanner";
 import { EventAnalyticsDashboard } from "@/modules/events/ui/event-analytics-dashboard";
-import { Loader2, Calendar, MapPin } from "lucide-react";
+import { Loader2, Calendar, MapPin, UserPlus, Link2 } from "lucide-react";
 import { getEvent, checkInWithQR } from "@/modules/events/events.functions";
 import { useCurrentChurch } from "@/hooks/use-current-church";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/events/$id")({
   head: () => ({ meta: [{ title: "Event Details — Shekinah Glory Baptist Church" }] }),
@@ -57,7 +59,30 @@ function EventDetail() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <PageHeader title={event.title} description={event.description} />
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <PageHeader title={event.title} description={event.description} />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const url = `${window.location.origin}/event-register/${id}`;
+              navigator.clipboard.writeText(url).then(() =>
+                toast.success("Public registration link copied!"),
+              );
+            }}
+          >
+            <Link2 className="w-4 h-4 mr-2" />
+            Share Link
+          </Button>
+          <Link to="/events/register" search={{ eventId: id }}>
+            <Button className="whitespace-nowrap">
+              <UserPlus className="w-4 h-4 mr-2" />
+              Register Attendee
+            </Button>
+          </Link>
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="p-4 flex items-center gap-3">
@@ -95,11 +120,16 @@ function EventDetail() {
             <QRCodeScanner
               eventId={id}
               onScan={async (token) => {
+                const deviceName =
+                  typeof navigator !== "undefined"
+                    ? `${navigator.platform} - ${navigator.userAgent}`
+                    : "Unknown device";
                 await checkInFn({
                   data: {
                     qrToken: token,
                     eventId: id,
                     churchId: currentChurchId || "",
+                    deviceName,
                   },
                 });
               }}

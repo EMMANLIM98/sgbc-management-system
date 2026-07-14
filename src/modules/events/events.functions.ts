@@ -77,6 +77,28 @@ const checkInSchema = z.object({
   location: z.string().nullable().optional(),
 });
 
+const raffleFilterSchema = z.object({
+  churchId: z.string().uuid().optional(),
+  ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
+  visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).optional(),
+  leadershipRole: z
+    .enum([
+      "pastor",
+      "pastor_wife",
+      "pastor_children",
+      "associate_pastor",
+      "elder",
+      "deacon",
+      "deaconess",
+      "preacher",
+      "evangelist",
+      "ministry_leader",
+      "none",
+    ])
+    .optional(),
+  excludePreviousWinners: z.boolean().optional(),
+});
+
 // ============ EVENT FUNCTIONS ============
 
 export const listEvents = createServerFn({ method: "GET" })
@@ -88,21 +110,41 @@ export const listEvents = createServerFn({ method: "GET" })
     const eventService = new EventService(context.supabase);
     const churchId = data.churchId || undefined;
 
-    const { events, total } = await eventService.listEventsByChurch(churchId, {
-      futureOnly: data.futureOnly,
-      limit: 50,
-    });
+    try {
+      const { events, total } = await eventService.listEventsByChurch(churchId, {
+        futureOnly: data.futureOnly,
+        limit: 50,
+      });
 
-    return {
-      events: events.map((e) => ({
-        id: e.id,
-        title: e.title,
-        eventDate: e.eventDate.toISOString(),
-        location: e.location,
-        status: e.status,
-      })),
-      total,
-    };
+      return {
+        events: events.map((e) => ({
+          id: e.id,
+          title: e.title,
+          eventDate: e.eventDate.toISOString(),
+          location: e.location,
+          status: e.status,
+        })),
+        total,
+        setupRequired: false,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to list events";
+      const setupRequired =
+        message.includes("Could not find the table 'public.events'") ||
+        message.includes("relation \"events\" does not exist");
+
+      if (setupRequired) {
+        return {
+          events: [],
+          total: 0,
+          setupRequired: true,
+          setupMessage:
+            "Events module schema is not installed in Supabase yet. Apply the events migration first.",
+        };
+      }
+
+      throw error;
+    }
   });
 
 export const getEvent = createServerFn({ method: "GET" })
@@ -136,19 +178,33 @@ export const createEvent = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const eventService = new EventService(context.supabase);
 
-    const event = await eventService.createEvent({
-      churchId: data.churchId,
-      organizationId: data.organizationId,
-      title: data.title,
-      description: data.description || undefined,
-      eventDate: data.eventDate,
-      startTime: data.startTime || undefined,
-      endTime: data.endTime || undefined,
-      location: data.location || undefined,
-      maxCapacity: data.maxCapacity || undefined,
-      allowMultipleCheckins: data.allowMultipleCheckins,
-      createdBy: context.supabase.auth.session()?.user.id || "",
-    });
+    let event;
+    try {
+      event = await eventService.createEvent({
+        churchId: data.churchId,
+        organizationId: data.organizationId,
+        title: data.title,
+        description: data.description || undefined,
+        eventDate: data.eventDate,
+        startTime: data.startTime || undefined,
+        endTime: data.endTime || undefined,
+        location: data.location || undefined,
+        maxCapacity: data.maxCapacity || undefined,
+        allowMultipleCheckins: data.allowMultipleCheckins,
+        createdBy: context.supabase.auth.session()?.user.id || "",
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create event";
+      if (
+        message.includes("Could not find the table 'public.events'") ||
+        message.includes("relation \"events\" does not exist")
+      ) {
+        throw new Error(
+          "Events database schema is missing. Run the events migration in Supabase before creating events.",
+        );
+      }
+      throw error;
+    }
 
     return { id: event.id, message: "Event created successfully" };
   });
@@ -162,7 +218,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
     const eventService = new EventService(context.supabase);
     const registrationService = new RegistrationService(context.supabase, eventService);
 
-    const registration = await registrationService.registerForEvent({
+    const { registration, qrCode } = await registrationService.registerForEvent({
       eventId: data.eventId,
       churchId: data.churchId,
       organizationId: data.organizationId,
@@ -186,19 +242,22 @@ export const registerForEvent = createServerFn({ method: "POST" })
         if (event) {
           // Send registration confirmation email
           await emailService.sendEventRegistrationConfirmation({
-            recipientEmail: data.attendeeEmail,
+            to: data.attendeeEmail,
             recipientName: `${data.attendeeFirstName} ${data.attendeeLastName}`,
             eventName: event.title,
             eventDate: event.eventDate.toISOString().split("T")[0],
+            eventLocation: event.location || "",
             registrationId: registration.id,
           });
 
           // Send QR code email
           await emailService.sendEventQRCode({
-            recipientEmail: data.attendeeEmail,
+            to: data.attendeeEmail,
             recipientName: `${data.attendeeFirstName} ${data.attendeeLastName}`,
             eventName: event.title,
-            qrToken: (registration as any).qrCode?.token || "",
+            eventDate: event.eventDate.toISOString().split("T")[0],
+            qrCodeImage: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCode.token)}`,
+            registrationId: registration.id,
           });
         }
       } catch (emailError) {
@@ -209,8 +268,9 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
     return {
       id: registration.id,
+      attendeeName: registration.attendeeName,
       message: "Registration successful",
-      qrToken: (registration as any).qrCode?.token,
+      qrToken: qrCode.token,
     };
   });
 
@@ -286,10 +346,11 @@ export const checkInWithQR = createServerFn({ method: "POST" })
         const event = await eventService.getEventById(data.eventId);
         if (event) {
           await emailService.sendAttendanceConfirmation({
-            recipientEmail: result.registration.attendeeEmail,
+            to: result.registration.attendeeEmail,
             recipientName: result.registration.attendeeName,
             eventName: event.title,
-            checkedInTime: new Date().toISOString(),
+            checkInTime: result.checkedInAt || new Date().toISOString(),
+            churchName: event.location || "Church",
           });
         }
       } catch (emailError) {
@@ -302,6 +363,7 @@ export const checkInWithQR = createServerFn({ method: "POST" })
       success: true,
       message: result.message,
       attendeeName: result.registration?.attendeeName,
+      checkedInAt: result.checkedInAt,
     };
   });
 
@@ -411,5 +473,95 @@ export const getRaffleWinners = createServerFn({ method: "GET" })
         drawnAt: w.drawnAt.toISOString(),
         drawnBy: w.drawnBy,
       })),
+    };
+  });
+
+export const populateRaffleEntries = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        filter: raffleFilterSchema.optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const raffleService = new RaffleService(context.supabase);
+    const added = await raffleService.populateRaffleFromEvent(data.eventId, {
+      ageCategory: data.filter?.ageCategory as any,
+      visitorStatus: data.filter?.visitorStatus as any,
+      leadershipRole: data.filter?.leadershipRole as any,
+      excludePreviousWinners: data.filter?.excludePreviousWinners,
+    });
+
+    return {
+      added,
+      message: `${added} raffle entries populated`,
+    };
+  });
+
+export const drawMultipleRaffleWinners = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        prizes: z.array(z.object({ name: z.string().min(1), count: z.number().int().min(1) })),
+        filter: raffleFilterSchema.optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const raffleService = new RaffleService(context.supabase);
+    const winners = await raffleService.drawMultipleWinners(
+      data.eventId,
+      data.prizes,
+      context.supabase.auth.session()?.user.id || "",
+      {
+        ageCategory: data.filter?.ageCategory as any,
+        visitorStatus: data.filter?.visitorStatus as any,
+        leadershipRole: data.filter?.leadershipRole as any,
+        excludePreviousWinners: true,
+      },
+    );
+
+    return {
+      winners,
+      totalWinners: winners.length,
+    };
+  });
+
+export const rerollRaffleWinners = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        prizeName: z.string().min(1),
+        count: z.number().int().min(1).default(1),
+        filter: raffleFilterSchema.optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const raffleService = new RaffleService(context.supabase);
+    const winners = await raffleService.rerollWinners(
+      data.eventId,
+      data.prizeName,
+      data.count,
+      context.supabase.auth.session()?.user.id || "",
+      {
+        ageCategory: data.filter?.ageCategory as any,
+        visitorStatus: data.filter?.visitorStatus as any,
+        leadershipRole: data.filter?.leadershipRole as any,
+        excludePreviousWinners: true,
+      },
+    );
+
+    return {
+      winners,
+      totalWinners: winners.length,
+      message: `Re-rolled ${winners.length} winner(s) for ${data.prizeName}`,
     };
   });
