@@ -61,16 +61,16 @@ function Landing() {
 
       <section className="max-w-3xl mx-auto text-center px-6 pt-24 pb-16">
         <div className="inline-block text-[11px] uppercase tracking-wider text-muted-foreground border border-border rounded-full px-3 py-1 mb-6">
-          Multi-church SaaS · Built for church networks
+          Multi-church SaaS · Built for Shekinah Glory Baptist Churches
         </div>
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-          One quiet platform for every church in your network.
+          Centralized platform for Shekinah Glory Baptist Church.
         </h1>
         <p className="text-muted-foreground mt-4 text-base max-w-xl mx-auto">
           Membership, finance, ministry, and events — centralized, spacious, and simple enough that a first-time administrator can just get started.
         </p>
         <div className="mt-8 flex items-center justify-center gap-2">
-          <Button size="lg" asChild><Link to="/auth">Start free <ArrowRight className="h-4 w-4 ml-1.5" /></Link></Button>
+          <Button size="lg" asChild><Link to="/auth">Register <ArrowRight className="h-4 w-4 ml-1.5" /></Link></Button>
           <Button size="lg" variant="outline" asChild><Link to="/auth">Sign in</Link></Button>
         </div>
       </section>
