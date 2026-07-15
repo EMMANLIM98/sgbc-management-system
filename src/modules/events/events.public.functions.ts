@@ -19,12 +19,45 @@ import { emailService } from "@/lib/email";
 // Service-role client used server-side only — never exposed to the browser
 function createAdminClient() {
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) {
     throw new Error("Server configuration error. Missing Supabase credentials.");
   }
   return createClient<Database>(url, key, { auth: { persistSession: false } });
 }
+
+export const listPublicEvents = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ limit: z.number().int().min(1).max(100).optional() }).parse(d))
+  .handler(async ({ data }) => {
+    const supabase = createAdminClient();
+    const today = new Date().toISOString().split("T")[0];
+
+    const { data: events, error } = await supabase
+      .from("events")
+      .select("id, title, description, event_date, start_time, end_time, location, max_capacity, status")
+      .in("status", ["scheduled", "active"])
+      .gte("event_date", today)
+      .order("event_date", { ascending: true })
+      .limit(data.limit ?? 50);
+
+    if (error) {
+      throw new Error("Failed to load public events.");
+    }
+
+    return {
+      events: (events ?? []).map((event) => ({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        eventDate: event.event_date,
+        startTime: event.start_time,
+        endTime: event.end_time,
+        location: event.location,
+        maxCapacity: event.max_capacity,
+        status: event.status,
+      })),
+    };
+  });
 
 // ============ PUBLIC GET EVENT ============
 
@@ -174,7 +207,6 @@ export const publicRegisterForEvent = createServerFn({ method: "POST" })
       sex: data.sex,
       visitorStatus: data.visitorStatus,
       leadershipRole: data.leadershipRole,
-      createdBy: "public-self-registration",
     });
 
     // ── Send emails (non-blocking) ──

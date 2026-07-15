@@ -45,7 +45,41 @@ export interface UpdateEventInput {
  * status management, and event queries.
  */
 export class EventService {
+  private resolvedEventsTable: "events" | "Events" | null = null;
+
   constructor(private supabase: SupabaseClient<Database>) {}
+
+  private isMissingEventsTableError(message: string): boolean {
+    const normalized = message.toLowerCase();
+    return (
+      normalized.includes("could not find the table") ||
+      normalized.includes('relation "events" does not exist') ||
+      normalized.includes('relation "Events" does not exist'.toLowerCase()) ||
+      normalized.includes("schema cache")
+    );
+  }
+
+  private async resolveEventsTable(): Promise<"events" | "Events"> {
+    if (this.resolvedEventsTable) {
+      return this.resolvedEventsTable;
+    }
+
+    // Prefer the canonical lowercase table name first.
+    const candidates: Array<"events" | "Events"> = ["events", "Events"];
+    for (const candidate of candidates) {
+      const { error } = await this.supabase.from(candidate).select("id").limit(1);
+      if (!error) {
+        this.resolvedEventsTable = candidate;
+        return candidate;
+      }
+
+      if (!this.isMissingEventsTableError(error.message)) {
+        throw new Error(`Failed to access events table: ${error.message}`);
+      }
+    }
+
+    throw new Error("Events table not found. Expected public.events.");
+  }
 
   /**
    * Create a new event
@@ -66,7 +100,8 @@ export class EventService {
       createdBy: input.createdBy,
     });
 
-    const { error } = await this.supabase.from("events").insert([event.toDatabase()]);
+    const eventsTable = await this.resolveEventsTable();
+    const { error } = await this.supabase.from(eventsTable).insert([event.toDatabase()]);
 
     if (error) {
       throw new Error(`Failed to create event: ${error.message}`);
@@ -79,8 +114,9 @@ export class EventService {
    * Get event by ID
    */
   async getEventById(eventId: string): Promise<Event | null> {
+    const eventsTable = await this.resolveEventsTable();
     const { data, error } = await this.supabase
-      .from("events")
+      .from(eventsTable)
       .select("*")
       .eq("id", eventId)
       .maybeSingle();
@@ -108,7 +144,8 @@ export class EventService {
       offset?: number;
     },
   ): Promise<{ events: Event[]; total: number }> {
-    let query = this.supabase.from("events").select("*", { count: "exact" });
+    const eventsTable = await this.resolveEventsTable();
+    let query = this.supabase.from(eventsTable).select("*", { count: "exact" });
 
     // Apply church filter only when specified; RLS handles access scoping
     if (churchId) {
@@ -124,7 +161,7 @@ export class EventService {
       query = query.gte("event_date", today);
     }
 
-    query = query.order("event_date", { ascending: false });
+    query = query.order("event_date", { ascending: !!options?.futureOnly });
 
     if (options?.limit) {
       query = query.limit(options.limit);
@@ -156,7 +193,7 @@ export class EventService {
       throw new Error("Event not found");
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     if (input.title !== undefined) updateData.title = input.title;
     if (input.description !== undefined) updateData.description = input.description;
@@ -171,7 +208,8 @@ export class EventService {
 
     updateData.updated_at = new Date();
 
-    const { error } = await this.supabase.from("events").update(updateData).eq("id", input.id);
+    const eventsTable = await this.resolveEventsTable();
+    const { error } = await this.supabase.from(eventsTable).update(updateData).eq("id", input.id);
 
     if (error) {
       throw new Error(`Failed to update event: ${error.message}`);
@@ -191,7 +229,8 @@ export class EventService {
    * Delete event
    */
   async deleteEvent(eventId: string): Promise<void> {
-    const { error } = await this.supabase.from("events").delete().eq("id", eventId);
+    const eventsTable = await this.resolveEventsTable();
+    const { error } = await this.supabase.from(eventsTable).delete().eq("id", eventId);
 
     if (error) {
       throw new Error(`Failed to delete event: ${error.message}`);

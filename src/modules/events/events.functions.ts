@@ -16,6 +16,21 @@ import { AttendanceAnalyticsService } from "@/modules/events/application/attenda
 import { RaffleService } from "@/modules/events/application/raffle.service";
 import { emailService } from "@/lib/email";
 
+function isEventsSchemaMissingError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("could not find the table 'public.events'") ||
+    normalized.includes('relation "events" does not exist') ||
+    normalized.includes('relation "Events" does not exist'.toLowerCase()) ||
+    normalized.includes("events table not found") ||
+    normalized.includes("schema cache")
+  );
+}
+
+function getEventsSetupMessage(): string {
+  return 'Events table is not reachable as public.events. Verify this app points to the correct Supabase project and that the table is named exactly public.events (or public."Events").';
+}
+
 // ============ SCHEMAS ============
 
 const scopeSchema = z.object({
@@ -129,17 +144,14 @@ export const listEvents = createServerFn({ method: "GET" })
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to list events";
-      const setupRequired =
-        message.includes("Could not find the table 'public.events'") ||
-        message.includes("relation \"events\" does not exist");
+      const setupRequired = isEventsSchemaMissingError(message);
 
       if (setupRequired) {
         return {
           events: [],
           total: 0,
           setupRequired: true,
-          setupMessage:
-            "Events module schema is not installed in Supabase yet. Apply the events migration first.",
+          setupMessage: getEventsSetupMessage(),
         };
       }
 
@@ -152,7 +164,16 @@ export const getEvent = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const eventService = new EventService(context.supabase);
-    const event = await eventService.getEventById(data.id);
+    let event;
+    try {
+      event = await eventService.getEventById(data.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to fetch event";
+      if (isEventsSchemaMissingError(message)) {
+        throw new Error(getEventsSetupMessage());
+      }
+      throw error;
+    }
 
     if (!event) {
       throw new Error("Event not found");
@@ -191,17 +212,12 @@ export const createEvent = createServerFn({ method: "POST" })
         location: data.location || undefined,
         maxCapacity: data.maxCapacity || undefined,
         allowMultipleCheckins: data.allowMultipleCheckins,
-        createdBy: context.supabase.auth.session()?.user.id || "",
+        createdBy: context.userId || "",
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to create event";
-      if (
-        message.includes("Could not find the table 'public.events'") ||
-        message.includes("relation \"events\" does not exist")
-      ) {
-        throw new Error(
-          "Events database schema is missing. Run the events migration in Supabase before creating events.",
-        );
+      if (isEventsSchemaMissingError(message)) {
+        throw new Error(getEventsSetupMessage());
       }
       throw error;
     }
@@ -231,7 +247,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
       sex: data.sex || undefined,
       visitorStatus: (data.visitorStatus as any) || undefined,
       leadershipRole: (data.leadershipRole as any) || undefined,
-      createdBy: context.supabase.auth.session()?.user.id || "",
+      createdBy: context.userId || "",
     });
 
     // Send confirmation emails if email is provided
@@ -330,7 +346,7 @@ export const checkInWithQR = createServerFn({ method: "POST" })
       qrToken: data.qrToken,
       eventId: data.eventId,
       churchId: data.churchId,
-      checkedInBy: context.supabase.auth.session()?.user.id || "",
+      checkedInBy: context.userId || "",
       deviceId: data.deviceId || undefined,
       deviceName: data.deviceName || undefined,
       location: data.location || undefined,
@@ -437,7 +453,7 @@ export const drawRaffleWinner = createServerFn({ method: "POST" })
     const winner = await raffleService.drawWinner(
       data.eventId,
       data.prizeName,
-      context.supabase.auth.session()?.user.id || "",
+      context.userId || "",
       {
         ageCategory: data.ageCategory,
         visitorStatus: data.visitorStatus as any,
@@ -517,7 +533,7 @@ export const drawMultipleRaffleWinners = createServerFn({ method: "POST" })
     const winners = await raffleService.drawMultipleWinners(
       data.eventId,
       data.prizes,
-      context.supabase.auth.session()?.user.id || "",
+      context.userId || "",
       {
         ageCategory: data.filter?.ageCategory as any,
         visitorStatus: data.filter?.visitorStatus as any,
@@ -550,7 +566,7 @@ export const rerollRaffleWinners = createServerFn({ method: "POST" })
       data.eventId,
       data.prizeName,
       data.count,
-      context.supabase.auth.session()?.user.id || "",
+      context.userId || "",
       {
         ageCategory: data.filter?.ageCategory as any,
         visitorStatus: data.filter?.visitorStatus as any,

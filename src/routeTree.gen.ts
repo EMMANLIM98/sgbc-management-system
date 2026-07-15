@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as EventRegisterRouteImport } from './routes/event-register'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EventRegisterIndexRouteImport } from './routes/event-register.index'
 import { Route as EventRegisterEventIdRouteImport } from './routes/event-register.$eventId'
 import { Route as AuthenticatedVisitorsRouteImport } from './routes/_authenticated/visitors'
 import { Route as AuthenticatedVisitationRouteImport } from './routes/_authenticated/visitation'
@@ -43,6 +45,7 @@ import { Route as AuthenticatedFinanceMemberReportsRouteImport } from './routes/
 import { Route as AuthenticatedFinanceContributionsRouteImport } from './routes/_authenticated/finance_.contributions'
 import { Route as AuthenticatedEventsRegisterRouteImport } from './routes/_authenticated/events/register'
 import { Route as AuthenticatedEventsNewRouteImport } from './routes/_authenticated/events/new'
+import { Route as AuthenticatedEventsBrowseRouteImport } from './routes/_authenticated/events/browse'
 import { Route as AuthenticatedEventsIdRouteImport } from './routes/_authenticated/events/$id'
 import { Route as AuthenticatedFinanceMembersIdRouteImport } from './routes/_authenticated/finance_.members.$id'
 
@@ -54,6 +57,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventRegisterRoute = EventRegisterRouteImport.update({
+  id: '/event-register',
+  path: '/event-register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -70,10 +78,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventRegisterIndexRoute = EventRegisterIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventRegisterRoute,
+} as any)
 const EventRegisterEventIdRoute = EventRegisterEventIdRouteImport.update({
-  id: '/event-register/$eventId',
-  path: '/event-register/$eventId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => EventRegisterRoute,
 } as any)
 const AuthenticatedVisitorsRoute = AuthenticatedVisitorsRouteImport.update({
   id: '/visitors',
@@ -229,6 +242,12 @@ const AuthenticatedEventsNewRoute = AuthenticatedEventsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthenticatedEventsRoute,
 } as any)
+const AuthenticatedEventsBrowseRoute =
+  AuthenticatedEventsBrowseRouteImport.update({
+    id: '/browse',
+    path: '/browse',
+    getParentRoute: () => AuthenticatedEventsRoute,
+  } as any)
 const AuthenticatedEventsIdRoute = AuthenticatedEventsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -244,6 +263,7 @@ const AuthenticatedFinanceMembersIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/event-register': typeof EventRegisterRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/committee': typeof AuthenticatedCommitteeRoute
@@ -260,7 +280,9 @@ export interface FileRoutesByFullPath {
   '/visitation': typeof AuthenticatedVisitationRoute
   '/visitors': typeof AuthenticatedVisitorsRoute
   '/event-register/$eventId': typeof EventRegisterEventIdRoute
+  '/event-register/': typeof EventRegisterIndexRoute
   '/events/$id': typeof AuthenticatedEventsIdRoute
+  '/events/browse': typeof AuthenticatedEventsBrowseRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/events/register': typeof AuthenticatedEventsRegisterRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
@@ -294,7 +316,9 @@ export interface FileRoutesByTo {
   '/visitation': typeof AuthenticatedVisitationRoute
   '/visitors': typeof AuthenticatedVisitorsRoute
   '/event-register/$eventId': typeof EventRegisterEventIdRoute
+  '/event-register': typeof EventRegisterIndexRoute
   '/events/$id': typeof AuthenticatedEventsIdRoute
+  '/events/browse': typeof AuthenticatedEventsBrowseRoute
   '/events/new': typeof AuthenticatedEventsNewRoute
   '/events/register': typeof AuthenticatedEventsRegisterRoute
   '/finance/contributions': typeof AuthenticatedFinanceContributionsRoute
@@ -317,6 +341,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/event-register': typeof EventRegisterRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/committee': typeof AuthenticatedCommitteeRoute
@@ -333,7 +358,9 @@ export interface FileRoutesById {
   '/_authenticated/visitation': typeof AuthenticatedVisitationRoute
   '/_authenticated/visitors': typeof AuthenticatedVisitorsRoute
   '/event-register/$eventId': typeof EventRegisterEventIdRoute
+  '/event-register/': typeof EventRegisterIndexRoute
   '/_authenticated/events/$id': typeof AuthenticatedEventsIdRoute
+  '/_authenticated/events/browse': typeof AuthenticatedEventsBrowseRoute
   '/_authenticated/events/new': typeof AuthenticatedEventsNewRoute
   '/_authenticated/events/register': typeof AuthenticatedEventsRegisterRoute
   '/_authenticated/finance_/contributions': typeof AuthenticatedFinanceContributionsRoute
@@ -356,6 +383,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/event-register'
     | '/reset-password'
     | '/sitemap.xml'
     | '/committee'
@@ -372,7 +400,9 @@ export interface FileRouteTypes {
     | '/visitation'
     | '/visitors'
     | '/event-register/$eventId'
+    | '/event-register/'
     | '/events/$id'
+    | '/events/browse'
     | '/events/new'
     | '/events/register'
     | '/finance/contributions'
@@ -406,7 +436,9 @@ export interface FileRouteTypes {
     | '/visitation'
     | '/visitors'
     | '/event-register/$eventId'
+    | '/event-register'
     | '/events/$id'
+    | '/events/browse'
     | '/events/new'
     | '/events/register'
     | '/finance/contributions'
@@ -428,6 +460,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/event-register'
     | '/reset-password'
     | '/sitemap.xml'
     | '/_authenticated/committee'
@@ -444,7 +477,9 @@ export interface FileRouteTypes {
     | '/_authenticated/visitation'
     | '/_authenticated/visitors'
     | '/event-register/$eventId'
+    | '/event-register/'
     | '/_authenticated/events/$id'
+    | '/_authenticated/events/browse'
     | '/_authenticated/events/new'
     | '/_authenticated/events/register'
     | '/_authenticated/finance_/contributions'
@@ -467,9 +502,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  EventRegisterRoute: typeof EventRegisterRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  EventRegisterEventIdRoute: typeof EventRegisterEventIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -486,6 +521,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/event-register': {
+      id: '/event-register'
+      path: '/event-register'
+      fullPath: '/event-register'
+      preLoaderRoute: typeof EventRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -509,12 +551,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/event-register/': {
+      id: '/event-register/'
+      path: '/'
+      fullPath: '/event-register/'
+      preLoaderRoute: typeof EventRegisterIndexRouteImport
+      parentRoute: typeof EventRegisterRoute
+    }
     '/event-register/$eventId': {
       id: '/event-register/$eventId'
-      path: '/event-register/$eventId'
+      path: '/$eventId'
       fullPath: '/event-register/$eventId'
       preLoaderRoute: typeof EventRegisterEventIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventRegisterRoute
     }
     '/_authenticated/visitors': {
       id: '/_authenticated/visitors'
@@ -712,6 +761,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsNewRouteImport
       parentRoute: typeof AuthenticatedEventsRoute
     }
+    '/_authenticated/events/browse': {
+      id: '/_authenticated/events/browse'
+      path: '/browse'
+      fullPath: '/events/browse'
+      preLoaderRoute: typeof AuthenticatedEventsBrowseRouteImport
+      parentRoute: typeof AuthenticatedEventsRoute
+    }
     '/_authenticated/events/$id': {
       id: '/_authenticated/events/$id'
       path: '/$id'
@@ -731,6 +787,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedEventsRouteChildren {
   AuthenticatedEventsIdRoute: typeof AuthenticatedEventsIdRoute
+  AuthenticatedEventsBrowseRoute: typeof AuthenticatedEventsBrowseRoute
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
   AuthenticatedEventsRegisterRoute: typeof AuthenticatedEventsRegisterRoute
   AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
@@ -738,6 +795,7 @@ interface AuthenticatedEventsRouteChildren {
 
 const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
   AuthenticatedEventsIdRoute: AuthenticatedEventsIdRoute,
+  AuthenticatedEventsBrowseRoute: AuthenticatedEventsBrowseRoute,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
   AuthenticatedEventsRegisterRoute: AuthenticatedEventsRegisterRoute,
   AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
@@ -830,13 +888,27 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface EventRegisterRouteChildren {
+  EventRegisterEventIdRoute: typeof EventRegisterEventIdRoute
+  EventRegisterIndexRoute: typeof EventRegisterIndexRoute
+}
+
+const EventRegisterRouteChildren: EventRegisterRouteChildren = {
+  EventRegisterEventIdRoute: EventRegisterEventIdRoute,
+  EventRegisterIndexRoute: EventRegisterIndexRoute,
+}
+
+const EventRegisterRouteWithChildren = EventRegisterRoute._addFileChildren(
+  EventRegisterRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  EventRegisterRoute: EventRegisterRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  EventRegisterEventIdRoute: EventRegisterEventIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

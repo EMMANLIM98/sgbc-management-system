@@ -103,6 +103,11 @@ function Landing() {
             <Link to="/auth">Sign in</Link>
           </Button>
         </div>
+        <div className="mt-4">
+          <Button size="sm" variant="ghost" asChild>
+            <Link to="/event-register">Attendee event registration (no login)</Link>
+          </Button>
+        </div>
       </section>
 
       <section className="max-w-4xl mx-auto px-6 pb-24">

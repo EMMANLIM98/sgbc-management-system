@@ -27,7 +27,11 @@ function EventDetail() {
   const getEventFn = useServerFn(getEvent);
   const checkInFn = useServerFn(checkInWithQR);
 
-  const { data: eventData, isLoading: eventLoading } = useQuery({
+  const {
+    data: eventData,
+    isLoading: eventLoading,
+    error: eventError,
+  } = useQuery({
     queryKey: ["event", id],
     queryFn: () => getEventFn({ data: { id } }),
   });
@@ -40,6 +44,19 @@ function EventDetail() {
         <Card className="p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
           <p className="text-gray-600">Loading event details...</p>
+        </Card>
+      </div>
+    );
+  }
+
+  if (eventError) {
+    return (
+      <div className="p-6 max-w-6xl mx-auto">
+        <Card className="p-6 bg-red-50 border-red-200">
+          <p className="text-red-800 font-medium mb-1">Unable to load event</p>
+          <p className="text-sm text-red-700">
+            {eventError instanceof Error ? eventError.message : "Please try again."}
+          </p>
         </Card>
       </div>
     );
@@ -67,9 +84,9 @@ function EventDetail() {
             size="sm"
             onClick={() => {
               const url = `${window.location.origin}/event-register/${id}`;
-              navigator.clipboard.writeText(url).then(() =>
-                toast.success("Public registration link copied!"),
-              );
+              navigator.clipboard
+                .writeText(url)
+                .then(() => toast.success("Public registration link copied!"));
             }}
           >
             <Link2 className="w-4 h-4 mr-2" />

@@ -31,7 +31,7 @@ export interface RegisterForEventInput {
   sex?: SexKind;
   visitorStatus?: VisitorMembership;
   leadershipRole?: LeadershipRole;
-  createdBy: string;
+  createdBy?: string;
 }
 
 export interface UpdateRegistrationInput {

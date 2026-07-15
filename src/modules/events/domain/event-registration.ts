@@ -72,11 +72,12 @@ export class EventRegistration {
   }
 
   static create(
-    props: Omit<EventRegistrationProps, "id" | "createdAt" | "updatedAt">,
+    props: Omit<EventRegistrationProps, "id" | "registeredAt" | "createdAt" | "updatedAt">,
   ): EventRegistration {
     return new EventRegistration({
       ...props,
       id: crypto.randomUUID(),
+      registeredAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
