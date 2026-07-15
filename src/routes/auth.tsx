@@ -1,12 +1,22 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { getAvailableOrganizations } from "@/modules/auth/auth.public.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -23,12 +33,22 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const getOrganizationsFn = useServerFn(getAvailableOrganizations);
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [orgName, setOrgName] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Fetch available organizations
+  const { data: organizationsData, isLoading: orgsLoading } = useQuery({
+    queryKey: ["available-organizations"],
+    queryFn: () => getOrganizationsFn(undefined),
+    staleTime: 60_000, // Cache for 1 minute
+  });
+
+  const organizations = organizationsData?.organizations ?? [];
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -55,12 +75,15 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        if (!orgName) {
+          throw new Error("Please select an organization");
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { full_name: fullName, organization_name: orgName || undefined },
+            data: { full_name: fullName, organization_name: orgName },
           },
         });
         if (error) throw error;
@@ -145,12 +168,19 @@ function AuthPage() {
                     autoComplete="name"
                   />
                 </Field>
-                <Field label="Organization name" hint="You can add churches after signup.">
-                  <Input
-                    value={orgName}
-                    onChange={(e) => setOrgName(e.target.value)}
-                    placeholder="e.g. Shekinah Glory Baptist Church - Main"
-                  />
+                <Field label="Organization" hint="You can add churches after signup.">
+                  <Select value={orgName} onValueChange={setOrgName}>
+                    <SelectTrigger disabled={orgsLoading}>
+                      <SelectValue placeholder={orgsLoading ? "Loading..." : "Select an organization"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {organizations.map((org) => (
+                        <SelectItem key={org.id} value={org.name}>
+                          {org.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
               </>
             )}
@@ -175,7 +205,11 @@ function AuthPage() {
                 />
               </Field>
             )}
-            <Button type="submit" className="w-full h-9" disabled={busy}>
+            <Button
+              type="submit"
+              className="w-full h-9"
+              disabled={busy || (mode === "signup" && (orgsLoading || !orgName))}
+            >
               {busy && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {mode === "signup"
                 ? "Create workspace"
