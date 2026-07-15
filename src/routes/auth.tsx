@@ -125,14 +125,14 @@ function AuthPage() {
         <div className="border border-border rounded-lg bg-card p-6">
           <h1 className="text-lg font-semibold tracking-tight">
             {mode === "signup"
-              ? "Create your workspace"
+              ? "Signup"
               : mode === "forgot"
                 ? "Reset password"
                 : "Sign in"}
           </h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             {mode === "signup"
-              ? "Set up your organization and first church."
+              ? "Set up your account."
               : mode === "forgot"
                 ? "We'll email you a reset link."
                 : "Welcome back."}
@@ -168,10 +168,10 @@ function AuthPage() {
                     autoComplete="name"
                   />
                 </Field>
-                <Field label="Organization" hint="You can add churches after signup.">
+                <Field label="Which Church?" hint="You can add churches after signup.">
                   <Select value={orgName} onValueChange={setOrgName}>
                     <SelectTrigger disabled={orgsLoading}>
-                      <SelectValue placeholder={orgsLoading ? "Loading..." : "Select an organization"} />
+                      <SelectValue placeholder={orgsLoading ? "Loading..." : "Select your church"} />
                     </SelectTrigger>
                     <SelectContent>
                       {organizations.map((org) => (
@@ -212,7 +212,7 @@ function AuthPage() {
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {mode === "signup"
-                ? "Create workspace"
+                ? "Signup"
                 : mode === "forgot"
                   ? "Send reset link"
                   : "Sign in"}
