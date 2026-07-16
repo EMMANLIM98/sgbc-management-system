@@ -1,13 +1,17 @@
 # Fix for Organization Dropdown Signup Issue
 
 ## Problem
+
 When users sign up through the organization dropdown, a NEW organization record is being created in the `organizations` table with a auto-generated slug, instead of linking to the pre-existing SGBC location organizations.
 
 ## Root Cause
+
 The `handle_new_user()` database trigger function automatically creates a new organization when a user signs up, regardless of whether the organization already exists.
 
 ## Solution
+
 Update the `handle_new_user()` function to:
+
 1. Look up if an organization with the selected name exists
 2. Link the user to the EXISTING organization
 3. Only fail gracefully if the organization doesn't exist (shouldn't happen with dropdown)
@@ -34,6 +38,7 @@ npx supabase db push
 See [fix-handle-new-user.sql](./fix-handle-new-user.sql) for the complete function replacement.
 
 The key changes:
+
 - Instead of `INSERT INTO public.organizations (name, slug, created_by)`, we now `SELECT id FROM organizations WHERE name = v_org_name`
 - Only perform further operations if the organization exists (`IF v_org_id IS NOT NULL`)
 - Link user as a regular member, not org_admin
@@ -42,6 +47,7 @@ The key changes:
 ## Verification
 
 After applying the fix:
+
 1. Go to http://localhost:8084/auth (or your signup URL)
 2. Click "Create account"
 3. Fill in the form and select an organization from dropdown

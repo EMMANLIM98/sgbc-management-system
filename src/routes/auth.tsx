@@ -70,6 +70,18 @@ function AuthPage() {
     navigate({ to: "/dashboard", replace: true });
   }
 
+  function getErrorMessage(err: any): string {
+    // Handle Supabase auth errors
+    if (err?.message) return err.message;
+    if (err?.error_description) return err.error_description;
+    if (err?.error) return err.error;
+    if (typeof err === "string") return err;
+    if (typeof err === "object" && Object.keys(err).length === 0) {
+      return "An error occurred. Please try again.";
+    }
+    return "Something went wrong";
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -104,7 +116,8 @@ function AuthPage() {
         setMode("signin");
       }
     } catch (err: any) {
-      toast.error(err.message ?? "Something went wrong");
+      const message = getErrorMessage(err);
+      toast.error("Error", { description: message });
     } finally {
       setBusy(false);
     }
