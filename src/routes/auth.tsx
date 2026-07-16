@@ -99,10 +99,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created", {
-          description: "Check your email if confirmation is required.",
+        toast.success("Account created successfully!", {
+          description: "Check your email to verify your account. Redirecting...",
         });
-        navigate({ to: "/dashboard", replace: true });
+        // Give user time to see the success message before navigating
+        setTimeout(() => {
+          navigate({ to: "/dashboard", replace: true });
+        }, 2000);
       } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
