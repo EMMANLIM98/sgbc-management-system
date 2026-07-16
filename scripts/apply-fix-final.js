@@ -46,8 +46,8 @@ BEGIN
 END;
 $$;`;
 
-const SUPABASE_URL = "https://auucbrkuwusxgctlfqae.supabase.co";
-const SERVICE_ROLE_KEY = "sb_secret_quciSbTHv0V56TFpTY9Fqg_o8nssJII";
+const SUPABASE_URL = "";
+const SERVICE_ROLE_KEY = "";
 
 async function applyFix() {
   try {

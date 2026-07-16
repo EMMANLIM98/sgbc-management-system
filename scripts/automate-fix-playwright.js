@@ -9,7 +9,7 @@
 
 import { chromium } from "playwright";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://auucbrkuwusxgctlfqae.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const PROJECT_ID = SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase/)?.[1] || "";
 
 if (!PROJECT_ID) {

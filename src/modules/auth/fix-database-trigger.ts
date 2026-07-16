@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = "https://auucbrkuwusxgctlfqae.supabase.co";
-const SUPABASE_SERVICE_ROLE_KEY = "sb_secret_quciSbTHv0V56TFpTY9Fqg_o8nssJII";
+const SUPABASE_URL = "";
+const SUPABASE_SERVICE_ROLE_KEY = "";
 
 const fixSQL = `
 CREATE OR REPLACE FUNCTION public.handle_new_user()
