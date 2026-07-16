@@ -9,11 +9,13 @@ This means the Supabase project doesn't have the **Email/Password** authenticati
 ## How to Fix
 
 ### Step 1: Go to Supabase Dashboard
+
 1. Navigate to: https://supabase.com/dashboard
 2. Select your **sgbc-management-system** project
 3. Click on **Authentication** in the left sidebar
 
 ### Step 2: Enable Email Provider
+
 1. Click on **Providers** (under Authentication)
 2. Find **Email** in the list
 3. Click on **Email** to open the settings
@@ -29,12 +31,14 @@ This means the Supabase project doesn't have the **Email/Password** authenticati
 For email to actually be sent, Supabase needs SMTP configured:
 
 **Option A: Use Supabase Built-in Email (Easiest)**
+
 - Go to **Authentication** → **Email Templates** → **Settings**
 - Select **Supabase** as the SMTP provider
 - This is limited but works for testing
 - Click **Save**
 
 **Option B: Configure SendGrid (Recommended)**
+
 - Sign up for [SendGrid](https://sendgrid.com) free account
 - Get your API key from SendGrid dashboard
 - In Supabase: Go to **Email Templates** → **Settings**
@@ -44,6 +48,7 @@ For email to actually be sent, Supabase needs SMTP configured:
 - Click **Save**
 
 **Option C: Configure AWS SES**
+
 - In Supabase: Go to **Email Templates** → **Settings**
 - Select **AWS SES** as SMTP provider
 - Add your AWS credentials
@@ -73,6 +78,7 @@ The signup email needs to redirect users back to your app:
 4. Click **Signup**
 
 **Expected Results**:
+
 - ✅ Success toast: "Account created successfully! Check your email to verify your account. Redirecting..."
 - ✅ 2 second delay before navigation to dashboard
 - ✅ Verification email sent to your email address
@@ -81,20 +87,25 @@ The signup email needs to redirect users back to your app:
 ## Troubleshooting
 
 ### "Anonymous sign-ins are disabled" error
+
 - **Solution**: Email provider is not enabled. Follow Step 2 above.
 
 ### "User signup is disabled" error
+
 - **Solution**: Go to **Authentication** → **Providers** → **Email** and enable "Enable Sign up"
 
 ### Email not received after successful signup
+
 - **Cause**: SMTP not configured
 - **Solution**: Follow Step 3 to configure SMTP (Supabase, SendGrid, or AWS SES)
 
 ### "Error: Email settings missing or invalid"
+
 - **Cause**: SMTP configured but missing required fields
 - **Solution**: Go to **Email Templates** → **Settings** and verify all fields are filled
 
 ### Email sent but redirect not working
+
 - **Cause**: Redirect URL not whitelisted
 - **Solution**: Follow Step 4 to add your domain to Redirect URLs
 

@@ -28,13 +28,16 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, any>) => ({
+    mode: (search.mode ?? "signin") as "signin" | "signup" | "forgot",
+  }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const getOrganizationsFn = useServerFn(getAvailableOrganizations);
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -71,13 +74,27 @@ function AuthPage() {
   }
 
   function getErrorMessage(err: any): string {
+    // Log the full error for debugging
+    console.error("[Auth Error]", {
+      message: err?.message,
+      status: err?.status,
+      error: err?.error,
+      error_description: err?.error_description,
+      code: err?.code,
+      hint: err?.hint,
+      details: err?.details,
+      fullError: err,
+    });
+
     // Handle Supabase auth errors
     if (err?.message) return err.message;
     if (err?.error_description) return err.error_description;
     if (err?.error) return err.error;
+    if (err?.hint) return err.hint;
+    if (err?.details) return err.details;
     if (typeof err === "string") return err;
     if (typeof err === "object" && Object.keys(err).length === 0) {
-      return "An error occurred. Please try again.";
+      return "An error occurred. If you see an empty error, the issue might be with the database. Please contact support if this persists.";
     }
     return "Something went wrong";
   }
@@ -86,7 +103,7 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
+      if (search.mode === "signup") {
         if (!orgName) {
           throw new Error("Please select an organization");
         }
@@ -106,7 +123,7 @@ function AuthPage() {
         setTimeout(() => {
           navigate({ to: "/dashboard", replace: true });
         }, 2000);
-      } else if (mode === "signin") {
+      } else if (search.mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate({ to: "/dashboard", replace: true });
@@ -116,7 +133,7 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Reset link sent", { description: "Check your inbox." });
-        setMode("signin");
+        navigate({ search: { mode: "signin" }, replace: true });
       }
     } catch (err: any) {
       const message = getErrorMessage(err);
@@ -140,21 +157,21 @@ function AuthPage() {
 
         <div className="border border-border rounded-lg bg-card p-6">
           <h1 className="text-lg font-semibold tracking-tight">
-            {mode === "signup"
+            {search.mode === "signup"
               ? "Signup"
-              : mode === "forgot"
+              : search.mode === "forgot"
                 ? "Reset password"
                 : "Sign in"}
           </h1>
           <p className="text-[13px] text-muted-foreground mt-1">
-            {mode === "signup"
+            {search.mode === "signup"
               ? "Set up your account."
-              : mode === "forgot"
+              : search.mode === "forgot"
                 ? "We'll email you a reset link."
                 : "Welcome back."}
           </p>
 
-          {mode !== "forgot" && (
+          {search.mode !== "forgot" && (
             <>
               <Button
                 type="button"
@@ -174,7 +191,7 @@ function AuthPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
+            {search.mode === "signup" && (
               <>
                 <Field label="Full name">
                   <Input
@@ -209,7 +226,7 @@ function AuthPage() {
                 autoComplete="email"
               />
             </Field>
-            {mode !== "forgot" && (
+            {search.mode !== "forgot" && (
               <Field label="Password">
                 <Input
                   type="password"
@@ -217,36 +234,36 @@ function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  autoComplete={search.mode === "signup" ? "new-password" : "current-password"}
                 />
               </Field>
             )}
             <Button
               type="submit"
               className="w-full h-9"
-              disabled={busy || (mode === "signup" && (orgsLoading || !orgName))}
+              disabled={busy || (search.mode === "signup" && (orgsLoading || !orgName))}
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {mode === "signup"
+              {search.mode === "signup"
                 ? "Signup"
-                : mode === "forgot"
+                : search.mode === "forgot"
                   ? "Send reset link"
                   : "Sign in"}
             </Button>
           </form>
 
           <div className="mt-4 flex items-center justify-between text-[12px] text-muted-foreground">
-            {mode === "signin" ? (
+            {search.mode === "signin" ? (
               <>
-                <button className="hover:text-foreground" onClick={() => setMode("forgot")}>
+                <button className="hover:text-foreground" onClick={() => navigate({ search: { mode: "forgot" } })}>
                   Forgot password?
                 </button>
-                <button className="hover:text-foreground" onClick={() => setMode("signup")}>
+                <button className="hover:text-foreground" onClick={() => navigate({ search: { mode: "signup" } })}>
                   Create account
                 </button>
               </>
             ) : (
-              <button className="hover:text-foreground" onClick={() => setMode("signin")}>
+              <button className="hover:text-foreground" onClick={() => navigate({ search: { mode: "signin" } })}>
                 ← Back to sign in
               </button>
             )}

@@ -50,12 +50,20 @@ function createSupabaseClient() {
     throw new Error(message);
   }
 
+  // Use a storage option that works on both server and client
+  // On server: storage will be undefined (safe)
+  // On client: storage will be set to localStorage after hydration
+  let authStorage: Storage | undefined;
+  if (typeof globalThis !== "undefined" && globalThis.localStorage) {
+    authStorage = globalThis.localStorage;
+  }
+
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
       fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
     auth: {
-      storage: typeof window !== "undefined" ? localStorage : undefined,
+      storage: authStorage,
       persistSession: true,
       autoRefreshToken: true,
     },

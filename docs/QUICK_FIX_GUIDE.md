@@ -1,7 +1,9 @@
 # ✅ QUICK FIX GUIDE - Apply Database Trigger Fix (5 minutes)
 
 ## What's the Problem?
+
 Signup shows error: **"Database error saving new user"**
+
 - Root Cause: The `handle_new_user()` trigger is still using OLD code
 - It tries to CREATE a new organization for every signup
 - But the dropdown already links them to an existing org
@@ -12,16 +14,19 @@ Signup shows error: **"Database error saving new user"**
 ## 🚀 Quick Steps to Fix
 
 ### Step 1: Log In to Supabase
+
 1. Go to: **https://supabase.com/dashboard**
 2. Sign in with your GitHub or email
 3. Select project: **sgbc-management-system** (auucbrkuwusxgctlfqae)
 
 ### Step 2: Open SQL Editor
+
 1. In left sidebar, click **SQL** or **SQL Editor**
 2. You should see a list of saved queries
 3. Click **"+ New query"** button (usually top right)
 
 ### Step 3: Paste the Fix SQL
+
 Copy the entire SQL below and paste it into the editor:
 
 ```sql
@@ -73,12 +78,14 @@ $$;
 ```
 
 ### Step 4: Run the SQL
+
 1. Look for the blue **"Run"** button (bottom toolbar or top right)
 2. Click it
 3. Wait for the query to complete
 4. You should see a success message or no error
 
 ### Step 5: Test Signup
+
 1. Open: **http://localhost:8084/auth**
 2. Click **"Create account"**
 3. Fill in the form:
@@ -89,6 +96,7 @@ $$;
 4. Click **Signup**
 
 **Expected Result**:
+
 - ✅ Toast message: "Account created successfully!"
 - ✅ "Check your email to verify your account"
 - ✅ Redirects to dashboard after 2 seconds
@@ -98,38 +106,43 @@ $$;
 
 ## 🎯 What This Fix Does
 
-| Before (BROKEN) | After (FIXED) |
-|---|---|
-| Creates NEW org on every signup | Links to EXISTING org from dropdown |
-| Uses slug 'main' → conflicts | Uses unique slug 'main-{userId}' |
-| User is org_admin | User is member |
-| Signup fails with database error | Signup succeeds ✅ |
+| Before (BROKEN)                  | After (FIXED)                       |
+| -------------------------------- | ----------------------------------- |
+| Creates NEW org on every signup  | Links to EXISTING org from dropdown |
+| Uses slug 'main' → conflicts     | Uses unique slug 'main-{userId}'    |
+| User is org_admin                | User is member                      |
+| Signup fails with database error | Signup succeeds ✅                  |
 
 ---
 
 ## ❓ Troubleshooting
 
 ### "I can't find the Run button"
+
 - Look in the toolbar at the bottom or right of the editor
 - It's a blue button with text "Run" or a play icon (▶️)
 - Or press `Ctrl + Return` (Command + Return on Mac)
 
 ### "Permission denied" error
+
 - Make sure you're using the postgres role (you can see this in a dropdown)
 - If you see "service_role" selected, that's fine too
 - If it still fails, you might need admin access
 
 ### "Function already exists" error
+
 - That's fine! It means the function exists and is being replaced
 - The `CREATE OR REPLACE` means it updates the existing function
 - Not an error, just normal operation
 
 ### "Query executed but I still get the error"
+
 - Try clearing browser cache: `Ctrl + Shift + Delete`
 - Restart the development server: `npm run dev`
 - Test signup again
 
 ### Still stuck?
+
 - Check that all 6 organizations exist in database
 - Go to: Supabase Dashboard → SQL → Run:
   ```sql
@@ -164,6 +177,7 @@ $$;
 ## ✨ That's It!
 
 Once this fix is applied and signup works, the rest of the system should work too:
+
 - ✅ Organization dropdown loads
 - ✅ Signup links user to correct org
 - ✅ No duplicate organizations created
