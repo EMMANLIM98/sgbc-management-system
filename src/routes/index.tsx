@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
         property: "og:title",
         content: "Shekinah Glory Baptist Church — Centralized Church Management",
       },
-      { property: "og:description", content: "One platform for every church in your network." },
+      { property: "og:description", content: "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
