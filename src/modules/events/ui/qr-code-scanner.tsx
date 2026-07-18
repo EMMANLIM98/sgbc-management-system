@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Html5QrcodeScanner, Html5QrcodeScannerConfig } from "html5-qrcode";
+import { Html5QrcodeScanner } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertCircle, X, CheckCircle, Zap } from "lucide-react";
@@ -23,16 +23,39 @@ type ScanState = "idle" | "scanning" | "success" | "error" | "camera-not-found";
 export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerProps) {
   const [scanState, setScanState] = useState<ScanState>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [lastScanned, setLastScanned] = useState<string>("");
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(
+    null,
+  );
   const [torchActive, setTorchActive] = useState(false);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastScannedRef = useRef<string>("");
+  const onScanRef = useRef(onScan);
+
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
 
   // Camera permission and scanner management
   const handleStartScanning = () => {
+    if (typeof window !== "undefined" && !window.isSecureContext) {
+      setErrorMessage(
+        "Camera requires HTTPS on mobile browsers. Open this app with https:// or localhost.",
+      );
+      setScanState("error");
+      return;
+    }
+
+    if (typeof navigator !== "undefined" && !navigator.mediaDevices?.getUserMedia) {
+      setErrorMessage("Camera API is not available in this browser.");
+      setScanState("error");
+      return;
+    }
+
     setScanState("scanning");
     setErrorMessage("");
-    setLastScanned("");
+    setFeedback(null);
+    lastScannedRef.current = "";
   };
 
   useEffect(() => {
@@ -54,7 +77,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           return;
         }
 
-        const config: Html5QrcodeScannerConfig = {
+        const config = {
           fps: 15,
           qrbox: { width: 280, height: 280 },
           rememberLastUsedCamera: true,
@@ -73,30 +96,27 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         // This will request camera access and handle permissions
         await scanner.render(
           (decodedText: string) => {
-            if (decodedText === lastScanned) return;
-
-            setLastScanned(decodedText);
-            if (isComponentMounted) {
-              setScanState("success");
-            }
+            if (decodedText === lastScannedRef.current) return;
+            lastScannedRef.current = decodedText;
 
             // Call the onScan callback (don't await in the scanner callback)
-            onScan(decodedText)
+            onScanRef.current(decodedText)
               .then(() => {
                 if (isComponentMounted) {
+                  setFeedback({ type: "success", message: "Attendee checked in successfully." });
                   setTimeout(() => {
-                    setScanState("scanning");
-                    setErrorMessage("");
+                    setFeedback(null);
                   }, 2000);
                 }
               })
               .catch((error) => {
                 if (isComponentMounted) {
-                  setScanState("error");
-                  setErrorMessage(error instanceof Error ? error.message : "Check-in failed");
+                  setFeedback({
+                    type: "error",
+                    message: error instanceof Error ? error.message : "Check-in failed",
+                  });
                   setTimeout(() => {
-                    setScanState("scanning");
-                    setErrorMessage("");
+                    setFeedback(null);
                   }, 3000);
                 }
               });
@@ -114,7 +134,9 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         
         if (error instanceof DOMException) {
           if (error.name === "NotAllowedError") {
-            errorMsg = "Camera permission denied. Please allow camera access to scan QR codes.";
+            errorMsg = window.isSecureContext
+              ? "Camera permission denied. Please allow camera access to scan QR codes."
+              : "Camera requires HTTPS on mobile browsers. Open this app with https:// or localhost.";
           } else if (error.name === "NotFoundError") {
             errorMsg = "No camera found on this device.";
             setScanState("camera-not-found");
@@ -148,7 +170,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         scannerRef.current = null;
       }
     };
-  }, [scanState, eventId, onScan, lastScanned]);
+  }, [scanState, eventId]);
 
   const stopScanning = async () => {
     if (scannerRef.current) {
@@ -214,13 +236,11 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         </Card>
       )}
 
-      {scanState === "success" && (
+      {feedback?.type === "success" && (
         <Alert className="bg-green-50 border-green-200">
           <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-800">✅ Check-in Successful</AlertTitle>
-          <AlertDescription className="text-green-700">
-            Attendee has been checked in. Resuming scan...
-          </AlertDescription>
+          <AlertTitle className="text-green-800">Check-in Successful</AlertTitle>
+          <AlertDescription className="text-green-700">{feedback.message}</AlertDescription>
         </Alert>
       )}
 
@@ -238,13 +258,21 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
       {scanState === "error" && (
         <Alert className="bg-red-50 border-red-200">
           <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertTitle className="text-red-800">❌ Error</AlertTitle>
+          <AlertTitle className="text-red-800">Scanner Error</AlertTitle>
           <AlertDescription className="text-red-700">{errorMessage}</AlertDescription>
           <div className="mt-3">
             <Button onClick={() => setScanState("idle")} variant="outline" size="sm">
               Try Again
             </Button>
           </div>
+        </Alert>
+      )}
+
+      {feedback?.type === "error" && (
+        <Alert className="bg-red-50 border-red-200">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertTitle className="text-red-800">Check-in Failed</AlertTitle>
+          <AlertDescription className="text-red-700">{feedback.message}</AlertDescription>
         </Alert>
       )}
     </div>
