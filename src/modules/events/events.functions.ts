@@ -316,6 +316,21 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
       },
     );
 
+    // Fetch church names for all unique church IDs
+    const churchIds = [...new Set(registrations.map((r) => r.churchId))];
+    let churchNames: { [key: string]: string } = {};
+
+    if (churchIds.length > 0) {
+      const { data: churches } = await context.supabase
+        .from("churches")
+        .select("id, name")
+        .in("id", churchIds);
+
+      if (churches) {
+        churchNames = Object.fromEntries(churches.map((c: any) => [c.id, c.name]));
+      }
+    }
+
     return {
       registrations: registrations.map((r) => ({
         id: r.id,
@@ -323,6 +338,7 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
         email: r.attendeeEmail,
         phone: r.attendeePhone,
         churchId: r.churchId,
+        churchName: churchNames[r.churchId] || "Unknown Church",
         status: r.status,
         isCheckedIn: r.isCheckedIn(),
         ageCategory: r.ageCategory,

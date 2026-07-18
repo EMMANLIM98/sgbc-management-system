@@ -117,47 +117,47 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
     <div className="space-y-6">
       {/* Raffle Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-indigo-200">
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <Gift className="w-5 h-5 text-indigo-600" />
-            <h3 className="font-semibold text-indigo-900">Checked In</h3>
+            <Gift className="w-5 h-5 text-gray-600" />
+            <h3 className="font-semibold text-gray-900">Eligible Entries</h3>
           </div>
-          <p className="text-3xl font-bold text-indigo-600">{checkedInCount}</p>
-          <p className="text-xs text-indigo-600 mt-2">Eligible raffle entries</p>
+          <p className="text-3xl font-bold text-gray-900">{checkedInCount}</p>
+          <p className="text-xs text-gray-500 mt-2">Checked in attendees</p>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-5 h-5 text-purple-600" />
-            <h3 className="font-semibold text-purple-900">Winners</h3>
+            <Sparkles className="w-5 h-5 text-gray-600" />
+            <h3 className="font-semibold text-gray-900">Winners</h3>
           </div>
-          <p className="text-3xl font-bold text-purple-600">{winners.length}</p>
-          <p className="text-xs text-purple-600 mt-2">Prizes drawn</p>
+          <p className="text-3xl font-bold text-gray-900">{winners.length}</p>
+          <p className="text-xs text-gray-500 mt-2">Prizes drawn</p>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <Gift className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-green-900">Remaining</h3>
+            <Gift className="w-5 h-5 text-gray-600" />
+            <h3 className="font-semibold text-gray-900">Remaining</h3>
           </div>
-          <p className="text-3xl font-bold text-green-600">
+          <p className="text-3xl font-bold text-gray-900">
             {Math.max(0, checkedInCount - winners.length)}
           </p>
-          <p className="text-xs text-green-600 mt-2">Eligible entries left</p>
+          <p className="text-xs text-gray-500 mt-2">Eligible entries left</p>
         </Card>
       </div>
 
       {/* Draw Controls */}
-      <Card className="p-6 border-2 border-dashed border-purple-300 bg-purple-50">
+      <Card className="p-6 border border-gray-200 bg-gray-50 shadow-sm">
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Prize Name</label>
+            <label className="block text-sm font-medium text-gray-900 mb-2">Prize Name</label>
             <Input
               placeholder="e.g., Gift Card, Coffee Maker, Books..."
               value={prizeName}
               onChange={(e) => setPrizeName(e.target.value)}
               disabled={isDrawing || checkedInCount === 0}
-              className="w-full"
+              className="border-gray-200 bg-white text-gray-900 placeholder:text-gray-500"
             />
           </div>
 
@@ -174,7 +174,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
                   onClick={handlePopulateRaffle}
                   disabled={isPopulating || winners.length > 0}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 border-gray-200 text-gray-900 hover:bg-gray-50"
                 >
                   <Gift className="w-4 h-4 mr-2" />
                   {isPopulating ? "Populating..." : "Populate Raffle"}
@@ -185,7 +185,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
                   disabled={
                     isDrawing || checkedInCount === 0 || !prizeName.trim() || winners.length >= checkedInCount
                   }
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  className="flex-1 bg-gray-900 text-white hover:bg-gray-800"
                 >
                   {isDrawing ? (
                     <>
@@ -204,10 +204,9 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
           </div>
 
           {winners.length >= checkedInCount && checkedInCount > 0 && (
-            <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-md">
-              <p className="text-sm text-yellow-800">
-                ✨ All checked-in attendees have won! {checkedInCount} winners from {checkedInCount}{" "}
-                entries.
+            <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
+              <p className="text-sm text-gray-700">
+                ✨ All checked-in attendees have won! {checkedInCount} winners from {checkedInCount} entries.
               </p>
             </div>
           )}
@@ -216,10 +215,10 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
 
       {/* Winners List */}
       {winners.length > 0 && (
-        <Card className="overflow-hidden">
-          <div className="p-6 border-b bg-gradient-to-r from-purple-50 to-pink-50">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-purple-600" />
+        <Card className="border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-900">
+              <Sparkles className="w-5 h-5 text-gray-600" />
               Raffle Winners ({winners.length})
             </h3>
           </div>
@@ -227,30 +226,30 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="font-semibold">#</TableHead>
-                  <TableHead className="font-semibold">Winner</TableHead>
-                  <TableHead className="font-semibold">Email</TableHead>
-                  <TableHead className="font-semibold">Prize</TableHead>
-                  <TableHead className="font-semibold">Drawn At</TableHead>
+                <TableRow className="bg-gray-50 border-b border-gray-200">
+                  <TableHead className="font-semibold text-gray-900">#</TableHead>
+                  <TableHead className="font-semibold text-gray-900">Winner</TableHead>
+                  <TableHead className="font-semibold text-gray-900">Email</TableHead>
+                  <TableHead className="font-semibold text-gray-900">Prize</TableHead>
+                  <TableHead className="font-semibold text-gray-900">Drawn At</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {winners.map((winner, idx) => (
-                  <TableRow key={winner.id} className="hover:bg-gray-50">
+                  <TableRow key={winner.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                     <TableCell>
-                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
+                      <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 font-semibold">
                         {idx + 1}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium">{winner.participantName}</TableCell>
-                    <TableCell className="text-sm text-gray-600">{winner.participantEmail || "-"}</TableCell>
+                    <TableCell className="font-medium text-gray-900">{winner.participantName}</TableCell>
+                    <TableCell className="text-sm text-gray-600">{winner.participantEmail || "—"}</TableCell>
                     <TableCell className="font-medium">
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-300">
+                      <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200">
                         {winner.prizeName}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-500">
+                    <TableCell className="text-sm text-gray-600">
                       {new Date(winner.drawnAt).toLocaleDateString()} at{" "}
                       {new Date(winner.drawnAt).toLocaleTimeString()}
                     </TableCell>
@@ -263,7 +262,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
       )}
 
       {loadingWinners && (
-        <Card className="p-12 text-center">
+        <Card className="p-12 text-center border border-gray-200 bg-white shadow-sm">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-gray-400" />
           <p className="text-gray-500">Loading raffle data...</p>
         </Card>

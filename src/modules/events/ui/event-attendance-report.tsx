@@ -82,47 +82,47 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 border-l-4 border-l-green-500">
-          <p className="text-sm text-gray-600 font-medium">Checked In</p>
-          <p className="text-3xl font-bold text-green-600">{checkedInCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Attended</p>
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
+          <p className="text-sm font-medium text-gray-600">Checked In</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{checkedInCount}</p>
+          <p className="text-xs text-gray-500 mt-2">Attended</p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-blue-500">
-          <p className="text-sm text-gray-600 font-medium">Still Registered</p>
-          <p className="text-3xl font-bold text-blue-600">{registeredCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Not yet checked in</p>
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
+          <p className="text-sm font-medium text-gray-600">Still Registered</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{registeredCount}</p>
+          <p className="text-xs text-gray-500 mt-2">Not yet checked in</p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-red-500">
-          <p className="text-sm text-gray-600 font-medium">No-Show</p>
-          <p className="text-3xl font-bold text-red-600">{noShowCount}</p>
-          <p className="text-xs text-gray-500 mt-1">Did not attend</p>
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
+          <p className="text-sm font-medium text-gray-600">No-Show</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{noShowCount}</p>
+          <p className="text-xs text-gray-500 mt-2">Did not attend</p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-purple-500">
-          <p className="text-sm text-gray-600 font-medium">Attendance Rate</p>
-          <p className="text-3xl font-bold text-purple-600">{attendanceRate}%</p>
-          <p className="text-xs text-gray-500 mt-1">
+        <Card className="p-6 border border-gray-200 bg-white shadow-sm">
+          <p className="text-sm font-medium text-gray-600">Attendance Rate</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{attendanceRate}%</p>
+          <p className="text-xs text-gray-500 mt-2">
             {checkedInCount} of {totalRegistered}
           </p>
         </Card>
       </div>
 
       {/* Detailed Tables */}
-      <Card className="overflow-hidden">
+      <Card className="border border-gray-200 bg-white shadow-sm overflow-hidden">
         <Tabs defaultValue="checked_in" className="w-full">
-          <TabsList className="w-full justify-start rounded-none border-b bg-white p-0 h-auto">
-            <TabsTrigger value="checked_in" className="rounded-none border-b-2 border-b-transparent">
-              <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" />
+          <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-white p-0 h-auto">
+            <TabsTrigger value="checked_in" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+              <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
               Checked In ({checkedInCount})
             </TabsTrigger>
-            <TabsTrigger value="registered" className="rounded-none border-b-2 border-b-transparent">
-              <Clock className="w-4 h-4 mr-2 text-blue-600" />
+            <TabsTrigger value="registered" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+              <Clock className="w-4 h-4 mr-2 text-gray-600" />
               Registered ({registeredCount})
             </TabsTrigger>
-            <TabsTrigger value="no_show" className="rounded-none border-b-2 border-b-transparent">
-              <AlertCircle className="w-4 h-4 mr-2 text-red-600" />
+            <TabsTrigger value="no_show" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+              <AlertCircle className="w-4 h-4 mr-2 text-gray-600" />
               No-Show ({noShowCount})
             </TabsTrigger>
           </TabsList>
@@ -163,38 +163,25 @@ interface AttendanceTableProps {
 }
 
 function AttendanceTable({ data, isLoading, status }: AttendanceTableProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "checked_in":
-        return "bg-green-50 border-green-200";
-      case "registered":
-        return "bg-blue-50 border-blue-200";
-      case "no_show":
-        return "bg-red-50 border-red-200";
-      default:
-        return "";
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "checked_in":
         return (
-          <Badge className="bg-green-100 text-green-800 hover:bg-green-100 flex items-center gap-1 w-fit">
+          <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal">
             <CheckCircle2 className="w-3 h-3" />
             Checked In
           </Badge>
         );
       case "registered":
         return (
-          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 flex items-center gap-1 w-fit">
+          <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal">
             <Clock className="w-3 h-3" />
             Registered
           </Badge>
         );
       case "no_show":
         return (
-          <Badge className="bg-red-100 text-red-800 hover:bg-red-100 flex items-center gap-1 w-fit">
+          <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal">
             <AlertCircle className="w-3 h-3" />
             No-Show
           </Badge>
@@ -205,7 +192,7 @@ function AttendanceTable({ data, isLoading, status }: AttendanceTableProps) {
   };
 
   return (
-    <div className={`overflow-x-auto p-6 ${getStatusColor(status)}`}>
+    <div className="overflow-x-auto p-6">
       {isLoading ? (
         <div className="flex justify-center items-center h-32">
           <Loader2 className="w-5 h-5 animate-spin text-gray-400 mr-2" />
@@ -213,47 +200,45 @@ function AttendanceTable({ data, isLoading, status }: AttendanceTableProps) {
         </div>
       ) : data.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-500">No attendees in this category</p>
+          <p className="text-gray-500 text-sm">No attendees in this category</p>
         </div>
       ) : (
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="font-semibold">Name</TableHead>
-              <TableHead className="font-semibold">Email</TableHead>
-              <TableHead className="font-semibold">Phone</TableHead>
-              <TableHead className="font-semibold">Age Category</TableHead>
-              <TableHead className="font-semibold">Visitor Status</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+            <TableRow className="bg-gray-50 border-b border-gray-200">
+              <TableHead className="font-semibold text-gray-900">Name</TableHead>
+              <TableHead className="font-semibold text-gray-900">Email</TableHead>
+              <TableHead className="font-semibold text-gray-900">Phone</TableHead>
+              <TableHead className="font-semibold text-gray-900">Age Category</TableHead>
+              <TableHead className="font-semibold text-gray-900">Visitor Status</TableHead>
+              <TableHead className="text-center font-semibold text-gray-900">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map((registration) => (
-              <TableRow key={registration.id}>
-                <TableCell className="font-medium">{registration.name}</TableCell>
-                <TableCell className="text-sm text-gray-600">{registration.email || "-"}</TableCell>
-                <TableCell className="text-sm text-gray-600">{registration.phone || "-"}</TableCell>
+              <TableRow key={registration.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                <TableCell className="font-medium text-gray-900">{registration.name}</TableCell>
+                <TableCell className="text-sm text-gray-600">{registration.email || "—"}</TableCell>
+                <TableCell className="text-sm text-gray-600">{registration.phone || "—"}</TableCell>
                 <TableCell>
                   {registration.ageCategory ? (
-                    <Badge variant="outline" className="capitalize">
+                    <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal">
                       {registration.ageCategory.replace("_", " ")}
                     </Badge>
                   ) : (
-                    <span className="text-gray-400 text-sm">-</span>
+                    <span className="text-gray-400 text-sm">—</span>
                   )}
                 </TableCell>
                 <TableCell>
                   {registration.visitorStatus ? (
                     <Badge
-                      variant={
-                        registration.visitorStatus === "member" ? "default" : "secondary"
-                      }
-                      className="capitalize"
+                      variant="outline"
+                      className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal"
                     >
                       {registration.visitorStatus.replace("_", " ")}
                     </Badge>
                   ) : (
-                    <span className="text-gray-400 text-sm">-</span>
+                    <span className="text-gray-400 text-sm">—</span>
                   )}
                 </TableCell>
                 <TableCell className="text-center">{getStatusBadge(registration.status)}</TableCell>
