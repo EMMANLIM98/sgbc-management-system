@@ -322,6 +322,7 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
         name: r.attendeeName,
         email: r.attendeeEmail,
         phone: r.attendeePhone,
+        churchId: r.churchId,
         status: r.status,
         isCheckedIn: r.isCheckedIn(),
         ageCategory: r.ageCategory,

@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeScanner } from "@/modules/events/ui/qr-code-scanner";
 import { EventAnalyticsDashboard } from "@/modules/events/ui/event-analytics-dashboard";
 import { EventCheckinReport } from "@/modules/events/ui/event-checkin-report";
+import { EventAttendanceReport } from "@/modules/events/ui/event-attendance-report";
+import { EventRaffle } from "@/modules/events/ui/event-raffle";
 import { Loader2, Calendar, MapPin, UserPlus, Link2 } from "lucide-react";
 import { getEvent, checkInWithQR } from "@/modules/events/events.functions";
 import { useCurrentChurch } from "@/hooks/use-current-church";
@@ -126,7 +128,9 @@ function EventDetail() {
         <TabsList>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="checkin">Check-In</TabsTrigger>
-          <TabsTrigger value="attendees">Attendees</TabsTrigger>
+          <TabsTrigger value="attendees">Checked In</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance Report</TabsTrigger>
+          <TabsTrigger value="raffle">Raffle 🎉</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analytics">
@@ -158,6 +162,14 @@ function EventDetail() {
 
         <TabsContent value="attendees">
           <EventCheckinReport eventId={id} />
+        </TabsContent>
+
+        <TabsContent value="attendance">
+          <EventAttendanceReport eventId={id} />
+        </TabsContent>
+
+        <TabsContent value="raffle">
+          <EventRaffle eventId={id} />
         </TabsContent>
       </Tabs>
     </div>

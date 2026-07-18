@@ -4,9 +4,10 @@
  * Displays list of attendees who have checked in to an event.
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { getEventRegistrations } from "@/modules/events/events.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ interface EventCheckinReportProps {
 export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [churchNames, setChurchNames] = useState<{ [key: string]: string }>({});
   const pageSize = 25;
 
   const getRegistrationsFn = useServerFn(getEventRegistrations);
@@ -54,6 +56,33 @@ export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
         },
       }),
   });
+
+  // Fetch church names for all unique churchIds
+  useEffect(() => {
+    if (!data?.registrations) return;
+
+    const churchIds = [...new Set(data.registrations.map((r) => r.churchId))];
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY,
+    );
+
+    Promise.all(
+      churchIds.map((churchId) =>
+        supabase
+          .from("churches")
+          .select("id, name")
+          .eq("id", churchId)
+          .maybeSingle()
+          .then(({ data: church }) => {
+            if (church) {
+              setChurchNames((prev) => ({ ...prev, [churchId]: church.name }));
+            }
+          })
+          .catch(() => {}),
+      ),
+    );
+  }, [data?.registrations]);
 
   // Filter registrations by search term
   const filteredRegistrations = useMemo(() => {
@@ -124,6 +153,7 @@ export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
             <TableHeader>
               <TableRow className="bg-gray-50">
                 <TableHead className="font-semibold">Name</TableHead>
+                <TableHead className="font-semibold">Church</TableHead>
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Phone</TableHead>
                 <TableHead className="font-semibold">Category</TableHead>
@@ -134,14 +164,14 @@ export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center">
+                  <TableCell colSpan={7} className="h-32 text-center">
                     <Loader2 className="w-5 h-5 animate-spin mx-auto text-gray-400 mb-2" />
                     <p className="text-gray-500 text-sm">Loading check-ins...</p>
                   </TableCell>
                 </TableRow>
               ) : filteredRegistrations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     <p className="text-gray-500">
                       {searchTerm ? "No check-ins match your search." : "No check-ins yet."}
                     </p>
@@ -151,6 +181,9 @@ export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
                 filteredRegistrations.map((registration) => (
                   <TableRow key={registration.id} className="hover:bg-gray-50">
                     <TableCell className="font-medium">{registration.name}</TableCell>
+                    <TableCell className="text-sm font-medium text-blue-600">
+                      {churchNames[registration.churchId] || "Loading..."}
+                    </TableCell>
                     <TableCell className="text-sm text-gray-600">{registration.email || "-"}</TableCell>
                     <TableCell className="text-sm text-gray-600">{registration.phone || "-"}</TableCell>
                     <TableCell>
