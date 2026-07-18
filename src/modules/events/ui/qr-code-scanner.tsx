@@ -66,54 +66,61 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
   useEffect(() => {
     if (scanState !== "scanning" || !containerRef.current) return;
 
-    const initializeScanner = () => {
+    let isComponentMounted = true;
+
+    const initializeScanner = async () => {
       try {
         const config: Html5QrcodeScannerConfig = {
           fps: 15,
           qrbox: { width: 280, height: 280 },
-          aspectRatio: 1.0,
           rememberLastUsedCamera: true,
-          supportedScanTypes: [],
-          showTorchButtonIfSupported: true,
           disableFlip: false,
-          formatsToSupport: [],
         };
 
         const scanner = new Html5QrcodeScanner(`qr-reader-${eventId}`, config, false);
+        
+        if (!isComponentMounted) return;
         scannerRef.current = scanner;
 
-        // Don't await - render() is synchronous with callbacks
-        scanner.render(
+        // render() returns a Promise - must await it
+        await scanner.render(
           async (decodedText: string) => {
-            if (decodedText === lastScanned) return; // Ignore duplicate scans
+            if (decodedText === lastScanned) return;
 
             setLastScanned(decodedText);
-            setScanState("success");
+            if (isComponentMounted) {
+              setScanState("success");
+            }
 
             try {
               await onScan(decodedText);
-              // Reset after success
-              setTimeout(() => {
-                setScanState("scanning");
-                setErrorMessage("");
-              }, 2000);
+              if (isComponentMounted) {
+                setTimeout(() => {
+                  setScanState("scanning");
+                  setErrorMessage("");
+                }, 2000);
+              }
             } catch (error) {
-              setScanState("error");
-              setErrorMessage(error instanceof Error ? error.message : "Check-in failed");
-              setTimeout(() => {
-                setScanState("scanning");
-                setErrorMessage("");
-              }, 3000);
+              if (isComponentMounted) {
+                setScanState("error");
+                setErrorMessage(error instanceof Error ? error.message : "Check-in failed");
+                setTimeout(() => {
+                  setScanState("scanning");
+                  setErrorMessage("");
+                }, 3000);
+              }
             }
           },
           (error: any) => {
-            // Ignore scanning errors during scanning - they're normal
             if (error && typeof error === 'string' && error.includes('NotFoundError')) {
               console.debug('QR code not found in frame');
             }
           },
         );
+
+        console.debug('QR Scanner initialized successfully');
       } catch (error) {
+        if (!isComponentMounted) return;
         console.error('Scanner initialization error:', error);
         const errorMsg = error instanceof Error ? error.message : 'Failed to initialize camera scanner';
         setErrorMessage(errorMsg);
@@ -121,13 +128,10 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
       }
     };
 
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      initializeScanner();
-    }, 100);
+    initializeScanner();
 
     return () => {
-      clearTimeout(timer);
+      isComponentMounted = false;
       if (scannerRef.current) {
         try {
           scannerRef.current.clear().catch(() => {});
