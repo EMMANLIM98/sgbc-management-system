@@ -66,7 +66,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
   useEffect(() => {
     if (scanState !== "scanning" || !containerRef.current) return;
 
-    const initializeScanner = async () => {
+    const initializeScanner = () => {
       try {
         const config: Html5QrcodeScannerConfig = {
           fps: 15,
@@ -75,7 +75,6 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           rememberLastUsedCamera: true,
           supportedScanTypes: [],
           showTorchButtonIfSupported: true,
-          // Mobile optimizations
           disableFlip: false,
           formatsToSupport: [],
         };
@@ -83,7 +82,8 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         const scanner = new Html5QrcodeScanner(`qr-reader-${eventId}`, config, false);
         scannerRef.current = scanner;
 
-        await scanner.render(
+        // Don't await - render() is synchronous with callbacks
+        scanner.render(
           async (decodedText: string) => {
             if (decodedText === lastScanned) return; // Ignore duplicate scans
 
@@ -107,22 +107,33 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
             }
           },
           (error: any) => {
-            // Ignore scanning errors, they're normal during scanning
+            // Ignore scanning errors during scanning - they're normal
+            if (error && typeof error === 'string' && error.includes('NotFoundError')) {
+              console.debug('QR code not found in frame');
+            }
           },
         );
       } catch (error) {
-        setErrorMessage(
-          error instanceof Error ? error.message : "Failed to initialize camera scanner"
-        );
+        console.error('Scanner initialization error:', error);
+        const errorMsg = error instanceof Error ? error.message : 'Failed to initialize camera scanner';
+        setErrorMessage(errorMsg);
         setScanState("error");
       }
     };
 
-    initializeScanner();
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      initializeScanner();
+    }, 100);
 
     return () => {
+      clearTimeout(timer);
       if (scannerRef.current) {
-        scannerRef.current.clear().catch(() => {});
+        try {
+          scannerRef.current.clear().catch(() => {});
+        } catch (error) {
+          console.debug('Error clearing scanner:', error);
+        }
         scannerRef.current = null;
       }
     };
