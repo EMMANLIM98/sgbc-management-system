@@ -89,10 +89,15 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
   }
 
   if (errorCheckedIn || errorRegistered || errorNoShow) {
+    const errorMsg = errorCheckedIn?.message || errorRegistered?.message || errorNoShow?.message || "Unknown error";
+    console.error("Attendance report error:", { errorCheckedIn, errorRegistered, errorNoShow });
     return (
       <Card className="p-6 border border-gray-200 bg-white">
-        <p className="text-gray-900 font-medium mb-1\">Failed to load attendance data</p>
-        <p className="text-sm text-gray-600\">Please try again or contact support</p>
+        <p className="text-gray-900 font-medium mb-1">Failed to load attendance data</p>
+        <p className="text-sm text-gray-600 mb-3">Please try again or contact support</p>
+        <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-200 font-mono break-all">
+          Error: {errorMsg}
+        </p>
       </Card>
     );
   }

@@ -321,13 +321,20 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
     let churchNames: { [key: string]: string } = {};
 
     if (churchIds.length > 0) {
-      const { data: churches } = await context.supabase
-        .from("churches")
-        .select("id, name")
-        .in("id", churchIds);
+      try {
+        const { data: churches, error: churchesError } = await context.supabase
+          .from("churches")
+          .select("id, name")
+          .in("id", churchIds);
 
-      if (churches) {
-        churchNames = Object.fromEntries(churches.map((c: any) => [c.id, c.name]));
+        if (churchesError) {
+          console.warn("Warning: Could not fetch church names, will use fallback:", churchesError);
+        } else if (churches && churches.length > 0) {
+          churchNames = Object.fromEntries(churches.map((c: any) => [c.id, c.name]));
+        }
+      } catch (error) {
+        console.warn("Warning: Error fetching church names:", error);
+        // Continue without church names - they'll show as "Unknown Church"
       }
     }
 
