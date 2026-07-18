@@ -18,7 +18,7 @@ export interface QRScannerProps {
   eventId: string;
 }
 
-type ScanState = "idle" | "requesting-permission" | "scanning" | "success" | "error" | "camera-not-found";
+type ScanState = "idle" | "scanning" | "success" | "error" | "camera-not-found";
 
 export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerProps) {
   const [scanState, setScanState] = useState<ScanState>("idle");
@@ -28,48 +28,32 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Request camera permissions explicitly
-  const requestCameraPermission = async () => {
-    try {
-      setScanState("requesting-permission");
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment", // Back camera on mobile
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
-      // Stop the stream immediately, just checking permission
-      stream.getTracks().forEach((track) => track.stop());
-      return true;
-    } catch (error) {
-      if (error instanceof DOMException) {
-        if (error.name === "NotAllowedError") {
-          setErrorMessage("Camera permission denied. Please allow camera access to scan QR codes.");
-        } else if (error.name === "NotFoundError") {
-          setErrorMessage("No camera found on this device.");
-          setScanState("camera-not-found");
-          return false;
-        } else if (error.name === "NotReadableError") {
-          setErrorMessage("Camera is already in use. Please close other apps using the camera.");
-        } else {
-          setErrorMessage(`Camera error: ${error.message}`);
-        }
-      } else {
-        setErrorMessage("Unable to access camera. Please check your device permissions.");
-      }
-      setScanState("error");
-      return false;
-    }
+  // Camera permission and scanner management
+  const handleStartScanning = () => {
+    setScanState("scanning");
+    setErrorMessage("");
+    setLastScanned("");
   };
 
   useEffect(() => {
     if (scanState !== "scanning" || !containerRef.current) return;
 
     let isComponentMounted = true;
+    const containerId = `qr-reader-${eventId}`;
 
     const initializeScanner = async () => {
       try {
+        // Check if container exists
+        const container = document.getElementById(containerId);
+        if (!container) {
+          console.error(`Container ${containerId} not found`);
+          if (isComponentMounted) {
+            setErrorMessage("Scanner container not found");
+            setScanState("error");
+          }
+          return;
+        }
+
         const config: Html5QrcodeScannerConfig = {
           fps: 15,
           qrbox: { width: 280, height: 280 },
@@ -77,14 +61,18 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           disableFlip: false,
         };
 
-        const scanner = new Html5QrcodeScanner(`qr-reader-${eventId}`, config, false);
+        const scanner = new Html5QrcodeScanner(containerId, config, false);
         
-        if (!isComponentMounted) return;
+        if (!isComponentMounted) {
+          scanner.clear().catch(() => {});
+          return;
+        }
+
         scannerRef.current = scanner;
 
-        // render() returns a Promise - must await it
+        // This will request camera access and handle permissions
         await scanner.render(
-          async (decodedText: string) => {
+          (decodedText: string) => {
             if (decodedText === lastScanned) return;
 
             setLastScanned(decodedText);
@@ -92,65 +80,75 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
               setScanState("success");
             }
 
-            try {
-              await onScan(decodedText);
-              if (isComponentMounted) {
-                setTimeout(() => {
-                  setScanState("scanning");
-                  setErrorMessage("");
-                }, 2000);
-              }
-            } catch (error) {
-              if (isComponentMounted) {
-                setScanState("error");
-                setErrorMessage(error instanceof Error ? error.message : "Check-in failed");
-                setTimeout(() => {
-                  setScanState("scanning");
-                  setErrorMessage("");
-                }, 3000);
-              }
-            }
+            // Call the onScan callback (don't await in the scanner callback)
+            onScan(decodedText)
+              .then(() => {
+                if (isComponentMounted) {
+                  setTimeout(() => {
+                    setScanState("scanning");
+                    setErrorMessage("");
+                  }, 2000);
+                }
+              })
+              .catch((error) => {
+                if (isComponentMounted) {
+                  setScanState("error");
+                  setErrorMessage(error instanceof Error ? error.message : "Check-in failed");
+                  setTimeout(() => {
+                    setScanState("scanning");
+                    setErrorMessage("");
+                  }, 3000);
+                }
+              });
           },
-          (error: any) => {
-            if (error && typeof error === 'string' && error.includes('NotFoundError')) {
-              console.debug('QR code not found in frame');
-            }
-          },
+          (error: string) => {
+            // Ignore scanning errors - this is normal during operation
+          }
         );
 
-        console.debug('QR Scanner initialized successfully');
+        console.debug("Scanner initialized successfully");
       } catch (error) {
         if (!isComponentMounted) return;
-        console.error('Scanner initialization error:', error);
-        const errorMsg = error instanceof Error ? error.message : 'Failed to initialize camera scanner';
+
+        let errorMsg = "Failed to initialize camera scanner";
+        
+        if (error instanceof DOMException) {
+          if (error.name === "NotAllowedError") {
+            errorMsg = "Camera permission denied. Please allow camera access to scan QR codes.";
+          } else if (error.name === "NotFoundError") {
+            errorMsg = "No camera found on this device.";
+            setScanState("camera-not-found");
+          } else if (error.name === "NotReadableError") {
+            errorMsg = "Camera is already in use. Please close other apps using the camera.";
+          }
+        } else if (error instanceof Error) {
+          errorMsg = error.message;
+        }
+
+        console.error("Scanner error:", error);
         setErrorMessage(errorMsg);
         setScanState("error");
       }
     };
 
-    initializeScanner();
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      initializeScanner();
+    }, 100);
 
     return () => {
+      clearTimeout(timeoutId);
       isComponentMounted = false;
       if (scannerRef.current) {
         try {
           scannerRef.current.clear().catch(() => {});
-        } catch (error) {
-          console.debug('Error clearing scanner:', error);
+        } catch (e) {
+          console.debug("Error clearing scanner:", e);
         }
         scannerRef.current = null;
       }
     };
   }, [scanState, eventId, onScan, lastScanned]);
-
-  const startScanning = async () => {
-    const hasPermission = await requestCameraPermission();
-    if (hasPermission) {
-      setScanState("scanning");
-      setErrorMessage("");
-      setLastScanned("");
-    }
-  };
 
   const stopScanning = async () => {
     if (scannerRef.current) {
@@ -181,22 +179,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
             <p className="text-sm text-gray-600">
               Click below to access your device camera and scan check-in QR codes.
             </p>
-            <Button onClick={startScanning} size="lg" disabled={isLoading} className="w-full">
+            <Button onClick={handleStartScanning} size="lg" disabled={isLoading} className="w-full">
               {isLoading ? "Processing..." : "📱 Start Camera Scanner"}
             </Button>
             <p className="text-xs text-gray-500 text-center">
               This requires camera access. Make sure to grant permission when prompted.
             </p>
-          </div>
-        </Card>
-      )}
-
-      {scanState === "requesting-permission" && (
-        <Card className="p-6">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin">📷</div>
-            <h3 className="text-lg font-semibold">Requesting Camera Access</h3>
-            <p className="text-sm text-gray-600">Please allow camera access in the popup...</p>
           </div>
         </Card>
       )}
