@@ -20,10 +20,10 @@ export interface EventListingProps {
 
 const statusColors: Record<string, string> = {
   draft: "bg-gray-100 text-gray-700 border-gray-200",
-  scheduled: "bg-blue-50 text-blue-700 border-blue-200",
-  active: "bg-green-50 text-green-700 border-green-200",
+  scheduled: "bg-gray-100 text-gray-700 border-gray-200",
+  active: "bg-gray-100 text-gray-700 border-gray-200",
   completed: "bg-gray-100 text-gray-700 border-gray-200",
-  cancelled: "bg-red-50 text-red-700 border-red-200",
+  cancelled: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
 export function EventListing({ churchId, futureOnly = true, onEventClick }: EventListingProps) {
@@ -51,7 +51,7 @@ export function EventListing({ churchId, futureOnly = true, onEventClick }: Even
 
   if (!churchId) {
     return (
-      <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
+      <div className="p-8 text-center border border-gray-200 rounded-lg bg-white">
         <p className="text-gray-700 font-medium">Please select a church first</p>
       </div>
     );
@@ -69,12 +69,12 @@ export function EventListing({ churchId, futureOnly = true, onEventClick }: Even
 
   if (error) {
     return (
-      <div className="p-8 text-center border border-gray-200 rounded-lg bg-gray-50">
+      <div className="p-8 text-center border border-gray-200 rounded-lg bg-white">
         <p className="text-gray-700 font-medium mb-2">Unable to load events</p>
         <p className="text-sm text-gray-500 mb-4">
           {error instanceof Error ? error.message : "Please try again later"}
         </p>
-        <Button onClick={() => window.location.reload()} variant="outline" size="sm">
+        <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-gray-200 text-gray-900 hover:bg-gray-50">
           Retry
         </Button>
       </div>
@@ -85,13 +85,13 @@ export function EventListing({ churchId, futureOnly = true, onEventClick }: Even
 
   if (data?.setupRequired) {
     return (
-      <div className="p-8 text-center border border-amber-200 rounded-lg bg-amber-50">
-        <p className="text-amber-800 font-medium mb-2">Events module setup required</p>
-        <p className="text-sm text-amber-700 mb-4">
+      <div className="p-8 text-center border border-gray-200 rounded-lg bg-white">
+        <p className="text-gray-900 font-medium mb-2">Events module setup required</p>
+        <p className="text-sm text-gray-600 mb-4">
           {data.setupMessage ||
             "Run the Supabase events migration before using event creation and registration."}
         </p>
-        <Button onClick={() => window.location.reload()} variant="outline" size="sm">
+        <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-gray-200 text-gray-900 hover:bg-gray-50">
           Recheck
         </Button>
       </div>
@@ -100,7 +100,7 @@ export function EventListing({ churchId, futureOnly = true, onEventClick }: Even
 
   if (events.length === 0) {
     return (
-      <div className="p-12 text-center border border-gray-200 rounded-lg bg-gray-50">
+      <div className="p-12 text-center border border-gray-200 rounded-lg bg-white">
         <Calendar className="w-10 h-10 mx-auto text-gray-400 mb-3" />
         <p className="text-gray-600 font-medium">No events scheduled</p>
         <p className="text-sm text-gray-500 mt-1">Events will appear here as they are added</p>
