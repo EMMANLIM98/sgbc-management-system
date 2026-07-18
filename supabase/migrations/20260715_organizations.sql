@@ -18,6 +18,7 @@ create policy "organizations_public_read" on public.organizations
 -- Insert initial organizations (alphabetically sorted)
 insert into public.organizations (name, is_active) values
   ('SGBC - Antipolo', true),
+  ('SGBC - Angono', true),
   ('SGBC - Baras', true),
   ('SGBC - Boracay', true),
   ('SGBC - Cainta', true),
