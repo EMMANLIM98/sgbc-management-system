@@ -413,7 +413,7 @@ export class RaffleService {
     const { data, error } = await this.supabase
       .from("raffle_draws")
       .select(
-        "id, event_id, winner_id, prize_name, draw_time, drawn_by, raffle_entries(participant_name)",
+        "id, event_id, winner_id, prize_name, draw_time, drawn_by, raffle_entries(participant_name, participant_email)",
       )
       .eq("event_id", eventId)
       .order("draw_time", { ascending: false });
@@ -427,6 +427,7 @@ export class RaffleService {
       eventId: record.event_id,
       winnerId: record.winner_id,
       participantName: record.raffle_entries?.participant_name || "Unknown",
+      participantEmail: record.raffle_entries?.participant_email || null,
       prizeName: record.prize_name,
       drawnAt: new Date(record.draw_time),
       drawnBy: record.drawn_by,

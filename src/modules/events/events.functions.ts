@@ -509,6 +509,7 @@ export const getRaffleWinners = createServerFn({ method: "GET" })
       winners: winners.map((w) => ({
         id: w.id,
         participantName: w.participantName,
+        participantEmail: w.participantEmail,
         prizeName: w.prizeName,
         drawnAt: w.drawnAt.toISOString(),
         drawnBy: w.drawnBy,
