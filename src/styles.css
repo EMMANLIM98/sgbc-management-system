@@ -162,3 +162,40 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* QR Code Scanner Styles for Mobile */
+@layer components {
+  /* Ensure video element displays properly */
+  #qr-reader video,
+  #qr-reader__header_message {
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+  }
+
+  #qr-reader {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  #qr-reader__scan_region {
+    position: relative;
+    width: 100%;
+  }
+
+  #qr-reader__camera_permission_prompt {
+    display: none;
+  }
+
+  /* Mobile optimized QR reader container */
+  @media (max-width: 768px) {
+    #qr-reader {
+      max-width: 100vw;
+    }
+
+    #qr-reader video {
+      transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+    }
+  }
+}
