@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeScanner } from "@/modules/events/ui/qr-code-scanner";
 import { EventAnalyticsDashboard } from "@/modules/events/ui/event-analytics-dashboard";
+import { EventCheckinReport } from "@/modules/events/ui/event-checkin-report";
 import { Loader2, Calendar, MapPin, UserPlus, Link2 } from "lucide-react";
 import { getEvent, checkInWithQR } from "@/modules/events/events.functions";
 import { useCurrentChurch } from "@/hooks/use-current-church";
@@ -125,6 +126,7 @@ function EventDetail() {
         <TabsList>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="checkin">Check-In</TabsTrigger>
+          <TabsTrigger value="attendees">Attendees</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analytics">
@@ -152,6 +154,10 @@ function EventDetail() {
               }}
             />
           </Card>
+        </TabsContent>
+
+        <TabsContent value="attendees">
+          <EventCheckinReport eventId={id} />
         </TabsContent>
       </Tabs>
     </div>
