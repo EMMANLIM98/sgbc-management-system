@@ -87,9 +87,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         };
 
         console.debug(`Initializing scanner with container: ${containerId}`, config);
+        console.log("About to create Html5QrcodeScanner instance");
         const scanner = new Html5QrcodeScanner(containerId, config, true);
+        console.log("Html5QrcodeScanner instance created");
         
         if (!isComponentMounted) {
+          console.log("Component unmounted, clearing scanner");
           scanner.clear().catch(() => {});
           return;
         }
@@ -98,6 +101,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
 
         try {
           // This will request camera access and handle permissions
+          console.log("Calling scanner.render()...");
           await scanner.render(
             (decodedText: string) => {
               console.debug("QR code scanned:", decodedText);
@@ -128,12 +132,25 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
             },
             (error: string) => {
               // Log scanning errors for debugging
-              if (error && typeof error === 'string' && error.length > 50) {
-                console.debug(`Scanning error (normal): ${error.substring(0, 100)}`);
+              if (error && typeof error === 'string') {
+                console.debug(`Scanning error (${error.length} chars): ${error.substring(0, 200)}`);
               }
             }
           );
 
+          console.log("scanner.render() completed - checking if video is visible");
+          const videoElement = document.querySelector(`#${containerId} video`);
+          console.log("Video element found:", videoElement);
+          if (videoElement) {
+            console.log("Video element details:", {
+              width: videoElement.clientWidth,
+              height: videoElement.clientHeight,
+              videoWidth: (videoElement as HTMLVideoElement).videoWidth,
+              videoHeight: (videoElement as HTMLVideoElement).videoHeight,
+              readyState: (videoElement as HTMLVideoElement).readyState,
+              style: videoElement.getAttribute("style"),
+            });
+          }
           console.debug("Scanner initialized and render() completed successfully");
         } catch (error) {
           if (!isComponentMounted) return;
