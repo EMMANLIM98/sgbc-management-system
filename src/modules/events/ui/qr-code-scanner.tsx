@@ -135,28 +135,34 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           );
 
           console.debug("Scanner initialized and render() completed successfully");
+        } catch (error) {
+          if (!isComponentMounted) return;
+
+          let errorMsg = "Failed to initialize camera scanner";
+          
+          if (error instanceof DOMException) {
+            if (error.name === "NotAllowedError") {
+              errorMsg = window.isSecureContext
+                ? "Camera permission denied. Please allow camera access to scan QR codes."
+                : "Camera requires HTTPS on mobile browsers. Open this app with https:// or localhost.";
+            } else if (error.name === "NotFoundError") {
+              errorMsg = "No camera found on this device.";
+              setScanState("camera-not-found");
+            } else if (error.name === "NotReadableError") {
+              errorMsg = "Camera is already in use. Please close other apps using the camera.";
+            }
+          } else if (error instanceof Error) {
+            errorMsg = error.message;
+          }
+
+          console.error("Scanner error:", error);
+          setErrorMessage(errorMsg);
+          setScanState("error");
+        }
       } catch (error) {
         if (!isComponentMounted) return;
-
-        let errorMsg = "Failed to initialize camera scanner";
-        
-        if (error instanceof DOMException) {
-          if (error.name === "NotAllowedError") {
-            errorMsg = window.isSecureContext
-              ? "Camera permission denied. Please allow camera access to scan QR codes."
-              : "Camera requires HTTPS on mobile browsers. Open this app with https:// or localhost.";
-          } else if (error.name === "NotFoundError") {
-            errorMsg = "No camera found on this device.";
-            setScanState("camera-not-found");
-          } else if (error.name === "NotReadableError") {
-            errorMsg = "Camera is already in use. Please close other apps using the camera.";
-          }
-        } else if (error instanceof Error) {
-          errorMsg = error.message;
-        }
-
-        console.error("Scanner error:", error);
-        setErrorMessage(errorMsg);
+        console.error("Scanner initialization error:", error);
+        setErrorMessage("Failed to initialize camera scanner");
         setScanState("error");
       }
     };
