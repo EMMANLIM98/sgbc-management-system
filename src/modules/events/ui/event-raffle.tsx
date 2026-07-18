@@ -75,11 +75,12 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
         },
       });
 
-      if (result.winner) {
+      if (result.participantName) {
         toast.success(
-          `🎉 Winner: ${result.winner.participantName} wins ${result.winner.prizeName}!`,
+          `🎉 Winner: ${result.participantName} wins ${result.prizeName}!`,
         );
         setPrizeName("");
+        // Refetch winners to update the UI
         await refetchWinners();
       } else {
         toast.error("No eligible entries for raffle");
