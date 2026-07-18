@@ -52,7 +52,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
           eventId,
           status: "checked_in",
           page: 1,
-          pageSize: 1000,
+          pageSize: 100,
         },
       }),
   });
@@ -111,7 +111,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
   };
 
   const checkedInCount = checkedInData?.total || 0;
-  const winners = winnersData || [];
+  const winners = winnersData?.winners || [];
 
   return (
     <div className="space-y-6">
@@ -156,7 +156,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
               placeholder="e.g., Gift Card, Coffee Maker, Books..."
               value={prizeName}
               onChange={(e) => setPrizeName(e.target.value)}
-              disabled={isDrawing || checkedInCount === 0}
+              disabled={isDrawing || loadingCheckedIn || checkedInCount === 0}
               className="border-gray-200 bg-white text-gray-900 placeholder:text-gray-500"
             />
           </div>
