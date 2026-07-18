@@ -177,7 +177,7 @@ export function EventRegistrationForm({
             <Label htmlFor="phone">Phone</Label>
             <Input
               id="phone"
-              placeholder="+1 (555) 000-0000"
+              placeholder="+639181234567"
               {...register("attendeePhone")}
               disabled={isSubmitting || submit.isPending}
             />

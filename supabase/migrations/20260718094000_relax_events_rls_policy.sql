@@ -7,4 +7,4 @@ DROP POLICY "manage events in my churches" ON public.events;
 CREATE POLICY "manage events in my churches"
   ON public.events FOR ALL TO authenticated
   USING (church_id IN (SELECT public.user_church_ids(auth.uid())))
-  WITH CHECK (church_id IN (SELECT public.user_church_ids(auth.uid())));
+  WITH CHECK (church_id IN (SELECT public.user_church_ids(auth.uid()))); 
