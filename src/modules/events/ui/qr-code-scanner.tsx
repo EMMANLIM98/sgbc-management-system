@@ -2,11 +2,11 @@
  * QR Code Scanner Component
  *
  * Captures video from camera and scans QR codes for event check-in.
- * Uses HTML5 QR code library for decoding with mobile device support.
+ * Uses manual camera access with html5-qrcode for fallback.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertCircle, X, CheckCircle, Zap } from "lucide-react";
@@ -77,6 +77,99 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           return;
         }
 
+        // Try manual camera access first
+        console.log("Attempting manual camera access via getUserMedia()...");
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "environment",
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            },
+            audio: false,
+          });
+
+          console.log("✓ Camera stream obtained successfully");
+          
+          if (!isComponentMounted) {
+            stream.getTracks().forEach(track => track.stop());
+            return;
+          }
+
+          // Create video element
+          let videoElement = container.querySelector("video") as HTMLVideoElement;
+          if (!videoElement) {
+            videoElement = document.createElement("video");
+            videoElement.setAttribute("playsinline", "true");
+            videoElement.setAttribute("autoplay", "true");
+            videoElement.setAttribute("muted", "true");
+            videoElement.style.width = "100%";
+            videoElement.style.height = "100%";
+            videoElement.style.objectFit = "cover";
+            container.innerHTML = "";
+            container.appendChild(videoElement);
+            console.log("Created video element");
+          }
+
+          videoElement.srcObject = stream;
+          
+          // Wait for video to be ready
+          await new Promise((resolve) => {
+            videoElement.onloadedmetadata = () => {
+              console.log("Video metadata loaded, starting playback");
+              videoElement.play();
+              resolve(null);
+            };
+          });
+
+          console.log("✓ Video stream is playing");
+
+          // Initialize Html5Qrcode for decoding
+          const qrcodeInstance = new Html5Qrcode(containerId);
+          scannerRef.current = qrcodeInstance as any;
+
+          // Start continuous scanning
+          await qrcodeInstance.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 280 },
+            (decodedText: string) => {
+              console.log("QR code detected:", decodedText);
+              if (decodedText === lastScannedRef.current) return;
+              lastScannedRef.current = decodedText;
+
+              onScanRef.current(decodedText)
+                .then(() => {
+                  if (isComponentMounted) {
+                    setFeedback({ type: "success", message: "Attendee checked in successfully." });
+                    setTimeout(() => setFeedback(null), 2000);
+                  }
+                })
+                .catch((error) => {
+                  if (isComponentMounted) {
+                    setFeedback({
+                      type: "error",
+                      message: error instanceof Error ? error.message : "Check-in failed",
+                    });
+                    setTimeout(() => setFeedback(null), 3000);
+                  }
+                });
+            },
+            (errorMessage: string) => {
+              // Ignore scanning errors
+              if (errorMessage && errorMessage.length > 50) {
+                console.debug(`Scanning: ${errorMessage.substring(0, 100)}`);
+              }
+            }
+          );
+
+          console.log("✓ Scanner initialized successfully");
+          return;
+        } catch (manualError) {
+          console.warn("Manual camera access failed, falling back to Html5QrcodeScanner:", manualError);
+        }
+
+        // Fallback to Html5QrcodeScanner
+        console.log("Using Html5QrcodeScanner fallback...");
         const config = {
           fps: 15,
           qrbox: { width: 280, height: 280 },
@@ -86,29 +179,22 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           aspectRatio: 1.0,
         };
 
-        console.debug(`Initializing scanner with container: ${containerId}`, config);
-        console.log("About to create Html5QrcodeScanner instance");
         const scanner = new Html5QrcodeScanner(containerId, config, true);
-        console.log("Html5QrcodeScanner instance created");
         
         if (!isComponentMounted) {
-          console.log("Component unmounted, clearing scanner");
-          scanner.clear().catch(() => {});
+          await scanner.clear();
           return;
         }
 
         scannerRef.current = scanner;
 
         try {
-          // This will request camera access and handle permissions
-          console.log("Calling scanner.render()...");
           await scanner.render(
             (decodedText: string) => {
               console.debug("QR code scanned:", decodedText);
               if (decodedText === lastScannedRef.current) return;
               lastScannedRef.current = decodedText;
 
-              // Call the onScan callback (don't await in the scanner callback)
               onScanRef.current(decodedText)
                 .then(() => {
                   if (isComponentMounted) {
@@ -131,27 +217,13 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
                 });
             },
             (error: string) => {
-              // Log scanning errors for debugging
               if (error && typeof error === 'string') {
-                console.debug(`Scanning error (${error.length} chars): ${error.substring(0, 200)}`);
+                console.debug(`Scanning error: ${error.substring(0, 200)}`);
               }
             }
           );
 
-          console.log("scanner.render() completed - checking if video is visible");
-          const videoElement = document.querySelector(`#${containerId} video`);
-          console.log("Video element found:", videoElement);
-          if (videoElement) {
-            console.log("Video element details:", {
-              width: videoElement.clientWidth,
-              height: videoElement.clientHeight,
-              videoWidth: (videoElement as HTMLVideoElement).videoWidth,
-              videoHeight: (videoElement as HTMLVideoElement).videoHeight,
-              readyState: (videoElement as HTMLVideoElement).readyState,
-              style: videoElement.getAttribute("style"),
-            });
-          }
-          console.debug("Scanner initialized and render() completed successfully");
+          console.log("✓ Html5QrcodeScanner fallback initialized");
         } catch (error) {
           if (!isComponentMounted) return;
 
@@ -159,14 +231,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           
           if (error instanceof DOMException) {
             if (error.name === "NotAllowedError") {
-              errorMsg = window.isSecureContext
-                ? "Camera permission denied. Please allow camera access to scan QR codes."
-                : "Camera requires HTTPS on mobile browsers. Open this app with https:// or localhost.";
+              errorMsg = "Camera permission denied. Please allow camera access in your browser settings.";
             } else if (error.name === "NotFoundError") {
               errorMsg = "No camera found on this device.";
               setScanState("camera-not-found");
             } else if (error.name === "NotReadableError") {
-              errorMsg = "Camera is already in use. Please close other apps using the camera.";
+              errorMsg = "Camera is already in use by another app.";
             }
           } else if (error instanceof Error) {
             errorMsg = error.message;
@@ -194,7 +264,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
       isComponentMounted = false;
       if (scannerRef.current) {
         try {
-          scannerRef.current.clear().catch(() => {});
+          (scannerRef.current as any).clear?.().catch(() => {});
         } catch (e) {
           console.debug("Error clearing scanner:", e);
         }
