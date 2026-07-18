@@ -10,7 +10,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRCodeScanner } from "@/modules/events/ui/qr-code-scanner";
-import { EventAnalyticsDashboard } from "@/modules/events/ui/event-analytics-dashboard";
 import { EventCheckinReport } from "@/modules/events/ui/event-checkin-report";
 import { EventAttendanceReport } from "@/modules/events/ui/event-attendance-report";
 import { EventRaffle } from "@/modules/events/ui/event-raffle";
@@ -44,8 +43,8 @@ function EventDetail() {
   if (eventLoading) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
-        <Card className="p-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
+        <Card className="p-12 text-center border border-gray-200 bg-white shadow-sm">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-gray-400" />
           <p className="text-gray-600">Loading event details...</p>
         </Card>
       </div>
@@ -55,9 +54,9 @@ function EventDetail() {
   if (eventError) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
-        <Card className="p-6 bg-red-50 border-red-200">
-          <p className="text-red-800 font-medium mb-1">Unable to load event</p>
-          <p className="text-sm text-red-700">
+        <Card className="p-6 border border-gray-200 bg-white">
+          <p className="text-gray-900 font-medium mb-1">Unable to load event</p>
+          <p className="text-sm text-gray-600">
             {eventError instanceof Error ? eventError.message : "Please try again."}
           </p>
         </Card>
@@ -68,8 +67,8 @@ function EventDetail() {
   if (!event) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
-        <Card className="p-6 bg-red-50 border-red-200">
-          <p className="text-red-800">Event not found</p>
+        <Card className="p-6 border border-gray-200 bg-white">
+          <p className="text-gray-900">Event not found</p>
         </Card>
       </div>
     );
@@ -105,41 +104,36 @@ function EventDetail() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <Card className="p-4 flex items-center gap-3">
-          <Calendar className="w-5 h-5 text-blue-600" />
+        <Card className="p-4 flex items-center gap-3 border border-gray-200 bg-white shadow-sm">
+          <Calendar className="w-5 h-5 text-gray-600" />
           <div>
             <p className="text-xs text-gray-600">Event Date</p>
-            <p className="font-medium">{eventDate.toLocaleDateString()}</p>
+            <p className="font-medium text-gray-900">{eventDate.toLocaleDateString()}</p>
           </div>
         </Card>
 
         {event.location && (
-          <Card className="p-4 flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-green-600" />
+          <Card className="p-4 flex items-center gap-3 border border-gray-200 bg-white shadow-sm">
+            <MapPin className="w-5 h-5 text-gray-600" />
             <div>
               <p className="text-xs text-gray-600">Location</p>
-              <p className="font-medium">{event.location}</p>
+              <p className="font-medium text-gray-900">{event.location}</p>
             </div>
           </Card>
         )}
       </div>
 
-      <Tabs defaultValue="analytics" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+      <Tabs defaultValue="checkin" className="space-y-4">
+        <TabsList className="border-b border-gray-200 bg-white">
           <TabsTrigger value="checkin">Check-In</TabsTrigger>
           <TabsTrigger value="attendees">Checked In</TabsTrigger>
           <TabsTrigger value="attendance">Attendance Report</TabsTrigger>
           <TabsTrigger value="raffle">Raffle 🎉</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="analytics">
-          <EventAnalyticsDashboard eventId={id} />
-        </TabsContent>
-
         <TabsContent value="checkin">
-          <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Attendee Check-In</h3>
+          <Card className="p-6 border border-gray-200 bg-white shadow-sm">
+            <h3 className="font-semibold text-lg mb-4 text-gray-900">Scan QR Code to Check In</h3>
             <QRCodeScanner
               eventId={id}
               onScan={async (token) => {

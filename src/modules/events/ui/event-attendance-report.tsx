@@ -26,13 +26,9 @@ interface EventAttendanceReportProps {
 }
 
 export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
-  const [expandedTab, setExpandedTab] = useState<"checked_in" | "registered" | "no_show">(
-    "checked_in",
-  );
-
   const getRegistrationsFn = useServerFn(getEventRegistrations);
 
-  const { data: checkedInData, isLoading: loadingCheckedIn } = useQuery({
+  const { data: checkedInData, isLoading: loadingCheckedIn, error: errorCheckedIn } = useQuery({
     queryKey: ["registrations", eventId, "checked_in"],
     queryFn: () =>
       getRegistrationsFn({
@@ -43,9 +39,10 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
           pageSize: 1000,
         },
       }),
+    retry: 2,
   });
 
-  const { data: registeredData, isLoading: loadingRegistered } = useQuery({
+  const { data: registeredData, isLoading: loadingRegistered, error: errorRegistered } = useQuery({
     queryKey: ["registrations", eventId, "registered"],
     queryFn: () =>
       getRegistrationsFn({
@@ -56,9 +53,10 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
           pageSize: 1000,
         },
       }),
+    retry: 2,
   });
 
-  const { data: noShowData, isLoading: loadingNoShow } = useQuery({
+  const { data: noShowData, isLoading: loadingNoShow, error: errorNoShow } = useQuery({
     queryKey: ["registrations", eventId, "no_show"],
     queryFn: () =>
       getRegistrationsFn({
@@ -69,6 +67,7 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
           pageSize: 1000,
         },
       }),
+    retry: 2,
   });
 
   const checkedInCount = checkedInData?.total || 0;
@@ -77,6 +76,26 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
   const totalRegistered = checkedInCount + registeredCount + noShowCount;
   const attendanceRate =
     totalRegistered > 0 ? Math.round((checkedInCount / totalRegistered) * 100) : 0;
+  
+  const isLoading = loadingCheckedIn || loadingRegistered || loadingNoShow;
+
+  if (isLoading) {
+    return (
+      <Card className="p-12 text-center border border-gray-200 bg-white shadow-sm\">
+        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-gray-400" />
+        <p className="text-gray-600">Loading attendance data...</p>
+      </Card>
+    );
+  }
+
+  if (errorCheckedIn || errorRegistered || errorNoShow) {
+    return (
+      <Card className="p-6 border border-gray-200 bg-white">
+        <p className="text-gray-900 font-medium mb-1\">Failed to load attendance data</p>
+        <p className="text-sm text-gray-600\">Please try again or contact support</p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
