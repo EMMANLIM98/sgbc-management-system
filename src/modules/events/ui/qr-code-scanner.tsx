@@ -82,9 +82,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           qrbox: { width: 280, height: 280 },
           rememberLastUsedCamera: true,
           disableFlip: false,
+          showTorchButtonIfSupported: true,
+          aspectRatio: 1.0,
         };
 
-        const scanner = new Html5QrcodeScanner(containerId, config, false);
+        console.debug(`Initializing scanner with container: ${containerId}`, config);
+        const scanner = new Html5QrcodeScanner(containerId, config, true);
         
         if (!isComponentMounted) {
           scanner.clear().catch(() => {});
@@ -93,40 +96,45 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
 
         scannerRef.current = scanner;
 
-        // This will request camera access and handle permissions
-        await scanner.render(
-          (decodedText: string) => {
-            if (decodedText === lastScannedRef.current) return;
-            lastScannedRef.current = decodedText;
+        try {
+          // This will request camera access and handle permissions
+          await scanner.render(
+            (decodedText: string) => {
+              console.debug("QR code scanned:", decodedText);
+              if (decodedText === lastScannedRef.current) return;
+              lastScannedRef.current = decodedText;
 
-            // Call the onScan callback (don't await in the scanner callback)
-            onScanRef.current(decodedText)
-              .then(() => {
-                if (isComponentMounted) {
-                  setFeedback({ type: "success", message: "Attendee checked in successfully." });
-                  setTimeout(() => {
-                    setFeedback(null);
-                  }, 2000);
-                }
-              })
-              .catch((error) => {
-                if (isComponentMounted) {
-                  setFeedback({
-                    type: "error",
-                    message: error instanceof Error ? error.message : "Check-in failed",
-                  });
-                  setTimeout(() => {
-                    setFeedback(null);
-                  }, 3000);
-                }
-              });
-          },
-          (error: string) => {
-            // Ignore scanning errors - this is normal during operation
-          }
-        );
+              // Call the onScan callback (don't await in the scanner callback)
+              onScanRef.current(decodedText)
+                .then(() => {
+                  if (isComponentMounted) {
+                    setFeedback({ type: "success", message: "Attendee checked in successfully." });
+                    setTimeout(() => {
+                      setFeedback(null);
+                    }, 2000);
+                  }
+                })
+                .catch((error) => {
+                  if (isComponentMounted) {
+                    setFeedback({
+                      type: "error",
+                      message: error instanceof Error ? error.message : "Check-in failed",
+                    });
+                    setTimeout(() => {
+                      setFeedback(null);
+                    }, 3000);
+                  }
+                });
+            },
+            (error: string) => {
+              // Log scanning errors for debugging
+              if (error && typeof error === 'string' && error.length > 50) {
+                console.debug(`Scanning error (normal): ${error.substring(0, 100)}`);
+              }
+            }
+          );
 
-        console.debug("Scanner initialized successfully");
+          console.debug("Scanner initialized and render() completed successfully");
       } catch (error) {
         if (!isComponentMounted) return;
 
