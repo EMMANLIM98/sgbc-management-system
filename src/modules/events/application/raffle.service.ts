@@ -195,6 +195,22 @@ export class RaffleService {
     drawnBy: string,
     filter?: RaffleFilter,
   ): Promise<DrawResult | null> {
+    // Auto-populate raffle entries if none exist yet
+    const { data: existingEntries, error: checkError } = await this.supabase
+      .from("raffle_entries")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", eventId)
+      .eq("excluded", false);
+
+    if (checkError) {
+      throw new Error(`Failed to check raffle entries: ${checkError.message}`);
+    }
+
+    // If no entries exist, populate from checked-in attendees
+    if (!existingEntries || existingEntries.length === 0) {
+      await this.populateRaffleFromEvent(eventId, filter);
+    }
+
     // Get eligible entries
     let query = this.supabase
       .from("raffle_entries")
