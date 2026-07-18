@@ -11,7 +11,6 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   drawRaffleWinner,
   getRaffleWinners,
-  populateRaffleEntries,
   getEventRegistrations,
 } from "@/modules/events/events.functions";
 import { Card } from "@/components/ui/card";
@@ -26,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Gift, Sparkles, Trash2 } from "lucide-react";
+import { Loader2, Gift, Sparkles, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 interface EventRaffleProps {
@@ -36,11 +35,9 @@ interface EventRaffleProps {
 export function EventRaffle({ eventId }: EventRaffleProps) {
   const [prizeName, setPrizeName] = useState("");
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isPopulating, setIsPopulating] = useState(false);
 
   const drawWinnerFn = useServerFn(drawRaffleWinner);
   const getWinnersFn = useServerFn(getRaffleWinners);
-  const populateEntriesFn = useServerFn(populateRaffleEntries);
   const getRegistrationsFn = useServerFn(getEventRegistrations);
 
   // Get checked-in attendees
@@ -62,21 +59,6 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
     queryKey: ["raffleWinners", eventId],
     queryFn: () => getWinnersFn({ data: { eventId } }),
   });
-
-  const handlePopulateRaffle = async () => {
-    try {
-      setIsPopulating(true);
-      const result = await populateEntriesFn({
-        data: { eventId },
-      });
-      toast.success(result.message);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to populate raffle";
-      toast.error(message);
-    } finally {
-      setIsPopulating(false);
-    }
-  };
 
   const handleDrawWinner = async () => {
     if (!prizeName.trim()) {
@@ -169,37 +151,25 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
                 </Button>
               </div>
             ) : (
-              <>
-                <Button
-                  onClick={handlePopulateRaffle}
-                  disabled={isPopulating || winners.length > 0}
-                  variant="outline"
-                  className="flex-1 border-gray-200 text-gray-900 hover:bg-gray-50"
-                >
-                  <Gift className="w-4 h-4 mr-2" />
-                  {isPopulating ? "Populating..." : "Populate Raffle"}
-                </Button>
-
-                <Button
-                  onClick={handleDrawWinner}
-                  disabled={
-                    isDrawing || checkedInCount === 0 || !prizeName.trim() || winners.length >= checkedInCount
-                  }
-                  className="flex-1 bg-gray-900 text-white hover:bg-gray-800"
-                >
-                  {isDrawing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Drawing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Draw Winner 🎉
-                    </>
-                  )}
-                </Button>
-              </>
+              <Button
+                onClick={handleDrawWinner}
+                disabled={
+                  isDrawing || checkedInCount === 0 || !prizeName.trim() || winners.length >= checkedInCount
+                }
+                className="w-full bg-gray-900 text-white hover:bg-gray-800"
+              >
+                {isDrawing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Drawing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Draw Winner 🎉
+                  </>
+                )}
+              </Button>
             )}
           </div>
 
@@ -212,6 +182,67 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
           )}
         </div>
       </Card>
+
+      {/* Eligible Attendees List */}
+      {checkedInData && checkedInData.data && checkedInData.data.length > 0 && (
+        <Card className="border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <h3 className="font-semibold text-lg flex items-center gap-2 text-gray-900">
+              <Gift className="w-5 h-5 text-gray-600" />
+              Eligible Attendees ({checkedInData.data.length})
+            </h3>
+          </div>
+
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50 border-b border-gray-200">
+                  <TableHead className="font-semibold text-gray-900">Attendee</TableHead>
+                  <TableHead className="font-semibold text-gray-900">Email</TableHead>
+                  <TableHead className="font-semibold text-gray-900">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {checkedInData.data.map((attendee: any) => {
+                  const hasWon = winners.some(
+                    (w: any) => w.participantEmail === attendee.participantEmail,
+                  );
+                  return (
+                    <TableRow
+                      key={attendee.id}
+                      className={`border-b border-gray-100 transition-colors ${
+                        hasWon ? "bg-green-50 hover:bg-green-100" : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <TableCell className="font-medium text-gray-900">
+                        {attendee.participantName}
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600">
+                        {attendee.participantEmail || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {hasWon ? (
+                          <Badge className="bg-green-100 text-green-700 border-green-200 flex items-center gap-1 w-fit">
+                            <Trophy className="w-3 h-3" />
+                            Winner
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-100 text-gray-700 border-gray-200"
+                          >
+                            Eligible
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </Card>
+      )}
 
       {/* Winners List */}
       {winners.length > 0 && (
