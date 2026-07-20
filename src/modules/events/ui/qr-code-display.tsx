@@ -32,18 +32,19 @@ export function QRCodeDisplay({
 
   useEffect(() => {
     const generateQRCode = async () => {
-      if (!canvasRef.current) {
-        console.error("Canvas ref not available");
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        console.warn("Canvas not ready yet, retrying...");
+        setTimeout(() => generateQRCode(), 100);
         return;
       }
 
       try {
-        setIsGenerating(true);
         // Set canvas dimensions
-        canvasRef.current.width = size;
-        canvasRef.current.height = size;
+        canvas.width = size;
+        canvas.height = size;
         
-        await QRCode.toCanvas(canvasRef.current, token, {
+        await QRCode.toCanvas(canvas, token, {
           errorCorrectionLevel: "H",
           margin: 2,
           width: size,
@@ -60,7 +61,10 @@ export function QRCodeDisplay({
       }
     };
 
-    generateQRCode();
+    if (token) {
+      setIsGenerating(true);
+      generateQRCode();
+    }
   }, [token, size]);
 
   const handleDownload = () => {
@@ -119,18 +123,17 @@ export function QRCodeDisplay({
       <div className="flex flex-col items-center gap-4">
         <h3 className="text-lg font-semibold text-gray-900 text-center">Event Check-In QR Code</h3>
 
-        <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg bg-white">
-          {isGenerating ? (
-            <div className="w-80 h-80 flex items-center justify-center">
+        <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg bg-white relative">
+          {isGenerating && (
+            <div className="w-80 h-80 flex items-center justify-center absolute inset-0 bg-white rounded">
               <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
             </div>
-          ) : (
-            <canvas 
-              ref={canvasRef}
-              style={{ display: "block", maxWidth: "100%", height: "auto" }}
-              className="mx-auto"
-            />
           )}
+          <canvas 
+            ref={canvasRef}
+            style={{ display: "block", maxWidth: "100%", height: "auto" }}
+            className="mx-auto"
+          />
         </div>
 
         <div className="text-center text-sm text-gray-600 w-full">
