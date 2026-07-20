@@ -39,7 +39,7 @@ export function Sidebar() {
       <div className="h-14 px-4 flex items-center border-b border-border">
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold tabular">
-            CO
+            SGBC
           </div>
           <div className="text-sm font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
         </div>
