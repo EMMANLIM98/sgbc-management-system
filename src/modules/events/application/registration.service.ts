@@ -86,6 +86,34 @@ export class RegistrationService {
       }
     }
 
+    // Check for duplicate registrations by email or phone
+    if (input.attendeeEmail || input.attendeePhone) {
+      const { data: existingByEmailOrPhone } = await this.supabase
+        .from("event_registrations")
+        .select("id, attendeeEmail, attendeePhone")
+        .eq("eventId", input.eventId)
+        .eq("churchId", input.churchId)
+        .or(
+          input.attendeeEmail && input.attendeePhone
+            ? `attendeeEmail.eq.${input.attendeeEmail},attendeePhone.eq.${input.attendeePhone}`
+            : input.attendeeEmail
+              ? `attendeeEmail.eq.${input.attendeeEmail}`
+              : `attendeePhone.eq.${input.attendeePhone}`,
+        );
+
+      if (existingByEmailOrPhone && existingByEmailOrPhone.length > 0) {
+        const duplicate = existingByEmailOrPhone[0];
+        if (
+          (input.attendeeEmail && duplicate.attendeeEmail === input.attendeeEmail) ||
+          (input.attendeePhone && duplicate.attendeePhone === input.attendeePhone)
+        ) {
+          throw new Error(
+            "This email or phone number is already registered for this event",
+          );
+        }
+      }
+    }
+
     // Check capacity
     const isAtCapacity = await this.eventService.isEventAtCapacity(input.eventId);
 

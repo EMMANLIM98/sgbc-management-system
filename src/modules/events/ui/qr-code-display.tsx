@@ -38,8 +38,6 @@ export function QRCodeDisplay({
         setIsGenerating(true);
         await QRCode.toCanvas(canvasRef.current, token, {
           errorCorrectionLevel: "H",
-          type: "image/png",
-          quality: 0.95,
           margin: 2,
           width: size,
           color: {
