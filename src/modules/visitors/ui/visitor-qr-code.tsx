@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import QRCode from "qrcode";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  generateQRCodeOnCanvas,
+  downloadCanvasAsImage,
+} from "@/lib/qr-code-generator";
 
 interface VisitorQRCodeProps {
   churchId: string;
@@ -25,19 +28,12 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
 
     try {
       setIsGenerating(true);
-      // Set canvas dimensions for proper rendering
-      canvasRef.current.width = 300;
-      canvasRef.current.height = 300;
-
-      await QRCode.toCanvas(canvasRef.current, registrationUrl, {
-        errorCorrectionLevel: "H",
-        margin: 2,
-        width: 300,
-        color: {
-          dark: "#111827",
-          light: "#ffffff",
-        },
+      await generateQRCodeOnCanvas(canvasRef.current, registrationUrl, {
+        size: 300,
+        faviconSize: 0.2,
+        includeLogoAsset: "/favicon.ico",
       });
+      console.log("Visitor QR code generated successfully with favicon");
     } catch (error) {
       console.error("Failed to generate QR code:", error);
       toast.error("Failed to generate QR code");
@@ -48,13 +44,7 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
 
   const downloadQRCode = () => {
     if (!canvasRef.current) return;
-
-    const link = document.createElement("a");
-    link.href = canvasRef.current.toDataURL("image/png");
-    link.download = `${churchName}-visitor-registration.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadCanvasAsImage(canvasRef.current, `${churchName}-visitor-registration.png`);
     toast.success("QR code downloaded!");
   };
 

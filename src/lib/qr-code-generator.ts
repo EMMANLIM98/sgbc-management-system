@@ -1,0 +1,214 @@
+/**
+ * QR Code Generator Utility
+ *
+ * Centralized QR code generation with favicon embedding.
+ * Used for event check-in, visitor registration, and shared links.
+ */
+
+import QRCode from "qrcode";
+
+export interface QRCodeGenerationOptions {
+  size?: number;
+  faviconSize?: number; // Percentage of QR code size (0-1)
+  includeLogoAsset?: string; // Path to logo/favicon image
+}
+
+/**
+ * Loads an image from a given source
+ */
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+    img.src = src;
+  });
+}
+
+/**
+ * Generates a QR code on a canvas with optional favicon/logo embedding
+ *
+ * @param canvas - The canvas element to draw on
+ * @param data - The data to encode in the QR code
+ * @param options - Configuration options
+ *
+ * @example
+ * // Basic QR code
+ * await generateQRCodeOnCanvas(canvasRef.current, "https://example.com");
+ *
+ * // With favicon
+ * await generateQRCodeOnCanvas(canvasRef.current, "https://example.com", {
+ *   size: 300,
+ *   faviconSize: 0.2,
+ *   includeLogoAsset: "/favicon.ico"
+ * });
+ */
+export async function generateQRCodeOnCanvas(
+  canvas: HTMLCanvasElement,
+  data: string,
+  options: QRCodeGenerationOptions = {}
+): Promise<void> {
+  const {
+    size = 300,
+    faviconSize = 0.2,
+    includeLogoAsset = "/favicon.ico",
+  } = options;
+
+  // Set canvas dimensions
+  canvas.width = size;
+  canvas.height = size;
+
+  // Generate QR code
+  await QRCode.toCanvas(canvas, data, {
+    errorCorrectionLevel: "H",
+    margin: 2,
+    width: size,
+    color: {
+      dark: "#111827",
+      light: "#ffffff",
+    },
+  });
+
+  // Add favicon/logo to center if requested
+  if (includeLogoAsset) {
+    try {
+      const img = await loadImage(includeLogoAsset);
+      const ctx = canvas.getContext("2d");
+
+      if (ctx) {
+        // Calculate logo dimensions and position
+        const logoSize = size * faviconSize;
+        const x = (size - logoSize) / 2;
+        const y = (size - logoSize) / 2;
+        const padding = 4;
+
+        // Draw white background square
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+
+        // Draw border
+        ctx.strokeStyle = "#111827";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+
+        // Draw logo/favicon image
+        ctx.drawImage(img, x, y, logoSize, logoSize);
+      }
+    } catch (error) {
+      // If favicon fails to load, QR code is still valid without it
+      console.warn("Failed to embed favicon/logo in QR code:", error);
+    }
+  }
+}
+
+/**
+ * Downloads a canvas as a PNG image
+ *
+ * @param canvas - The canvas to download
+ * @param filename - The desired filename
+ */
+export function downloadCanvasAsImage(canvas: HTMLCanvasElement, filename: string): void {
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/**
+ * Prints a canvas-based QR code with metadata
+ *
+ * @param canvas - The canvas to print
+ * @param metadata - Optional metadata to display
+ */
+export function printCanvasQRCode(
+  canvas: HTMLCanvasElement,
+  metadata?: {
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    timestamp?: Date;
+  }
+): void {
+  const printWindow = window.open("", "", "height=600,width=600");
+  if (!printWindow) {
+    console.error("Failed to open print window");
+    return;
+  }
+
+  const now = metadata?.timestamp || new Date();
+  const title = metadata?.title || "QR Code";
+  const subtitle = metadata?.subtitle || "";
+  const description = metadata?.description || "";
+
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: white;
+          }
+          h1 {
+            color: #111827;
+            margin: 0 0 8px 0;
+            font-size: 24px;
+          }
+          h2 {
+            color: #6B7280;
+            margin: 0 0 20px 0;
+            font-size: 14px;
+            font-weight: 500;
+          }
+          .qr-container {
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .qr-container img {
+            max-width: 400px;
+            height: auto;
+            display: block;
+          }
+          .description {
+            color: #6B7280;
+            font-size: 14px;
+            margin: 20px 0;
+            line-height: 1.5;
+          }
+          .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            font-size: 12px;
+            color: #9CA3AF;
+          }
+          @media print {
+            body { margin: 0; padding: 10mm; }
+            h1 { page-break-after: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${title}</h1>
+        ${subtitle ? `<h2>${subtitle}</h2>` : ""}
+        <div class="qr-container">
+          <img src="${canvas.toDataURL("image/png")}" alt="QR Code" />
+        </div>
+        ${description ? `<p class="description">${description}</p>` : ""}
+        <div class="footer">
+          <p>Generated on ${now.toLocaleString()}</p>
+        </div>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}

@@ -3,14 +3,19 @@
  *
  * Displays a QR code for event registration check-in as an image.
  * Allows printing and downloading the QR code as PNG.
+ * Uses centralized QR code generator with favicon embedding.
  */
 
-import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, Printer } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import {
+  generateQRCodeOnCanvas,
+  downloadCanvasAsImage,
+  printCanvasQRCode,
+} from "@/lib/qr-code-generator";
 
 export interface QRCodeDisplayProps {
   token: string;
@@ -40,50 +45,13 @@ export function QRCodeDisplay({
       }
 
       try {
-        // Set canvas dimensions
-        canvas.width = size;
-        canvas.height = size;
-        
-        await QRCode.toCanvas(canvas, token, {
-          errorCorrectionLevel: "H",
-          margin: 2,
-          width: size,
-          color: {
-            dark: "#111827",
-            light: "#ffffff",
-          },
+        setIsGenerating(true);
+        await generateQRCodeOnCanvas(canvas, token, {
+          size: 300,
+          faviconSize: 0.2,
+          includeLogoAsset: "/favicon.ico",
         });
-
-        // Add favicon to center of QR code
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const img = new Image();
-          img.onload = () => {
-            // Favicon size (square in center)
-            const faviconSize = size * 0.2; // 20% of QR code size
-            const x = (size - faviconSize) / 2;
-            const y = (size - faviconSize) / 2;
-
-            // Draw white background square
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(x - 4, y - 4, faviconSize + 8, faviconSize + 8);
-
-            // Draw border
-            ctx.strokeStyle = "#111827";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x - 4, y - 4, faviconSize + 8, faviconSize + 8);
-
-            // Draw favicon image
-            ctx.drawImage(img, x, y, faviconSize, faviconSize);
-            console.log("Favicon embedded in QR code");
-          };
-          img.onerror = () => {
-            console.warn("Failed to load favicon, QR code generated without favicon");
-          };
-          img.src = "/favicon.ico";
-        }
-
-        console.log("QR code generated successfully");
+        console.log("QR code generated successfully with favicon");
       } catch (error) {
         console.error("Failed to generate QR code:", error);
       } finally {
@@ -92,60 +60,23 @@ export function QRCodeDisplay({
     };
 
     if (token) {
-      setIsGenerating(true);
       generateQRCode();
     }
-  }, [token, size]);
+  }, [token]);
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
-
-    const link = document.createElement("a");
-    link.href = canvasRef.current.toDataURL("image/png");
-    link.download = `qr-${registrationId}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadCanvasAsImage(canvasRef.current, `qr-${registrationId}.png`);
   };
 
   const handlePrint = () => {
     if (!canvasRef.current) return;
-
-    const printWindow = window.open("", "", "height=500,width=500");
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>QR Code - ${eventName}</title>
-            <style>
-              body { font-family: Arial, sans-serif; text-align: center; padding: 20px; margin: 0; }
-              h1 { color: #1F2937; margin: 20px 0 10px 0; font-size: 24px; }
-              p { color: #6B7280; margin: 5px 0; }
-              .qr-container { margin: 30px auto; }
-              .qr-container img { max-width: 400px; height: auto; }
-              .footer { margin-top: 20px; font-size: 12px; color: #9CA3AF; }
-              @media print {
-                body { margin: 0; padding: 10mm; }
-              }
-            </style>
-          </head>
-          <body>
-            <h1>${eventName}</h1>
-            <p><strong>${attendeeName}</strong></p>
-            <p style="font-size: 12px; color: #9CA3AF;">${registrationId}</p>
-            <div class="qr-container">
-              <img src="${canvasRef.current.toDataURL("image/png")}" alt="QR Code" />
-            </div>
-            <p style="margin-top: 20px;">Scan this QR code to check in to the event</p>
-            <div class="footer">
-              <p>Generated on ${new Date().toLocaleString()}</p>
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
+    printCanvasQRCode(canvasRef.current, {
+      title: eventName,
+      subtitle: attendeeName,
+      description: `Registration ID: ${registrationId}`,
+      timestamp: new Date(),
+    });
   };
 
   return (
