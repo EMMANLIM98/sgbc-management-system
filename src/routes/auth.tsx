@@ -70,6 +70,28 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
+    
+    // Wait for session to be fully established
+    let retries = 0;
+    const maxRetries = 10;
+    let sessionReady = false;
+    
+    while (!sessionReady && retries < maxRetries) {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user) {
+        sessionReady = true;
+        break;
+      }
+      retries++;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    if (!sessionReady) {
+      toast.error("Session failed to initialize", { description: "Please try signing in again." });
+      setBusy(false);
+      return;
+    }
+    
     navigate({ to: "/dashboard", replace: true });
   }
 
@@ -126,6 +148,26 @@ function AuthPage() {
       } else if (search.mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        
+        // Wait for session to be fully established
+        let retries = 0;
+        const maxRetries = 10;
+        let sessionReady = false;
+        
+        while (!sessionReady && retries < maxRetries) {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session?.user) {
+            sessionReady = true;
+            break;
+          }
+          retries++;
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        if (!sessionReady) {
+          throw new Error("Session failed to initialize. Please try signing in again.");
+        }
+        
         navigate({ to: "/dashboard", replace: true });
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
