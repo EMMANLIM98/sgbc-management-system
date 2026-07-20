@@ -32,10 +32,17 @@ export function QRCodeDisplay({
 
   useEffect(() => {
     const generateQRCode = async () => {
-      if (!canvasRef.current) return;
+      if (!canvasRef.current) {
+        console.error("Canvas ref not available");
+        return;
+      }
 
       try {
         setIsGenerating(true);
+        // Set canvas dimensions
+        canvasRef.current.width = size;
+        canvasRef.current.height = size;
+        
         await QRCode.toCanvas(canvasRef.current, token, {
           errorCorrectionLevel: "H",
           margin: 2,
@@ -45,6 +52,7 @@ export function QRCodeDisplay({
             light: "#ffffff",
           },
         });
+        console.log("QR code generated successfully");
       } catch (error) {
         console.error("Failed to generate QR code:", error);
       } finally {
@@ -117,7 +125,11 @@ export function QRCodeDisplay({
               <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
             </div>
           ) : (
-            <canvas ref={canvasRef} />
+            <canvas 
+              ref={canvasRef}
+              style={{ display: "block", maxWidth: "100%", height: "auto" }}
+              className="mx-auto"
+            />
           )}
         </div>
 
