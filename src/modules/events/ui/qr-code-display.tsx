@@ -39,21 +39,23 @@ export function QRCodeDisplay({
     const generateQRCode = async () => {
       const canvas = canvasRef.current;
       if (!canvas) {
-        console.warn("Canvas not ready yet, retrying...");
+        console.warn("[Event QR] Canvas not ready yet, retrying...");
         setTimeout(() => generateQRCode(), 100);
         return;
       }
 
       try {
         setIsGenerating(true);
+        console.log("[Event QR] Starting QR code generation for token:", token.substring(0, 20));
+        
         await generateQRCodeOnCanvas(canvas, token, {
           size: 300,
           faviconSize: 0.2,
           includeLogoAsset: "/favicon.ico",
         });
-        console.log("QR code generated successfully with favicon");
+        console.log("[Event QR] QR code generated successfully with favicon");
       } catch (error) {
-        console.error("Failed to generate QR code:", error);
+        console.error("[Event QR] Failed to generate QR code:", error);
       } finally {
         setIsGenerating(false);
       }

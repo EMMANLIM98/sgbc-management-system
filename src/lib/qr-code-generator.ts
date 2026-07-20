@@ -55,12 +55,24 @@ export async function generateQRCodeOnCanvas(
     includeLogoAsset = "/favicon.ico",
   } = options;
 
-  // Set canvas dimensions BEFORE generating QR
-  canvas.width = size;
-  canvas.height = size;
-
-  // Generate QR code - this must complete before favicon
   try {
+    // Verify canvas is valid
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Failed to get 2D context from canvas");
+    }
+
+    // Set canvas dimensions BEFORE generating QR
+    canvas.width = size;
+    canvas.height = size;
+    console.log(`[QR] Canvas dimensions set to ${size}x${size}`);
+
+    // Clear canvas first
+    ctx.clearRect(0, 0, size, size);
+
+    // Generate QR code - this must complete before favicon
+    console.log(`[QR] Generating QR code for data:`, data.substring(0, 50));
+    
     await QRCode.toCanvas(canvas, data, {
       errorCorrectionLevel: "H",
       margin: 2,
@@ -69,8 +81,16 @@ export async function generateQRCodeOnCanvas(
         light: "#ffffff",
       },
     });
+    
+    console.log("[QR] QR code generated successfully");
+    
+    // Verify something was drawn
+    const imageData = ctx.getImageData(0, 0, 1, 1);
+    if (!imageData || imageData.data.length === 0) {
+      throw new Error("QR code generation resulted in blank canvas");
+    }
   } catch (error) {
-    console.error("Failed to generate QR code:", error);
+    console.error("[QR] Failed to generate QR code:", error);
     throw error;
   }
 
@@ -98,11 +118,11 @@ export async function generateQRCodeOnCanvas(
 
         // Draw logo/favicon image
         ctx.drawImage(img, x, y, logoSize, logoSize);
-        console.log("Favicon embedded successfully");
+        console.log("[QR] Favicon embedded successfully");
       }
     } catch (error) {
       // If favicon fails to load, QR code is still valid without it
-      console.warn("Failed to embed favicon/logo in QR code:", error);
+      console.warn("[QR] Failed to embed favicon/logo in QR code:", error);
     }
   }
 }

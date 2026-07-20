@@ -24,16 +24,27 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
   }, [churchId]);
 
   const generateQRCode = async () => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      console.error("Canvas ref not available");
+      return;
+    }
 
     try {
       setIsGenerating(true);
-      await generateQRCodeOnCanvas(canvasRef.current, registrationUrl, {
+      console.log("Starting QR code generation for:", registrationUrl);
+      
+      const canvas = canvasRef.current;
+      console.log("Canvas element:", canvas);
+      console.log("Canvas context:", canvas.getContext("2d"));
+      
+      await generateQRCodeOnCanvas(canvas, registrationUrl, {
         size: 300,
         faviconSize: 0.2,
         includeLogoAsset: "/favicon.ico",
       });
-      console.log("Visitor QR code generated successfully with favicon");
+      
+      console.log("Visitor QR code generated successfully");
+      console.log("Canvas data after generation:", canvas.toDataURL().substring(0, 100));
     } catch (error) {
       console.error("Failed to generate QR code:", error);
       toast.error("Failed to generate QR code");
