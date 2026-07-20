@@ -18,7 +18,7 @@ export const listVisitors = createServerFn({ method: "GET" })
     let q = context.supabase
       .from("visitors")
       .select(
-        "id, church_id, visit_date, full_name, age, address, contact_number, source, invited_by, can_visit, visit_when, notes, created_at, churches(name)",
+        "id, church_id, visit_date, full_name, age, address, contact_number, source, invited_by, can_visit, visit_when, notes, email_address, is_first_time_visitor, prayer_requests, interests, visitor_status, created_at, churches(name)",
       )
       .order("visit_date", { ascending: false })
       .order("created_at", { ascending: false });
@@ -26,7 +26,7 @@ export const listVisitors = createServerFn({ method: "GET" })
     if (data.source) q = q.eq("source", data.source);
     if (data.q) {
       const like = `%${data.q}%`;
-      q = q.or(`full_name.ilike.${like},address.ilike.${like},contact_number.ilike.${like}`);
+      q = q.or(`full_name.ilike.${like},address.ilike.${like},contact_number.ilike.${like},email_address.ilike.${like}`);
     }
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -53,9 +53,15 @@ const upsertSchema = z.object({
   full_name: z.string().min(1).max(160),
   age: z.number().int().min(0).max(150).nullable().optional(),
   address: z.string().max(400).nullable().optional(),
+  home_address: z.string().max(400).nullable().optional(),
   contact_number: z.string().max(60).nullable().optional(),
+  email_address: z.string().email().max(160).nullable().optional(),
   source: z.enum(["invited", "walk_in"]),
   invited_by: z.string().max(160).nullable().optional(),
+  is_first_time_visitor: z.boolean().default(true),
+  prayer_requests: z.string().max(1000).nullable().optional(),
+  interests: z.array(z.enum(["bible_study", "small_group", "volunteer_ministry", "baptism", "church_membership"])).default([]),
+  visitor_status: z.enum(["first_time", "returning", "needs_followup", "interested_membership", "prayer_request_only"]).default("first_time"),
   can_visit: z.boolean().default(false),
   visit_when: z.string().nullable().optional(),
   notes: z.string().max(1000).nullable().optional(),

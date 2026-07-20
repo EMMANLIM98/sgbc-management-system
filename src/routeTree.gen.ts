@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventRegisterIndexRouteImport } from './routes/event-register.index'
+import { Route as VisitorRegisterChurchIdRouteImport } from './routes/visitor-register.$churchId'
 import { Route as EventRegisterEventIdRouteImport } from './routes/event-register.$eventId'
 import { Route as AuthenticatedVisitorsRouteImport } from './routes/_authenticated/visitors'
 import { Route as AuthenticatedVisitationRouteImport } from './routes/_authenticated/visitation'
@@ -30,6 +31,7 @@ import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDiscipleshipRouteImport } from './routes/_authenticated/discipleship'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommitteeRouteImport } from './routes/_authenticated/committee'
+import { Route as AuthenticatedVisitorsIndexRouteImport } from './routes/_authenticated/visitors/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events/index'
@@ -82,6 +84,11 @@ const EventRegisterIndexRoute = EventRegisterIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => EventRegisterRoute,
+} as any)
+const VisitorRegisterChurchIdRoute = VisitorRegisterChurchIdRouteImport.update({
+  id: '/visitor-register/$churchId',
+  path: '/visitor-register/$churchId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventRegisterEventIdRoute = EventRegisterEventIdRouteImport.update({
   id: '/$eventId',
@@ -155,6 +162,12 @@ const AuthenticatedCommitteeRoute = AuthenticatedCommitteeRouteImport.update({
   path: '/committee',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVisitorsIndexRoute =
+  AuthenticatedVisitorsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedVisitorsRoute,
+  } as any)
 const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/',
@@ -278,8 +291,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/visitation': typeof AuthenticatedVisitationRoute
-  '/visitors': typeof AuthenticatedVisitorsRoute
+  '/visitors': typeof AuthenticatedVisitorsRouteWithChildren
   '/event-register/$eventId': typeof EventRegisterEventIdRoute
+  '/visitor-register/$churchId': typeof VisitorRegisterChurchIdRoute
   '/event-register/': typeof EventRegisterIndexRoute
   '/events/$id': typeof AuthenticatedEventsIdRoute
   '/events/browse': typeof AuthenticatedEventsBrowseRoute
@@ -298,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/events/': typeof AuthenticatedEventsIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/visitors/': typeof AuthenticatedVisitorsIndexRoute
   '/finance/members/$id': typeof AuthenticatedFinanceMembersIdRoute
 }
 export interface FileRoutesByTo {
@@ -314,8 +329,8 @@ export interface FileRoutesByTo {
   '/outreach': typeof AuthenticatedOutreachRoute
   '/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/visitation': typeof AuthenticatedVisitationRoute
-  '/visitors': typeof AuthenticatedVisitorsRoute
   '/event-register/$eventId': typeof EventRegisterEventIdRoute
+  '/visitor-register/$churchId': typeof VisitorRegisterChurchIdRoute
   '/event-register': typeof EventRegisterIndexRoute
   '/events/$id': typeof AuthenticatedEventsIdRoute
   '/events/browse': typeof AuthenticatedEventsBrowseRoute
@@ -334,6 +349,7 @@ export interface FileRoutesByTo {
   '/events': typeof AuthenticatedEventsIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/visitors': typeof AuthenticatedVisitorsIndexRoute
   '/finance/members/$id': typeof AuthenticatedFinanceMembersIdRoute
 }
 export interface FileRoutesById {
@@ -356,8 +372,9 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/sunday-school': typeof AuthenticatedSundaySchoolRoute
   '/_authenticated/visitation': typeof AuthenticatedVisitationRoute
-  '/_authenticated/visitors': typeof AuthenticatedVisitorsRoute
+  '/_authenticated/visitors': typeof AuthenticatedVisitorsRouteWithChildren
   '/event-register/$eventId': typeof EventRegisterEventIdRoute
+  '/visitor-register/$churchId': typeof VisitorRegisterChurchIdRoute
   '/event-register/': typeof EventRegisterIndexRoute
   '/_authenticated/events/$id': typeof AuthenticatedEventsIdRoute
   '/_authenticated/events/browse': typeof AuthenticatedEventsBrowseRoute
@@ -376,6 +393,7 @@ export interface FileRoutesById {
   '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/visitors/': typeof AuthenticatedVisitorsIndexRoute
   '/_authenticated/finance_/members/$id': typeof AuthenticatedFinanceMembersIdRoute
 }
 export interface FileRouteTypes {
@@ -400,6 +418,7 @@ export interface FileRouteTypes {
     | '/visitation'
     | '/visitors'
     | '/event-register/$eventId'
+    | '/visitor-register/$churchId'
     | '/event-register/'
     | '/events/$id'
     | '/events/browse'
@@ -418,6 +437,7 @@ export interface FileRouteTypes {
     | '/events/'
     | '/members/'
     | '/settings/'
+    | '/visitors/'
     | '/finance/members/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -434,8 +454,8 @@ export interface FileRouteTypes {
     | '/outreach'
     | '/sunday-school'
     | '/visitation'
-    | '/visitors'
     | '/event-register/$eventId'
+    | '/visitor-register/$churchId'
     | '/event-register'
     | '/events/$id'
     | '/events/browse'
@@ -454,6 +474,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/members'
     | '/settings'
+    | '/visitors'
     | '/finance/members/$id'
   id:
     | '__root__'
@@ -477,6 +498,7 @@ export interface FileRouteTypes {
     | '/_authenticated/visitation'
     | '/_authenticated/visitors'
     | '/event-register/$eventId'
+    | '/visitor-register/$churchId'
     | '/event-register/'
     | '/_authenticated/events/$id'
     | '/_authenticated/events/browse'
@@ -495,6 +517,7 @@ export interface FileRouteTypes {
     | '/_authenticated/events/'
     | '/_authenticated/members/'
     | '/_authenticated/settings/'
+    | '/_authenticated/visitors/'
     | '/_authenticated/finance_/members/$id'
   fileRoutesById: FileRoutesById
 }
@@ -505,6 +528,7 @@ export interface RootRouteChildren {
   EventRegisterRoute: typeof EventRegisterRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VisitorRegisterChurchIdRoute: typeof VisitorRegisterChurchIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -557,6 +581,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/event-register/'
       preLoaderRoute: typeof EventRegisterIndexRouteImport
       parentRoute: typeof EventRegisterRoute
+    }
+    '/visitor-register/$churchId': {
+      id: '/visitor-register/$churchId'
+      path: '/visitor-register/$churchId'
+      fullPath: '/visitor-register/$churchId'
+      preLoaderRoute: typeof VisitorRegisterChurchIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/event-register/$eventId': {
       id: '/event-register/$eventId'
@@ -655,6 +686,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/committee'
       preLoaderRoute: typeof AuthenticatedCommitteeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/visitors/': {
+      id: '/_authenticated/visitors/'
+      path: '/'
+      fullPath: '/visitors/'
+      preLoaderRoute: typeof AuthenticatedVisitorsIndexRouteImport
+      parentRoute: typeof AuthenticatedVisitorsRoute
     }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
@@ -841,6 +879,19 @@ const AuthenticatedSettingsRouteWithChildren =
     AuthenticatedSettingsRouteChildren,
   )
 
+interface AuthenticatedVisitorsRouteChildren {
+  AuthenticatedVisitorsIndexRoute: typeof AuthenticatedVisitorsIndexRoute
+}
+
+const AuthenticatedVisitorsRouteChildren: AuthenticatedVisitorsRouteChildren = {
+  AuthenticatedVisitorsIndexRoute: AuthenticatedVisitorsIndexRoute,
+}
+
+const AuthenticatedVisitorsRouteWithChildren =
+  AuthenticatedVisitorsRoute._addFileChildren(
+    AuthenticatedVisitorsRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommitteeRoute: typeof AuthenticatedCommitteeRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -854,7 +905,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedSundaySchoolRoute: typeof AuthenticatedSundaySchoolRoute
   AuthenticatedVisitationRoute: typeof AuthenticatedVisitationRoute
-  AuthenticatedVisitorsRoute: typeof AuthenticatedVisitorsRoute
+  AuthenticatedVisitorsRoute: typeof AuthenticatedVisitorsRouteWithChildren
   AuthenticatedFinanceContributionsRoute: typeof AuthenticatedFinanceContributionsRoute
   AuthenticatedFinanceMemberReportsRoute: typeof AuthenticatedFinanceMemberReportsRoute
   AuthenticatedFinancePledgesRoute: typeof AuthenticatedFinancePledgesRoute
@@ -875,7 +926,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedSundaySchoolRoute: AuthenticatedSundaySchoolRoute,
   AuthenticatedVisitationRoute: AuthenticatedVisitationRoute,
-  AuthenticatedVisitorsRoute: AuthenticatedVisitorsRoute,
+  AuthenticatedVisitorsRoute: AuthenticatedVisitorsRouteWithChildren,
   AuthenticatedFinanceContributionsRoute:
     AuthenticatedFinanceContributionsRoute,
   AuthenticatedFinanceMemberReportsRoute:
@@ -909,6 +960,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventRegisterRoute: EventRegisterRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VisitorRegisterChurchIdRoute: VisitorRegisterChurchIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
