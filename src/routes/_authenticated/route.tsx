@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/shell/app-shell";
+import { InactivityProvider } from "@/integrations/supabase/inactivity-provider";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -10,8 +11,10 @@ export const Route = createFileRoute("/_authenticated")({
     return { user: data.user };
   },
   component: () => (
-    <AppShell>
-      <Outlet />
-    </AppShell>
+    <InactivityProvider inactivityTimeoutMinutes={60}>
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    </InactivityProvider>
   ),
 });
