@@ -55,22 +55,26 @@ export async function generateQRCodeOnCanvas(
     includeLogoAsset = "/favicon.ico",
   } = options;
 
-  // Set canvas dimensions
+  // Set canvas dimensions BEFORE generating QR
   canvas.width = size;
   canvas.height = size;
 
-  // Generate QR code
-  await QRCode.toCanvas(canvas, data, {
-    errorCorrectionLevel: "H",
-    margin: 2,
-    width: size,
-    color: {
-      dark: "#111827",
-      light: "#ffffff",
-    },
-  });
+  // Generate QR code - this must complete before favicon
+  try {
+    await QRCode.toCanvas(canvas, data, {
+      errorCorrectionLevel: "H",
+      margin: 2,
+      color: {
+        dark: "#111827",
+        light: "#ffffff",
+      },
+    });
+  } catch (error) {
+    console.error("Failed to generate QR code:", error);
+    throw error;
+  }
 
-  // Add favicon/logo to center if requested
+  // Try to add favicon/logo to center AFTER QR is drawn
   if (includeLogoAsset) {
     try {
       const img = await loadImage(includeLogoAsset);
@@ -94,6 +98,7 @@ export async function generateQRCodeOnCanvas(
 
         // Draw logo/favicon image
         ctx.drawImage(img, x, y, logoSize, logoSize);
+        console.log("Favicon embedded successfully");
       }
     } catch (error) {
       // If favicon fails to load, QR code is still valid without it
