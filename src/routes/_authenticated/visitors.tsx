@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +37,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { UserPlus, Search, Pencil, Trash2, Phone, MapPin } from "lucide-react";
+import { UserPlus, Search, Pencil, Trash2, Phone, MapPin, QrCode } from "lucide-react";
+import { VisitorQRCode } from "@/modules/visitors/ui/visitor-qr-code";
 import {
   listVisitors,
   createVisitor,
@@ -112,6 +114,7 @@ function VisitorsPage() {
   const [q, setQ] = useState("");
   const [source, setSource] = useState<"all" | "invited" | "walk_in">("all");
   const [open, setOpen] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm());
 
   const key = ["visitors", currentChurchId, q, source] as const;
@@ -232,6 +235,51 @@ function VisitorsPage() {
           </Dialog>
         }
       />
+
+      {/* QR Code Section */}
+      {targetChurchId && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <QrCode className="w-5 h-5 text-gray-700" />
+              <h3 className="text-lg font-semibold text-gray-900">Visitor Registration</h3>
+            </div>
+            <Dialog open={showQRCode} onOpenChange={setShowQRCode}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="border-gray-200 text-gray-900 hover:bg-gray-50">
+                  <QrCode className="w-4 h-4 mr-2" />
+                  Show QR Code
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Visitor Registration QR Code</DialogTitle>
+                </DialogHeader>
+                <div className="flex justify-center py-4">
+                  {targetChurchId && (
+                    <VisitorQRCode
+                      churchId={targetChurchId}
+                      churchName={currentChurch?.name || "Church"}
+                    />
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          <Card className="p-4 border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-sm">
+            <p className="text-sm text-gray-600 mb-3">
+              Visitors can scan this QR code to register themselves using a simple form. Share this QR code at the entrance or on your bulletin.
+            </p>
+            {targetChurchId && (
+              <VisitorQRCode
+                churchId={targetChurchId}
+                churchName={currentChurch?.name || "Church"}
+              />
+            )}
+          </Card>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-md">

@@ -25,10 +25,12 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
 
     try {
       setIsGenerating(true);
+      // Set canvas dimensions for proper rendering
+      canvasRef.current.width = 300;
+      canvasRef.current.height = 300;
+
       await QRCode.toCanvas(canvasRef.current, registrationUrl, {
         errorCorrectionLevel: "H",
-        type: "image/png",
-        quality: 0.95,
         margin: 2,
         width: 300,
         color: {
