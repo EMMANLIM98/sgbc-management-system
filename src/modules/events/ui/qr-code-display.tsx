@@ -53,6 +53,36 @@ export function QRCodeDisplay({
             light: "#ffffff",
           },
         });
+
+        // Add favicon to center of QR code
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const img = new Image();
+          img.onload = () => {
+            // Favicon size (square in center)
+            const faviconSize = size * 0.2; // 20% of QR code size
+            const x = (size - faviconSize) / 2;
+            const y = (size - faviconSize) / 2;
+
+            // Draw white background square
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(x - 4, y - 4, faviconSize + 8, faviconSize + 8);
+
+            // Draw border
+            ctx.strokeStyle = "#111827";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x - 4, y - 4, faviconSize + 8, faviconSize + 8);
+
+            // Draw favicon image
+            ctx.drawImage(img, x, y, faviconSize, faviconSize);
+            console.log("Favicon embedded in QR code");
+          };
+          img.onerror = () => {
+            console.warn("Failed to load favicon, QR code generated without favicon");
+          };
+          img.src = "/favicon.ico";
+        }
+
         console.log("QR code generated successfully");
       } catch (error) {
         console.error("Failed to generate QR code:", error);
