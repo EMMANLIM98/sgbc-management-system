@@ -61,7 +61,12 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
                 <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
               </div>
             ) : (
-              <canvas ref={canvasRef} className="w-80 h-80" />
+              <canvas 
+                ref={canvasRef} 
+                width={300}
+                height={300}
+                style={{ display: "block", maxWidth: "100%", height: "auto" }}
+              />
             )}
           </div>
         </div>
