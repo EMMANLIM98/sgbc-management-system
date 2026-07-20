@@ -2,13 +2,16 @@
  * Event Attendance Report Component
  *
  * Comprehensive report showing registered vs checked-in vs no-show attendees.
+ * Includes all attendees view with Excel export capability.
  */
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getEventRegistrations } from "@/modules/events/events.functions";
+import { getEventRegistrations, getAllEventRegistrations } from "@/modules/events/events.functions";
+import { exportRegistrationsToExcel } from "@/lib/excel";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertCircle, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Loader2, Download } from "lucide-react";
 
 interface EventAttendanceReportProps {
   eventId: string;
@@ -27,6 +30,7 @@ interface EventAttendanceReportProps {
 
 export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
   const getRegistrationsFn = useServerFn(getEventRegistrations);
+  const getAllRegistrationsFn = useServerFn(getAllEventRegistrations);
 
   const { data: checkedInData, isLoading: loadingCheckedIn, error: errorCheckedIn } = useQuery({
     queryKey: ["registrations", eventId, "checked_in"],
@@ -70,6 +74,17 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
     retry: 2,
   });
 
+  const { data: allData, isLoading: loadingAll, error: errorAll } = useQuery({
+    queryKey: ["registrations", eventId, "all"],
+    queryFn: () =>
+      getAllRegistrationsFn({
+        data: {
+          eventId,
+        },
+      }),
+    retry: 2,
+  });
+
   const checkedInCount = checkedInData?.total || 0;
   const registeredCount = registeredData?.total || 0;
   const noShowCount = noShowData?.total || 0;
@@ -101,6 +116,12 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
       </Card>
     );
   }
+
+  const handleExportAllAttendees = () => {
+    if (!allData?.registrations) return;
+    const now = new Date().toISOString().split("T")[0];
+    exportRegistrationsToExcel(`event-attendees-${now}.xlsx`, allData.registrations);
+  };
 
   return (
     <div className="space-y-6">
@@ -149,6 +170,10 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
               <AlertCircle className="w-4 h-4 mr-2 text-gray-600" />
               No-Show ({noShowCount})
             </TabsTrigger>
+            <TabsTrigger value="all_attendees" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+              <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
+              All Attendees ({allData?.total || 0})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="checked_in" className="p-0">
@@ -172,6 +197,14 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
               data={noShowData?.registrations || []}
               isLoading={loadingNoShow}
               status="no_show"
+            />
+          </TabsContent>
+
+          <TabsContent value="all_attendees" className="p-0">
+            <AllAttendeesTable
+              data={allData?.registrations || []}
+              isLoading={loadingAll}
+              onExport={handleExportAllAttendees}
             />
           </TabsContent>
         </Tabs>
@@ -271,6 +304,125 @@ function AttendanceTable({ data, isLoading, status }: AttendanceTableProps) {
           </TableBody>
         </Table>
       )}
+    </div>
+  );
+}
+
+interface AllAttendeesTableProps {
+  data: any[];
+  isLoading: boolean;
+  onExport: () => void;
+}
+
+function AllAttendeesTable({ data, isLoading, onExport }: AllAttendeesTableProps) {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "checked_in":
+        return (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 w-fit font-normal">
+            <CheckCircle2 className="w-3 h-3" />
+            Checked In
+          </Badge>
+        );
+      case "registered":
+        return (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1 w-fit font-normal">
+            <Clock className="w-3 h-3" />
+            Registered
+          </Badge>
+        );
+      case "no_show":
+        return (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1 w-fit font-normal">
+            <AlertCircle className="w-3 h-3" />
+            No-Show
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="p-6 space-y-4">
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-600">
+          Total: <span className="font-semibold text-gray-900">{data.length} attendees</span>
+        </p>
+        <Button
+          onClick={onExport}
+          disabled={isLoading || data.length === 0}
+          className="bg-gray-900 hover:bg-gray-800 text-white"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export to Excel
+        </Button>
+      </div>
+
+      <div className="overflow-x-auto border border-gray-200 rounded-lg">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader2 className="w-5 h-5 animate-spin text-gray-400 mr-2" />
+            <p className="text-gray-500">Loading...</p>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-sm">No attendees registered for this event</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 border-b border-gray-200">
+                <TableHead className="font-semibold text-gray-900">Name</TableHead>
+                <TableHead className="font-semibold text-gray-900">Email</TableHead>
+                <TableHead className="font-semibold text-gray-900">Phone</TableHead>
+                <TableHead className="font-semibold text-gray-900">Age Category</TableHead>
+                <TableHead className="font-semibold text-gray-900">Gender</TableHead>
+                <TableHead className="font-semibold text-gray-900">Visitor Status</TableHead>
+                <TableHead className="font-semibold text-gray-900">Leadership Role</TableHead>
+                <TableHead className="text-center font-semibold text-gray-900">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.map((registration) => (
+                <TableRow key={registration.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <TableCell className="font-medium text-gray-900">{registration.name}</TableCell>
+                  <TableCell className="text-sm text-gray-600">{registration.email || "—"}</TableCell>
+                  <TableCell className="text-sm text-gray-600">{registration.phone || "—"}</TableCell>
+                  <TableCell>
+                    {registration.ageCategory ? (
+                      <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal">
+                        {registration.ageCategory.replace("_", " ")}
+                      </Badge>
+                    ) : (
+                      <span className="text-gray-400 text-sm">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-sm text-gray-600">
+                    {registration.sex ? (registration.sex === "male" ? "Male" : "Female") : "—"}
+                  </TableCell>
+                  <TableCell>
+                    {registration.visitorStatus ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal"
+                      >
+                        {registration.visitorStatus.replace("_", " ")}
+                      </Badge>
+                    ) : (
+                      <span className="text-gray-400 text-sm">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-sm text-gray-600">
+                    {registration.leadershipRole ? registration.leadershipRole.replace("_", " ") : "—"}
+                  </TableCell>
+                  <TableCell className="text-center">{getStatusBadge(registration.status)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
     </div>
   );
 }

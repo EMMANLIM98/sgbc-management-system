@@ -357,6 +357,50 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
     };
   });
 
+/**
+ * Get all registrations for an event regardless of status (for reporting/export)
+ */
+export const getAllEventRegistrations = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const eventService = new EventService(context.supabase);
+    const registrationService = new RegistrationService(context.supabase, eventService);
+
+    // Get all registrations without status filter (limit to 1000 for export)
+    const { registrations, total } = await registrationService.listRegistrationsByEvent(
+      data.eventId,
+      {
+        limit: 1000,
+        offset: 0,
+      },
+    );
+
+    return {
+      registrations: registrations.map((r) => ({
+        id: r.id,
+        name: r.attendeeName,
+        email: r.attendeeEmail,
+        phone: r.attendeePhone,
+        churchId: r.churchId,
+        status: r.status,
+        ageCategory: r.ageCategory,
+        sex: r.sex,
+        visitorStatus: r.visitorStatus,
+        leadershipRole: r.leadershipRole,
+        registeredAt: r.registeredAt,
+        checkedInAt: r.checkedInAt,
+      })),
+      total,
+    };
+  });
+
 // ============ CHECK-IN FUNCTIONS ============
 
 export const checkInWithQR = createServerFn({ method: "POST" })
