@@ -76,7 +76,7 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
                 ref={canvasRef} 
                 width={300}
                 height={300}
-                style={{ display: "block", maxWidth: "100%", height: "auto" }}
+                style={{ display: "block" }}
               />
             )}
           </div>

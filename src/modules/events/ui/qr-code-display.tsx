@@ -96,7 +96,7 @@ export function QRCodeDisplay({
             ref={canvasRef}
             width={300}
             height={300}
-            style={{ display: "block", maxWidth: "100%", height: "auto" }}
+            style={{ display: "block" }}
             className="mx-auto"
           />
         </div>
