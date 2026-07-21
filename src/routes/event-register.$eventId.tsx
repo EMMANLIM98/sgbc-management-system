@@ -11,7 +11,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeCanvas } from "@/components/ui/qr-code-canvas";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,10 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, CheckCircle2, Calendar, MapPin, Clock, Download } from "lucide-react";
+import { Loader2, CheckCircle2, Calendar, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { getPublicEvent, publicRegisterForEvent } from "@/modules/events/events.public.functions";
-import { useRef } from "react";
 
 export const Route = createFileRoute("/event-register/$eventId")({
   head: () => ({ meta: [{ title: "Register for Event" }] }),
@@ -51,7 +50,6 @@ function PublicRegisterPage() {
   const { eventId } = Route.useParams();
   const getEventFn = useServerFn(getPublicEvent);
   const registerFn = useServerFn(publicRegisterForEvent);
-  const qrRef = useRef<HTMLDivElement>(null);
 
   const {
     data: event,
@@ -118,17 +116,6 @@ function PublicRegisterPage() {
   // ── Success state ──
   if (submitMutation.isSuccess && submitMutation.data) {
     const result = submitMutation.data;
-    const handleDownloadQR = () => {
-      const svg = qrRef.current?.querySelector("svg");
-      if (!svg) return;
-      const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `qr-${result.id}.svg`;
-      a.click();
-      URL.revokeObjectURL(url);
-    };
 
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
@@ -142,44 +129,17 @@ function PublicRegisterPage() {
           </div>
 
           <Card className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-700 mb-1">{event.title}</p>
-              <p className="text-xs text-gray-500 mb-4">{result.attendeeName}</p>
+            <QRCodeCanvas
+              value={result.qrToken}
+              title={event.title}
+              subtitle={result.attendeeName}
+              size={300}
+              showDownload
+              showPrint
+              downloadFilename={`event-registration-${result.id}.png`}
+            />
 
-              <div
-                ref={qrRef}
-                className="flex justify-center p-4 bg-white border border-gray-200 rounded-lg"
-              >
-                <QRCodeSVG
-                  value={result.qrToken}
-                  size={200}
-                  level="H"
-                  includeMargin
-                />
-              </div>
-
-              <p className="text-xs text-gray-500 mt-3 font-mono break-all">{result.id}</p>
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <Button
-                onClick={handleDownloadQR}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Save QR
-              </Button>
-              <Button
-                onClick={() => window.print()}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                Print
-              </Button>
-            </div>
+            <p className="text-xs text-gray-500 mt-4 font-mono break-all text-center">{result.id}</p>
           </Card>
 
           <p className="text-xs text-gray-500 text-center">
