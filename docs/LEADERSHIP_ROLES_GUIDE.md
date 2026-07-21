@@ -79,6 +79,7 @@ interface LeadershipRoleMetadata {
 Service class providing all role operations with repository pattern.
 
 **Key Methods:**
+
 - `getAll()` - Get all available roles
 - `getByCategory(category)` - Get roles for specific category
 - `getByValue(value)` - Get metadata for a role
@@ -92,13 +93,13 @@ Service class providing all role operations with repository pattern.
 React hook providing memoized access to roles with category grouping.
 
 ```typescript
-const { 
-  roles,              // All roles
-  rolesByCategory,    // Organized by category
-  getLabel,           // Get label for role
-  getRole,            // Get full metadata
-  isValidRole,        // Type validation
-  categories          // Available categories
+const {
+  roles, // All roles
+  rolesByCategory, // Organized by category
+  getLabel, // Get label for role
+  getRole, // Get full metadata
+  isValidRole, // Type validation
+  categories, // Available categories
 } = useLeadershipRoles();
 ```
 
@@ -107,12 +108,13 @@ const {
 ### In React Components
 
 **Display roles with category grouping:**
+
 ```typescript
 import { useLeadershipRoles } from "@/hooks/use-leadership-roles";
 
 export function RoleSelector() {
   const { rolesByCategory } = useLeadershipRoles();
-  
+
   return (
     <SelectContent>
       {/* Leadership category */}
@@ -124,7 +126,7 @@ export function RoleSelector() {
           </SelectItem>
         ))}
       </div>
-      
+
       {/* Administrative category */}
       <div>
         <h3>Administrative</h3>
@@ -140,6 +142,7 @@ export function RoleSelector() {
 ```
 
 **Get role label for display:**
+
 ```typescript
 const { getLabel } = useLeadershipRoles();
 
@@ -151,6 +154,7 @@ function RoleDisplay({ roleId }: { roleId: LeadershipRoleType }) {
 ### In Zod Schemas (Frontend & Backend)
 
 **Type-safe role validation:**
+
 ```typescript
 import { z } from "zod";
 import { LeadershipRoleType, leadershipRoles } from "@/lib/domain/leadership-roles";
@@ -183,10 +187,13 @@ export const updateUserRole = createServerFn({ method: "POST" })
 ## Role Categories
 
 ### 1. General (1 role)
+
 - Church Member
 
 ### 2. Leadership (9 roles)
+
 Core leadership positions:
+
 - Bishop
 - Pastor
 - Pastor's Wife
@@ -195,10 +202,11 @@ Core leadership positions:
 - Preacher
 - Evangelist
 - Deacon
-- Deaconess
 
 ### 3. Administrative (16 roles)
+
 Department heads and treasurers:
+
 - Missions Director
 - MOD President/Vice President/Treasurer
 - HOL President/Vice President/Treasurer
@@ -208,7 +216,9 @@ Department heads and treasurers:
 - SGBC Treasurer
 
 ### 4. Ministry (8 roles)
+
 Music and worship leaders:
+
 - Music Director
 - Choir Conductor/Conductress
 - Adults Choir Director/Member
@@ -217,7 +227,9 @@ Music and worship leaders:
 - Song Leader
 
 ### 5. Special Ministry (12 roles)
+
 Dedicated service roles:
+
 - Sound System Ministry
 - Media Team
 - Usher
@@ -236,6 +248,7 @@ Dedicated service roles:
 To add a new role:
 
 1. **Update the type** in `src/lib/domain/leadership-roles.ts`:
+
 ```typescript
 export type LeadershipRoleType =
   | "none"
@@ -244,6 +257,7 @@ export type LeadershipRoleType =
 ```
 
 2. **Add to ROLES_CATALOG**:
+
 ```typescript
 const ROLES_CATALOG: LeadershipRoleMetadata[] = [
   // ... existing entries ...
@@ -284,6 +298,7 @@ When using in a new module:
 ## Backward Compatibility
 
 The system maintains backward compatibility:
+
 - Old role values (e.g., "pastor_children") are deprecated but accepted
 - New validation automatically maps legacy roles where applicable
 - Existing database records continue to work without migration
@@ -291,6 +306,7 @@ The system maintains backward compatibility:
 ## Future Enhancements
 
 Potential improvements:
+
 - [ ] Add role hierarchy/permissions
 - [ ] Create role-based access control (RBAC) system
 - [ ] Add role descriptions and responsibilities
@@ -301,6 +317,7 @@ Potential improvements:
 ## Support
 
 For questions or issues with the roles system:
+
 1. Check `src/lib/domain/leadership-roles.ts` for available roles
 2. Review `src/hooks/use-leadership-roles.ts` for hook usage
 3. See `src/modules/events/ui/event-registration-form.tsx` for implementation example

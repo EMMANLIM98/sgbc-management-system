@@ -14,7 +14,6 @@ export type LeadershipRole =
   | "associate_pastor"
   | "elder"
   | "deacon"
-  | "deaconess"
   | "preacher"
   | "evangelist"
   | "ministry_leader"

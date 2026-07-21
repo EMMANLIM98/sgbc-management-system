@@ -8,7 +8,7 @@ CREATE TYPE public.registration_status AS ENUM ('registered', 'checked_in', 'can
 CREATE TYPE public.attendance_category AS ENUM ('children', 'youth', 'young_adults', 'adults', 'seniors');
 CREATE TYPE public.leadership_role AS ENUM (
   'pastor', 'pastor_wife', 'pastor_children', 'associate_pastor',
-  'elder', 'deacon', 'deaconess', 'preacher', 'evangelist',
+  'elder', 'deacon', 'preacher', 'evangelist',
   'ministry_leader', 'none'
 );
 CREATE TYPE public.visitor_membership AS ENUM ('member', 'visitor', 'first_time_guest');

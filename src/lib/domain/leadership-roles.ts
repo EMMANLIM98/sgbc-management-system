@@ -67,8 +67,7 @@ export type LeadershipRoleType =
   | "evangelist"
   | "ministry_leader"
   | "pastor_wife"
-  | "associate_pastor"
-  | "deaconess";
+  | "associate_pastor";
 
 export interface LeadershipRoleMetadata {
   value: LeadershipRoleType;
@@ -129,11 +128,6 @@ const ROLES_CATALOG: LeadershipRoleMetadata[] = [
     value: "deacon",
     label: "Deacon",
     description: "Church deacon",
-    category: "leadership",
-  },
-  {
-    value: "deaconess",
-    label: "Deaconess",
     category: "leadership",
   },
 

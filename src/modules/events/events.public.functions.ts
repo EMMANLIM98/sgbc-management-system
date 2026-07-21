@@ -124,7 +124,6 @@ const publicRegisterSchema = z.object({
       "associate_pastor",
       "elder",
       "deacon",
-      "deaconess",
       "preacher",
       "evangelist",
       "ministry_leader",
