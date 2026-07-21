@@ -124,7 +124,7 @@ export async function generateQRCodeOnCanvas(
  * Embeds a logo on a canvas asynchronously (non-blocking)
  * This won't prevent the QR code from displaying if it fails
  * Properly centers the logo image while preserving aspect ratio
- * Clean design: no background square or border - just the logo
+ * Clean modern design: semi-transparent circular background, no border
  */
 async function embedLogoOnCanvas(
   canvas: HTMLCanvasElement,
@@ -166,13 +166,21 @@ async function embedLogoOnCanvas(
     const imgX = centerX - displayWidth / 2;
     const imgY = centerY - displayHeight / 2;
 
-    // Draw logo image centered - no background square or border
+    // Draw subtle semi-transparent circular background for visibility
+    // This makes the logo pop without a hard border/square
+    const bgRadius = (Math.max(displayWidth, displayHeight) / 2) + 6;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, bgRadius, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Draw logo image centered on the background
     ctx.drawImage(img, imgX, imgY, displayWidth, displayHeight);
     console.log(
       "[QR] SGBC logo embedded successfully - centered at (" +
-        imgX.toFixed(1) +
+        centerX.toFixed(1) +
         ", " +
-        imgY.toFixed(1) +
+        centerY.toFixed(1) +
         ") with size " +
         displayWidth.toFixed(0) +
         "x" +
