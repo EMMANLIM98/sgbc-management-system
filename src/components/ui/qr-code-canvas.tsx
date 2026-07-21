@@ -141,14 +141,36 @@ export function QRCodeCanvas({
         </div>
       )}
 
-      {/* QR Code Canvas Container */}
-      <div className="flex justify-center p-4 bg-white border border-gray-200 rounded-lg mb-4">
-        {isGenerating && !hasError ? (
-          <div className="flex items-center justify-center" style={{ width: size, height: size }}>
+      {/* QR Code Canvas Container - Canvas always rendered, UI overlaid on top */}
+      <div className="relative flex justify-center p-4 bg-white border border-gray-200 rounded-lg mb-4">
+        {/* Canvas - ALWAYS rendered and mounted */}
+        <canvas
+          ref={canvasRef}
+          width={size}
+          height={size}
+          style={{
+            display: "block",
+            maxWidth: "100%",
+            height: "auto",
+          }}
+        />
+
+        {/* Loading Overlay */}
+        {isGenerating && !hasError && (
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-white/80 rounded"
+            style={{ width: size, height: size }}
+          >
             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
           </div>
-        ) : hasError ? (
-          <div className="flex items-center justify-center" style={{ width: size, height: size }}>
+        )}
+
+        {/* Error Overlay */}
+        {hasError && (
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-white/90 rounded"
+            style={{ width: size, height: size }}
+          >
             <div className="text-center">
               <p className="text-sm text-red-600">Failed to generate QR code</p>
               <Button
@@ -161,13 +183,6 @@ export function QRCodeCanvas({
               </Button>
             </div>
           </div>
-        ) : (
-          <canvas
-            ref={canvasRef}
-            width={size}
-            height={size}
-            style={{ display: "block", maxWidth: "100%", height: "auto" }}
-          />
         )}
       </div>
 
