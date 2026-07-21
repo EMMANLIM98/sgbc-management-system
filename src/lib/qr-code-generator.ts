@@ -1,11 +1,13 @@
 /**
  * QR Code Generator Utility
  *
- * Centralized QR code generation with favicon embedding.
+ * Centralized QR code generation with SGBC logo embedding.
  * Used for event check-in, visitor registration, and shared links.
+ * Implements DDD by using BrandingService for logo configuration.
  */
 
 import QRCode from "qrcode";
+import { brandingService } from "@/lib/domain/branding.service";
 
 export interface QRCodeGenerationOptions {
   size?: number;
@@ -27,7 +29,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Generates a QR code on a canvas with optional favicon/logo embedding
+ * Generates a QR code on a canvas with optional SGBC logo embedding
  *
  * @param canvas - The canvas element to draw on
  * @param data - The data to encode in the QR code
@@ -37,11 +39,10 @@ function loadImage(src: string): Promise<HTMLImageElement> {
  * // Basic QR code
  * await generateQRCodeOnCanvas(canvasRef.current, "https://example.com");
  *
- * // With favicon
+ * // With SGBC logo (default)
  * await generateQRCodeOnCanvas(canvasRef.current, "https://example.com", {
  *   size: 300,
- *   faviconSize: 0.2,
- *   includeLogoAsset: "/favicon.ico"
+ *   logoSize: 0.2
  * });
  */
 export async function generateQRCodeOnCanvas(
@@ -52,7 +53,7 @@ export async function generateQRCodeOnCanvas(
   const {
     size = 300,
     faviconSize = 0.2,
-    includeLogoAsset = "/favicon.ico",
+    includeLogoAsset = brandingService.getLogoPath(),
   } = options;
 
   try {
@@ -116,13 +117,13 @@ export async function generateQRCodeOnCanvas(
         ctx.lineWidth = 1.5;
         ctx.strokeRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
 
-        // Draw logo/favicon image
+        // Draw logo image
         ctx.drawImage(img, x, y, logoSize, logoSize);
-        console.log("[QR] Favicon embedded successfully");
+        console.log("[QR] SGBC logo embedded successfully");
       }
     } catch (error) {
-      // If favicon fails to load, QR code is still valid without it
-      console.warn("[QR] Failed to embed favicon/logo in QR code:", error);
+      // If logo fails to load, QR code is still valid without it
+      console.warn("[QR] Failed to embed SGBC logo in QR code:", error);
     }
   }
 }

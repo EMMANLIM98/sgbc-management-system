@@ -51,7 +51,6 @@ export function QRCodeDisplay({
         await generateQRCodeOnCanvas(canvas, token, {
           size: 300,
           faviconSize: 0.2,
-          includeLogoAsset: "/favicon.ico",
         });
         console.log("[Event QR] QR code generated successfully with favicon");
       } catch (error) {

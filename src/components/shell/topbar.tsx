@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Check, ChevronsUpDown, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -41,8 +42,17 @@ export function Topbar({ ctx }: { ctx: MyContext }) {
   }
 
   return (
-    <header className="h-14 border-b border-border bg-background flex items-center gap-2 px-4">
-      <div className="flex items-center gap-2 min-w-0">
+    <header className="h-16 border-b border-border bg-background flex items-center gap-3 px-4 sm:px-6">
+      {/* Logo Section */}
+      <div className="flex items-center">
+        <Logo variant="compact" size="md" className="shrink-0" />
+      </div>
+
+      {/* Divider */}
+      <div className="h-8 w-px bg-border hidden sm:block" />
+
+      {/* Organization & Church Selector */}
+      <div className="flex items-center gap-2 min-w-0 hidden sm:flex">
         <div className="text-xs uppercase tracking-wider text-muted-foreground truncate">
           {org?.name ?? "—"}
         </div>

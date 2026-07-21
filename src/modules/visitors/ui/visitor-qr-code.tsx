@@ -40,7 +40,6 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
       await generateQRCodeOnCanvas(canvas, registrationUrl, {
         size: 300,
         faviconSize: 0.2,
-        includeLogoAsset: "/favicon.ico",
       });
       
       console.log("Visitor QR code generated successfully");
