@@ -14,6 +14,7 @@ import {
   Package,
   Settings,
 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
 
 type NavItem = { to: string; label: string; icon: any; soon?: boolean };
@@ -36,14 +37,12 @@ export function Sidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <aside className="hidden md:flex md:w-60 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
-      <div className="h-14 px-4 flex items-center border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-foreground text-background grid place-items-center text-[10px] font-semibold tabular">
-            SGBC
-          </div>
-          <div className="text-sm font-semibold tracking-tight">Shekinah Glory Baptist Church</div>
-        </div>
+      {/* Logo Header */}
+      <div className="h-20 px-4 flex items-center justify-center border-b border-border">
+        <Logo variant="compact" size="md" />
       </div>
+      
+      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
         {nav.map(({ to, label, icon: Icon, soon }) => {
           const active = path === to || path.startsWith(to + "/");

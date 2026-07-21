@@ -3,7 +3,7 @@
  *
  * Displays a QR code for event registration check-in as an image.
  * Allows printing and downloading the QR code as PNG.
- * Uses centralized QR code generator with favicon embedding.
+ * Uses centralized QR code generator with SGBC logo embedding.
  */
 
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ export function QRCodeDisplay({
           size: 300,
           faviconSize: 0.2,
         });
-        console.log("[Event QR] QR code generated successfully with favicon");
+        console.log("[Event QR] QR code generated successfully with SGBC logo");
       } catch (error) {
         console.error("[Event QR] Failed to generate QR code:", error);
       } finally {

@@ -12,7 +12,7 @@ import { brandingService } from "@/lib/domain/branding.service";
 export interface QRCodeGenerationOptions {
   size?: number;
   faviconSize?: number; // Percentage of QR code size (0-1)
-  includeLogoAsset?: string; // Path to logo/favicon image
+  includeLogoAsset?: string; // Path to SGBC logo image (defaults to BrandingService.getLogoPath())
 }
 
 /**
@@ -95,7 +95,7 @@ export async function generateQRCodeOnCanvas(
     throw error;
   }
 
-  // Try to add favicon/logo to center AFTER QR is drawn
+  // Try to add SGBC logo to center AFTER QR is drawn
   if (includeLogoAsset) {
     try {
       const img = await loadImage(includeLogoAsset);
