@@ -123,6 +123,7 @@ export async function generateQRCodeOnCanvas(
 /**
  * Embeds a logo on a canvas asynchronously (non-blocking)
  * This won't prevent the QR code from displaying if it fails
+ * Properly centers the logo image while preserving aspect ratio
  */
 async function embedLogoOnCanvas(
   canvas: HTMLCanvasElement,
@@ -139,24 +140,64 @@ async function embedLogoOnCanvas(
       return;
     }
 
-    // Calculate logo dimensions and position
-    const logoSize = size * faviconSize;
-    const x = (size - logoSize) / 2;
-    const y = (size - logoSize) / 2;
+    // Calculate logo container dimensions and position
+    const containerSize = size * faviconSize;
+    const containerX = (size - containerSize) / 2;
+    const containerY = (size - containerSize) / 2;
     const padding = 4;
 
     // Draw white background square
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+    ctx.fillRect(
+      containerX - padding,
+      containerY - padding,
+      containerSize + padding * 2,
+      containerSize + padding * 2
+    );
 
     // Draw border
     ctx.strokeStyle = "#111827";
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+    ctx.strokeRect(
+      containerX - padding,
+      containerY - padding,
+      containerSize + padding * 2,
+      containerSize + padding * 2
+    );
 
-    // Draw logo image
-    ctx.drawImage(img, x, y, logoSize, logoSize);
-    console.log("[QR] SGBC logo embedded successfully");
+    // Calculate image scaling to fit within container while preserving aspect ratio
+    const imgAspectRatio = img.width / img.height;
+    const containerAspectRatio = 1; // Container is square
+    
+    let imgWidth = containerSize;
+    let imgHeight = containerSize;
+
+    if (imgAspectRatio > containerAspectRatio) {
+      // Image is wider than tall - scale by height
+      imgHeight = containerSize;
+      imgWidth = containerSize * imgAspectRatio;
+    } else if (imgAspectRatio < containerAspectRatio) {
+      // Image is taller than wide - scale by width
+      imgWidth = containerSize;
+      imgHeight = containerSize / imgAspectRatio;
+    }
+
+    // Center image within container
+    const imgX = containerX + (containerSize - imgWidth) / 2;
+    const imgY = containerY + (containerSize - imgHeight) / 2;
+
+    // Draw logo image centered and scaled
+    ctx.drawImage(img, imgX, imgY, imgWidth, imgHeight);
+    console.log(
+      "[QR] SGBC logo embedded successfully - centered at (" +
+        imgX.toFixed(1) +
+        ", " +
+        imgY.toFixed(1) +
+        ") with size " +
+        imgWidth.toFixed(0) +
+        "x" +
+        imgHeight.toFixed(0)
+    );
   } catch (error) {
     console.warn("[QR] Failed to embed SGBC logo in QR code:", error);
     // Intentionally don't rethrow - QR code is still valid without logo
