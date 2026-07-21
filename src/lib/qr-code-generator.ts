@@ -16,14 +16,30 @@ export interface QRCodeGenerationOptions {
 }
 
 /**
- * Loads an image from a given source
+ * Loads an image from a given source with timeout protection
  */
-function loadImage(src: string): Promise<HTMLImageElement> {
+function loadImage(src: string, timeout = 5000): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+    
+    const timeoutId = setTimeout(() => {
+      img.onload = null;
+      img.onerror = null;
+      img.src = ""; // Cancel the image load
+      reject(new Error(`Image load timeout: ${src}`));
+    }, timeout);
+
+    img.onload = () => {
+      clearTimeout(timeoutId);
+      resolve(img);
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeoutId);
+      reject(new Error(`Failed to load image: ${src}`));
+    };
+
     img.src = src;
   });
 }
@@ -90,41 +106,60 @@ export async function generateQRCodeOnCanvas(
     if (!imageData || imageData.data.length === 0) {
       throw new Error("QR code generation resulted in blank canvas");
     }
+
+    // Try to add SGBC logo to center AFTER QR is drawn (non-blocking)
+    // This will happen asynchronously but won't prevent QR from displaying
+    if (includeLogoAsset) {
+      embedLogoOnCanvas(canvas, includeLogoAsset, size, faviconSize).catch((err) => {
+        console.warn("[QR] Logo embedding failed (non-blocking):", err);
+      });
+    }
   } catch (error) {
     console.error("[QR] Failed to generate QR code:", error);
     throw error;
   }
+}
 
-  // Try to add SGBC logo to center AFTER QR is drawn
-  if (includeLogoAsset) {
-    try {
-      const img = await loadImage(includeLogoAsset);
-      const ctx = canvas.getContext("2d");
+/**
+ * Embeds a logo on a canvas asynchronously (non-blocking)
+ * This won't prevent the QR code from displaying if it fails
+ */
+async function embedLogoOnCanvas(
+  canvas: HTMLCanvasElement,
+  logoAsset: string,
+  size: number,
+  faviconSize: number
+): Promise<void> {
+  try {
+    const img = await loadImage(logoAsset, 3000);
+    const ctx = canvas.getContext("2d");
 
-      if (ctx) {
-        // Calculate logo dimensions and position
-        const logoSize = size * faviconSize;
-        const x = (size - logoSize) / 2;
-        const y = (size - logoSize) / 2;
-        const padding = 4;
-
-        // Draw white background square
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
-
-        // Draw border
-        ctx.strokeStyle = "#111827";
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
-
-        // Draw logo image
-        ctx.drawImage(img, x, y, logoSize, logoSize);
-        console.log("[QR] SGBC logo embedded successfully");
-      }
-    } catch (error) {
-      // If logo fails to load, QR code is still valid without it
-      console.warn("[QR] Failed to embed SGBC logo in QR code:", error);
+    if (!ctx) {
+      console.warn("[QR] Canvas context unavailable for logo embedding");
+      return;
     }
+
+    // Calculate logo dimensions and position
+    const logoSize = size * faviconSize;
+    const x = (size - logoSize) / 2;
+    const y = (size - logoSize) / 2;
+    const padding = 4;
+
+    // Draw white background square
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+
+    // Draw border
+    ctx.strokeStyle = "#111827";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+
+    // Draw logo image
+    ctx.drawImage(img, x, y, logoSize, logoSize);
+    console.log("[QR] SGBC logo embedded successfully");
+  } catch (error) {
+    console.warn("[QR] Failed to embed SGBC logo in QR code:", error);
+    // Intentionally don't rethrow - QR code is still valid without logo
   }
 }
 

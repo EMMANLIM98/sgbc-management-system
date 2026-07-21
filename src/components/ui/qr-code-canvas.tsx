@@ -69,12 +69,20 @@ export function QRCodeCanvas({
   const generateQRCode = async () => {
     if (!canvasRef.current) {
       console.error("[QR Canvas] Canvas ref not available");
+      toast.error("QR code canvas not available");
+      setIsGenerating(false);
       return;
     }
 
     try {
       setIsGenerating(true);
       console.log("[QR Canvas] Starting QR code generation for:", value);
+
+      // Ensure canvas is clear and ready
+      const ctx = canvasRef.current.getContext("2d");
+      if (!ctx) {
+        throw new Error("Failed to get canvas 2D context");
+      }
 
       // Use domain layer function for logo-embedded QR code
       await generateQRCodeOnCanvas(canvasRef.current, value, {
@@ -86,7 +94,12 @@ export function QRCodeCanvas({
       onComplete?.();
     } catch (error) {
       console.error("[QR Canvas] Failed to generate QR code:", error);
-      toast.error("Failed to generate QR code");
+      // Don't show toast for logo loading failures (they're non-critical)
+      if (String(error).includes("logo") || String(error).includes("image")) {
+        console.warn("[QR Canvas] Logo embedding failed, but QR code may still be generated");
+      } else {
+        toast.error("Failed to generate QR code");
+      }
     } finally {
       setIsGenerating(false);
     }
