@@ -60,22 +60,29 @@ export function QRCodeCanvas({
 }: QRCodeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   // Generate QR code on mount or when value changes
   useEffect(() => {
-    generateQRCode();
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      generateQRCode();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [value, size]);
 
   const generateQRCode = async () => {
     if (!canvasRef.current) {
-      console.error("[QR Canvas] Canvas ref not available");
-      toast.error("QR code canvas not available");
+      console.error("[QR Canvas] Canvas ref not available - canvas may not be mounted yet");
+      setHasError(true);
       setIsGenerating(false);
       return;
     }
 
     try {
       setIsGenerating(true);
+      setHasError(false);
       console.log("[QR Canvas] Starting QR code generation for:", value);
 
       // Ensure canvas is clear and ready
@@ -94,10 +101,9 @@ export function QRCodeCanvas({
       onComplete?.();
     } catch (error) {
       console.error("[QR Canvas] Failed to generate QR code:", error);
+      setHasError(true);
       // Don't show toast for logo loading failures (they're non-critical)
-      if (String(error).includes("logo") || String(error).includes("image")) {
-        console.warn("[QR Canvas] Logo embedding failed, but QR code may still be generated");
-      } else {
+      if (!String(error).includes("logo") && !String(error).includes("image")) {
         toast.error("Failed to generate QR code");
       }
     } finally {
@@ -106,13 +112,19 @@ export function QRCodeCanvas({
   };
 
   const handleDownload = () => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      toast.error("Canvas not available");
+      return;
+    }
     downloadCanvasAsImage(canvasRef.current, downloadFilename);
     toast.success("QR code downloaded!");
   };
 
   const handlePrint = () => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      toast.error("Canvas not available");
+      return;
+    }
     printCanvasQRCode(canvasRef.current, {
       title,
       subtitle,
@@ -129,11 +141,25 @@ export function QRCodeCanvas({
         </div>
       )}
 
-      {/* QR Code Canvas */}
+      {/* QR Code Canvas Container */}
       <div className="flex justify-center p-4 bg-white border border-gray-200 rounded-lg mb-4">
-        {isGenerating ? (
+        {isGenerating && !hasError ? (
           <div className="flex items-center justify-center" style={{ width: size, height: size }}>
             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          </div>
+        ) : hasError ? (
+          <div className="flex items-center justify-center" style={{ width: size, height: size }}>
+            <div className="text-center">
+              <p className="text-sm text-red-600">Failed to generate QR code</p>
+              <Button
+                onClick={() => generateQRCode()}
+                variant="outline"
+                size="sm"
+                className="mt-2"
+              >
+                Retry
+              </Button>
+            </div>
           </div>
         ) : (
           <canvas
@@ -146,7 +172,7 @@ export function QRCodeCanvas({
       </div>
 
       {/* Action Buttons */}
-      {(showDownload || showPrint) && (
+      {(showDownload || showPrint) && !hasError && !isGenerating && (
         <div className="flex gap-2">
           {showDownload && (
             <Button
