@@ -34,6 +34,7 @@ Professional, minimalist branding system for SGBC that integrates the SGBC logo 
 Centralized management of all branding assets. Single source of truth for logo configuration.
 
 **Key Methods**:
+
 - `getLogoPath()` - Returns `/SGBC_Logo.jpg`
 - `getQRCodeLogoSize()` - Returns logo size (256px)
 - `getOrganizationName()` - Returns "SGBC"
@@ -42,6 +43,7 @@ Centralized management of all branding assets. Single source of truth for logo c
 - `getConfig()` - Returns complete BrandingConfig
 
 **Usage**:
+
 ```typescript
 import { brandingService } from "@/lib/domain/branding.service";
 
@@ -56,15 +58,18 @@ const color = brandingService.getPrimaryColor(); // "#111827"
 Reusable, minimalist logo component for consistent branding throughout the app.
 
 **Variants**:
+
 - `header` - Full logo with optional text for main header
 - `compact` - Logo only for sidebar/smaller spaces
 
 **Sizes**:
+
 - `sm` - 32x32px
 - `md` - 48x48px (default)
 - `lg` - 64x64px
 
 **Features**:
+
 - Professional shadow and rounding
 - Responsive
 - Mobile-friendly
@@ -72,6 +77,7 @@ Reusable, minimalist logo component for consistent branding throughout the app.
 - White background with generous spacing
 
 **Usage**:
+
 ```typescript
 import { Logo } from "@/components/ui/logo";
 
@@ -92,16 +98,18 @@ import { Logo } from "@/components/ui/logo";
 Now uses `BrandingService` for logo configuration instead of hardcoded favicon.
 
 **Changes**:
+
 - Imports and uses `brandingService` for logo path
 - Defaults to `/SGBC_Logo.jpg` instead of `/favicon.ico`
 - Embedded logo is professional and branded
 - Log messages updated to reference "SGBC logo"
 
 **Usage** (automatically uses SGBC logo):
+
 ```typescript
 await generateQRCodeOnCanvas(canvas, data, {
   size: 300,
-  faviconSize: 0.2
+  faviconSize: 0.2,
   // includeLogoAsset defaults to BrandingService.getLogoPath()
 });
 ```
@@ -111,6 +119,7 @@ await generateQRCodeOnCanvas(canvas, data, {
 **File**: `src/components/shell/topbar.tsx`
 
 **Improvements**:
+
 - Displays SGBC logo prominently on the left
 - Clean vertical divider separates logo from content
 - Professional navigation hierarchy
@@ -119,6 +128,7 @@ await generateQRCodeOnCanvas(canvas, data, {
 - Maintains minimalist aesthetic
 
 **Layout**:
+
 ```
 ┌─ Logo ─┐─────┬─ Organization ──┬─ Church Selector ──────┐  User Menu ─┐
 │ [SGBC] │     │ SGBC - Antipolo │  > Select Church...    │─ User Name ─┤
@@ -128,21 +138,25 @@ await generateQRCodeOnCanvas(canvas, data, {
 ## Design Principles
 
 ### Color Scheme
+
 - **Primary**: #111827 (Dark Navy) - Professional, trust-building
 - **Background**: #ffffff (White) - Clean, modern
 - **Accents**: Gray tones for hierarchy and separation
 
 ### Typography
+
 - **Organization Name**: Uppercase, small caps - Emphasis
 - **Labels**: Small, muted - Secondary information
 - **User Info**: Medium weight - Readable
 
 ### Spacing
+
 - Generous gaps between sections (gap-3, gap-6)
 - Proper padding within components (px-4, px-6)
 - Clear visual hierarchy through spacing
 
 ### Mobile Responsiveness
+
 - Logo always visible (core branding)
 - Organization/church selector hidden on mobile
 - Stacked layout for small screens
@@ -156,6 +170,7 @@ All QR codes now embed the SGBC logo:
 2. **Visitor Registration QR Codes**: `/modules/visitors/ui/visitor-qr-code.tsx`
 
 **Automatic Logo Embedding**:
+
 - QR codes automatically use SGBC_Logo.jpg from BrandingService
 - Logo appears in center of QR code with white background
 - Professional appearance for all QR-based registrations
@@ -174,8 +189,8 @@ function updateOrgBranding() {
     logoPath: "/org-logos/cainta.jpg",
     colors: {
       primary: "#1e40af", // Custom blue
-      background: "#ffffff"
-    }
+      background: "#ffffff",
+    },
   });
 }
 ```
@@ -216,18 +231,21 @@ public/
 ## Design Details
 
 ### Header Styling
+
 - Height: 64px (h-16) - Comfortable spacing
 - Border bottom: Subtle gray divider
 - Logo size: 48x48px with rounded corners and shadow
 - Generous padding: 16-24px horizontal
 
 ### Logo Appearance
+
 - Rounded corners (4px)
 - Subtle box shadow for depth
 - Maintains aspect ratio
 - Object-cover for consistent sizing
 
 ### QR Code Branding
+
 - SGBC logo embedded in center
 - 20% of QR code size (optimized)
 - White background square behind logo
