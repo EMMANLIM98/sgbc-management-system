@@ -12,6 +12,7 @@
 The codebase shows **strong DDD and Clean Architecture practices in the Events module** but is **highly inconsistent across other modules**. The Events module is well-structured with clear domain/application/infrastructure separation, while Auth, Finance, Membership, and Visitors modules lack this architectural foundation.
 
 ### Key Findings:
+
 - ✅ **Events module**: Exemplary DDD implementation with proper entity design, value objects, and application services
 - ❌ **Other modules**: Lack domain modeling; heavy mix of infrastructure and business logic in functions
 - ⚠️ **Infrastructure**: Minimal abstraction; direct Supabase calls throughout codebase
@@ -23,6 +24,7 @@ The codebase shows **strong DDD and Clean Architecture practices in the Events m
 ## 1. Folder Structure Analysis
 
 ### Current Organization
+
 ```
 src/
 ├── modules/              ← Module-based structure (GOOD)
@@ -47,12 +49,14 @@ src/
 ### Architecture Assessment
 
 **What's Done Right:**
+
 - Module-based folder structure follows DDD's bounded contexts
 - Events module has proper layering: domain → application → API → UI
 - Clear separation of concerns in Events module
 - Server functions (`*.functions.ts`) separate from React components
 
 **What's Missing:**
+
 - **Inconsistent structure**: 4 out of 6 major modules lack domain/application separation
 - **No repository pattern**: Direct database access via Supabase client
 - **Thin utility library**: `src/lib/utils.ts` has only 2 functions; utilities scattered across codebase
@@ -68,6 +72,7 @@ src/
 **Domain Files Located**: `src/modules/events/domain/`
 
 #### Event Entity
+
 ```typescript
 // ✅ GOOD: Encapsulation with private props
 export class Event {
@@ -109,6 +114,7 @@ export class Event {
 ```
 
 **DDD Patterns Implemented:**
+
 - ✅ **Entity**: Event with unique identity (id)
 - ✅ **Value Objects**: EventStatus (union type), EventProps (immutable data)
 - ✅ **Aggregates**: Event is root; EventRegistration and QRCode are separate aggregates
@@ -121,15 +127,16 @@ export class Event {
 ---
 
 #### EventRegistration Entity
+
 ```typescript
 export class EventRegistration {
   private props: EventRegistrationProps;
 
   // ✅ GOOD: Rich domain types
-  ageCategory?: AttendanceCategory;  // "children" | "youth" | "young_adults" | "adults" | "seniors"
-  sex?: SexKind;                     // "male" | "female"
+  ageCategory?: AttendanceCategory; // "children" | "youth" | "young_adults" | "adults" | "seniors"
+  sex?: SexKind; // "male" | "female"
   visitorStatus?: VisitorMembership; // "member" | "visitor" | "first_time_guest"
-  leadershipRole?: LeadershipRole;   // 10+ pastor/leader roles
+  leadershipRole?: LeadershipRole; // 10+ pastor/leader roles
 
   // ✅ GOOD: Status tracking
   status: RegistrationStatus; // "registered" | "checked_in" | "cancelled" | "no_show"
@@ -139,6 +146,7 @@ export class EventRegistration {
 ```
 
 **Strengths:**
+
 - Rich, expressive domain types (not just strings)
 - Encapsulation of related data
 - Clear temporal tracking (registeredAt, checkedInAt)
@@ -146,6 +154,7 @@ export class EventRegistration {
 ---
 
 #### QRCode Value Object
+
 ```typescript
 export class QRCode {
   private props: QRCodeProps;
@@ -179,6 +188,7 @@ export class QRCode {
 ```
 
 **Value Object Characteristics**: **A+ (10/10)**
+
 - Immutable (methods create new instances or modify via setters)
 - No identity - equality based on values
 - Secure token generation (not reusing IDs)
@@ -189,12 +199,14 @@ export class QRCode {
 ### ❌ Other Modules - **MISSING DOMAIN LAYER**
 
 #### Auth Module
+
 ```
 src/modules/auth/
 └── auth.public.functions.ts  ← Only file; NO domain layer
 ```
 
 **Code Pattern** (ANTI-PATTERN):
+
 ```typescript
 // ❌ ALL logic in API layer - no domain abstraction
 export const getAvailableOrganizations = createServerFn({ method: "GET" }).handler(async () => {
@@ -217,6 +229,7 @@ export const getAvailableOrganizations = createServerFn({ method: "GET" }).handl
 ```
 
 **Missing:**
+
 - ❌ No `Organization` entity or aggregate root
 - ❌ No business logic (e.g., organization visibility rules)
 - ❌ Database directly in server function
@@ -224,6 +237,7 @@ export const getAvailableOrganizations = createServerFn({ method: "GET" }).handl
 - ❌ No abstraction for testing
 
 #### Finance Module
+
 ```
 src/modules/finance/
 ├── contributions.functions.ts
@@ -234,6 +248,7 @@ src/modules/finance/
 ```
 
 **Code Pattern** (ANTI-PATTERN):
+
 ```typescript
 // ❌ Finance logic scattered across multiple function files
 export const getFinanceKpis = createServerFn({ method: "GET" })
@@ -243,7 +258,7 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
     const sb = context.supabase;
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    
+
     // ❌ Database queries in handler
     const [mtdC, prevC, ytdC, mtdE, prevE, ytdE] = await Promise.all([
       scopeFilter(sb.from("contributions").select("amount").gte("occurred_on", monthStart)),
@@ -256,12 +271,13 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
     const giving_mtd = sum(mtdC);
     const giving_prev = sum(prevC);
     const giving_delta_pct = giving_prev > 0 ? Math.round(((giving_mtd - giving_prev) / giving_prev) * 100) : null;
-    
+
     return { giving_mtd, giving_ytd, giving_delta_pct, ... };
   });
 ```
 
 **Missing:**
+
 - ❌ No `Contribution` or `Expense` entities
 - ❌ No `FinanceService` for business logic
 - ❌ No aggregate patterns (should group contributions/expenses under a ledger)
@@ -270,12 +286,14 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
 - ❌ No audit trail or immutability
 
 #### Membership Module
+
 ```
 src/modules/membership/
 └── membership.functions.ts  ← Only file; NO domain layer
 ```
 
 **Code Pattern** (ANTI-PATTERN):
+
 ```typescript
 // ❌ Member listing logic directly in API
 export const listMembers = createServerFn({ method: "GET" })
@@ -284,31 +302,36 @@ export const listMembers = createServerFn({ method: "GET" })
     let query = context.supabase
       .from("members")
       .select("id, church_id, first_name, last_name, email, phone, membership_status, ...");
-    
+
     if (data.church_id) query = query.eq("church_id", data.church_id);
     if (data.status) query = query.eq("membership_status", data.status);
     if (data.q) {
       const like = `%${data.q}%`;
       query = query.or(`first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like}`);
     }
-    
+
     // ❌ Sorting/pagination logic in API
     switch (data.sort) {
-      case "name_asc": query = query.order("last_name").order("first_name"); break;
-      case "name_desc": query = query.order("last_name", { ascending: false }); break;
+      case "name_asc":
+        query = query.order("last_name").order("first_name");
+        break;
+      case "name_desc":
+        query = query.order("last_name", { ascending: false });
+        break;
       // ...
     }
-    
+
     const from = (data.page - 1) * data.page_size;
     const to = from + data.page_size - 1;
     query = query.range(from, to);
     const { data: rows, count, error } = await query;
-    
+
     return { rows, count, page: data.page, page_size: data.page_size };
   });
 ```
 
 **Missing:**
+
 - ❌ No `Member` entity
 - ❌ No `MemberService` for business logic
 - ❌ Filtering/sorting logic in API layer (should be in domain)
@@ -319,13 +342,13 @@ export const listMembers = createServerFn({ method: "GET" })
 
 ### Domain Layer Summary
 
-| Module | Entity? | Aggregate? | Value Objects? | Domain Logic? | Grade |
-|--------|---------|-----------|----------------|---------------|-------|
-| Events | ✅ Yes | ✅ Yes | ✅ Yes (QRCode) | ✅ Yes | A+ |
-| Auth | ❌ No | ❌ No | ❌ No | ❌ No | F |
-| Finance | ❌ No | ❌ No | ❌ No | ❌ No | F |
-| Membership | ❌ No | ❌ No | ❌ No | ❌ No | F |
-| Visitors | ❌ No | ❌ No | ❌ No | ❌ No | F |
+| Module     | Entity? | Aggregate? | Value Objects?  | Domain Logic? | Grade |
+| ---------- | ------- | ---------- | --------------- | ------------- | ----- |
+| Events     | ✅ Yes  | ✅ Yes     | ✅ Yes (QRCode) | ✅ Yes        | A+    |
+| Auth       | ❌ No   | ❌ No      | ❌ No           | ❌ No         | F     |
+| Finance    | ❌ No   | ❌ No      | ❌ No           | ❌ No         | F     |
+| Membership | ❌ No   | ❌ No      | ❌ No           | ❌ No         | F     |
+| Visitors   | ❌ No   | ❌ No      | ❌ No           | ❌ No         | F     |
 
 ---
 
@@ -336,6 +359,7 @@ export const listMembers = createServerFn({ method: "GET" })
 **Application Services Located**: `src/modules/events/application/`
 
 #### EventService
+
 ```typescript
 // ✅ GOOD: Application service orchestrating domain logic
 export class EventService {
@@ -416,6 +440,7 @@ export class EventService {
 **Application Service Quality**: **A (9/10)**
 
 **Strengths:**
+
 - ✅ Orchestrates domain entities (Event.create, Event.fromDatabase)
 - ✅ Handles input DTOs (CreateEventInput)
 - ✅ Returns domain objects, not DTOs
@@ -423,6 +448,7 @@ export class EventService {
 - ✅ Error handling with meaningful messages
 
 **Weaknesses:**
+
 - ❌ Direct Supabase client (no repository pattern)
 - ❌ Table name resolution logic mixed with business logic (should be in repository)
 - ⚠️ Query construction in service (should be in repository)
@@ -430,12 +456,13 @@ export class EventService {
 ---
 
 #### RegistrationService
+
 ```typescript
 // ✅ EXCELLENT: Complex business logic in application service
 export class RegistrationService {
   constructor(
     private supabase: SupabaseClient<Database>,
-    private eventService: EventService,  // ✅ Service composition
+    private eventService: EventService, // ✅ Service composition
   ) {}
 
   // ✅ EXCELLENT: Rich input DTO
@@ -481,11 +508,7 @@ export class RegistrationService {
       // ...spread input
     });
 
-    const qrCode = QRCode.generate(
-      registration.id,
-      input.eventId,
-      input.churchId,
-    );
+    const qrCode = QRCode.generate(registration.id, input.eventId, input.churchId);
 
     // ... persist and return
     return { registration, qrCode };
@@ -496,6 +519,7 @@ export class RegistrationService {
 **Application Service Quality**: **A+ (10/10)**
 
 **Exemplary Practices:**
+
 - ✅ Validates business rules from domain (event.canRegister())
 - ✅ Prevents duplicates (by member, by email, by phone)
 - ✅ Enforces capacity constraints
@@ -506,6 +530,7 @@ export class RegistrationService {
 ---
 
 #### CheckInService
+
 ```typescript
 // ✅ EXCELLENT: Core business process logic
 export class CheckInService {
@@ -521,7 +546,11 @@ export class CheckInService {
       if (!qrCode) return { success: false, message: "Invalid QR code", error: "QR_NOT_FOUND" };
 
       if (qrCode.eventId !== input.eventId) {
-        return { success: false, message: "QR code is not valid for this event", error: "QR_EVENT_MISMATCH" };
+        return {
+          success: false,
+          message: "QR code is not valid for this event",
+          error: "QR_EVENT_MISMATCH",
+        };
       }
 
       // 2. Verify event exists and is active
@@ -535,7 +564,11 @@ export class CheckInService {
       // 3. Verify registration exists
       const registration = await this.getRegistrationById(qrCode.registrationId);
       if (!registration) {
-        return { success: false, message: "Registration not found", error: "REGISTRATION_NOT_FOUND" };
+        return {
+          success: false,
+          message: "Registration not found",
+          error: "REGISTRATION_NOT_FOUND",
+        };
       }
 
       // ... complex check-in logic
@@ -556,12 +589,12 @@ Finance module directly queries database in server functions with no service abs
 
 ```typescript
 // ❌ ANTI-PATTERN: Application logic in server function
-export const getFinanceKpis = createServerFn({ method: "GET" })
-  .handler(async ({ context, data }) => {
+export const getFinanceKpis = createServerFn({ method: "GET" }).handler(
+  async ({ context, data }) => {
     const sb = context.supabase;
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-    
+
     // ❌ This should be in FinanceService.getMonthlyKPIs()
     const [mtdC, prevC, ytdC, mtdE, prevE, ytdE] = await Promise.all([
       scopeFilter(sb.from("contributions").select("amount").gte("occurred_on", monthStart)),
@@ -571,7 +604,8 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
     const sum = (r: any) => (r.data ?? []).reduce((a: number, x: any) => a + Number(x.amount), 0);
     const giving_mtd = sum(mtdC);
     // ... aggregations in API layer
-  });
+  },
+);
 ```
 
 ---
@@ -581,6 +615,7 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
 ### Current Implementation
 
 **Files**: `src/integrations/supabase/`
+
 - `auth-middleware.ts` - Authentication enforcement ✅
 - `client.server.ts` - Server-side admin client ✅
 - `client.ts` - Client-side authenticated client ✅
@@ -589,16 +624,18 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
 ### Assessment: **C (6/10)**
 
 **What's Good:**
+
 - ✅ Clear separation of server admin client vs. client-side client
 - ✅ Authentication middleware enforces auth on protected functions
 - ✅ Environment variable validation with helpful error messages
 - ✅ RLS (Row-Level Security) enforcement via auth context
 
 **What's Missing:**
+
 - ❌ **No Repository Pattern**: Services directly use Supabase client
   - Should have `EventRepository`, `RegistrationRepository`, etc.
   - Would abstract database technology (could swap Supabase for PostgreSQL)
-  
+
 - ❌ **No Data Access Layer**: SQL queries and table names scattered across services
   - Table name resolution logic in `EventService` is a code smell
   - No query builder or query repository
@@ -624,7 +661,7 @@ export class EventService {
 // ✅ Should be: Service talks to repository
 export class EventService {
   constructor(private eventRepository: EventRepository) {}
-  
+
   async createEvent(input: CreateEventInput): Promise<Event> {
     const event = Event.create({...});
     await this.eventRepository.save(event);
@@ -641,12 +678,12 @@ export interface EventRepository {
 
 export class SupabaseEventRepository implements EventRepository {
   constructor(private supabase: SupabaseClient) {}
-  
+
   async save(event: Event): Promise<void> {
     const { error } = await this.supabase.from("events").insert([event.toDatabase()]);
     if (error) throw new Error(`Failed to save event: ${error.message}`);
   }
-  
+
   async findById(id: string): Promise<Event | null> {
     const { data } = await this.supabase.from("events").select("*").eq("id", id).maybeSingle();
     return data ? Event.fromDatabase(data) : null;
@@ -676,11 +713,11 @@ const createEventSchema = z.object({
 
 // ✅ GOOD: Separate authenticated vs. public functions
 export const createEvent = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])  // ← Protected
+  .middleware([requireSupabaseAuth]) // ← Protected
   .inputValidator((d: unknown) => createEventSchema.parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId, churchId } = context;
-    
+
     // ✅ GOOD: Use application service
     const eventService = new EventService(supabase);
     const result = await eventService.createEvent({
@@ -720,6 +757,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 **API Layer Quality**: **A (9/10)**
 
 **Strengths:**
+
 - ✅ Clear input validation with Zod schemas
 - ✅ Separation of authenticated vs. public endpoints
 - ✅ Authentication middleware enforcement
@@ -728,6 +766,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 - ✅ Error handling with meaningful messages
 
 **Weaknesses:**
+
 - ⚠️ No consistent error response format
 - ⚠️ No versioning strategy for API endpoints
 - ⚠️ Rate limiting mentioned but implementation not verified
@@ -784,6 +823,7 @@ export function EventCreateForm({ churchId, organizationId, onCreated }: EventCr
 **UI Layer Quality**: **A (9/10)**
 
 **Strengths:**
+
 - ✅ No business logic in components
 - ✅ Clean separation via server functions
 - ✅ Client-side validation with Zod
@@ -792,6 +832,7 @@ export function EventCreateForm({ churchId, organizationId, onCreated }: EventCr
 - ✅ Reusable UI components from Radix UI
 
 **Weaknesses:**
+
 - ⚠️ Limited data loading states/error boundaries
 - ⚠️ Form components could be more composable
 
@@ -811,27 +852,28 @@ const checkInService = new CheckInService(supabase, eventService);
 ```
 
 **Assessment**: **C+ (7/10)**
+
 - ✅ Simple, no external dependencies
 - ⚠️ No formal DI container
 - ⚠️ Services instantiated in server functions (not reusable across requests)
 - ⚠️ Tight coupling to Supabase client
 
 **Recommendation**:
+
 ```typescript
 // ✅ Factory function for DI
 function createEventDependencies(supabase: SupabaseClient) {
   const eventService = new EventService(supabase);
   const registrationService = new RegistrationService(supabase, eventService);
   const checkInService = new CheckInService(supabase, eventService);
-  
+
   return { eventService, registrationService, checkInService };
 }
 
-export const createEvent = createServerFn({ method: "POST" })
-  .handler(async ({ context, data }) => {
-    const { eventService } = createEventDependencies(context.supabase);
-    // ...
-  });
+export const createEvent = createServerFn({ method: "POST" }).handler(async ({ context, data }) => {
+  const { eventService } = createEventDependencies(context.supabase);
+  // ...
+});
 ```
 
 ---
@@ -839,23 +881,26 @@ export const createEvent = createServerFn({ method: "POST" })
 ### Error Handling
 
 **Current Pattern**:
+
 ```typescript
 // ✅ Good: Domain-specific errors
 if (!event) throw new Error("Event not found");
 if (!event.canRegister()) throw new Error("Event is not accepting registrations");
 
 // ⚠️ Could be improved with custom error types
-class EventNotFoundError extends Error { }
-class EventNotAcceptingRegistrationsError extends Error { }
+class EventNotFoundError extends Error {}
+class EventNotAcceptingRegistrationsError extends Error {}
 ```
 
 **Assessment**: **B (8/10)**
+
 - ✅ Meaningful error messages
 - ✅ Consistent error throwing
 - ⚠️ No custom error types (loses error context in logs)
 - ⚠️ No error codes for API responses
 
 **Recommendation**:
+
 ```typescript
 // ✅ Custom error types
 export enum ErrorCode {
@@ -865,7 +910,10 @@ export enum ErrorCode {
 }
 
 export class DomainError extends Error {
-  constructor(public code: ErrorCode, message: string) {
+  constructor(
+    public code: ErrorCode,
+    message: string,
+  ) {
     super(message);
     this.name = "DomainError";
   }
@@ -877,6 +925,7 @@ export class DomainError extends Error {
 ### Validation
 
 **Current Pattern**: ✅ Excellent
+
 ```typescript
 // ✅ Zod schemas at API layer
 const createEventSchema = z.object({
@@ -888,16 +937,20 @@ const createEventSchema = z.object({
 // ✅ Server function validation
 export const createEvent = createServerFn()
   .inputValidator((d: unknown) => createEventSchema.parse(d))
-  .handler(async ({ data }) => { /* ... */ });
+  .handler(async ({ data }) => {
+    /* ... */
+  });
 ```
 
 **Assessment**: **A (9/10)**
+
 - ✅ Zod validation at API layer
 - ✅ Type safety from schema inference
 - ✅ Client-side validation in components
 - ⚠️ Missing domain-level validation (in Event entity)
 
 **Recommendation**:
+
 ```typescript
 // ✅ Add domain validation
 export class Event {
@@ -920,12 +973,14 @@ export class Event {
 ### Testability Assessment
 
 **Events Module**: **A (9/10)**
+
 - ✅ Domain entities are easily unit testable (pure business logic)
 - ✅ Application services testable with mocked Supabase client
 - ✅ No React dependencies in domain/application layers
 - ✅ Can test Event.canRegister(), Event.isActive() without database
 
 **Example Test**:
+
 ```typescript
 describe("Event", () => {
   it("should allow registration when status is scheduled", () => {
@@ -947,6 +1002,7 @@ describe("Event", () => {
 ```
 
 **Other Modules**: **F (0/10)**
+
 - ❌ All logic in server functions
 - ❌ Cannot unit test business logic without database
 - ❌ Cannot mock dependencies
@@ -1032,22 +1088,23 @@ describe("Event", () => {
 
 ### DDD Principles Presence
 
-| Principle | Present? | Quality | Notes |
-|-----------|----------|---------|-------|
-| **Entities** | ✅ Partial | A (Events) / F (Others) | Event, EventRegistration, but missing many others |
-| **Value Objects** | ⚠️ Partial | A (QRCode) | QRCode excellent; missing Money, Date ranges, etc. |
-| **Aggregates** | ✅ Yes | A (Events) | Event as root with EventRegistration; others missing |
-| **Bounded Contexts** | ✅ Yes | B | Module structure aligns with contexts; not clearly defined |
-| **Repository Pattern** | ❌ No | F | Direct database access throughout |
-| **Services** | ✅ Partial | A (Events) / F (Others) | Only Events module has application services |
-| **Ubiquitous Language** | ⚠️ Partial | B | Good in domain models; inconsistent in infrastructure |
-| **Domain Events** | ❌ No | F | No event publishing or domain event model |
-| **Specifications** | ❌ No | F | No query specifications for complex filtering |
-| **Anti-Corruption Layer** | ❌ No | F | No isolation from external systems |
+| Principle                 | Present?   | Quality                 | Notes                                                      |
+| ------------------------- | ---------- | ----------------------- | ---------------------------------------------------------- |
+| **Entities**              | ✅ Partial | A (Events) / F (Others) | Event, EventRegistration, but missing many others          |
+| **Value Objects**         | ⚠️ Partial | A (QRCode)              | QRCode excellent; missing Money, Date ranges, etc.         |
+| **Aggregates**            | ✅ Yes     | A (Events)              | Event as root with EventRegistration; others missing       |
+| **Bounded Contexts**      | ✅ Yes     | B                       | Module structure aligns with contexts; not clearly defined |
+| **Repository Pattern**    | ❌ No      | F                       | Direct database access throughout                          |
+| **Services**              | ✅ Partial | A (Events) / F (Others) | Only Events module has application services                |
+| **Ubiquitous Language**   | ⚠️ Partial | B                       | Good in domain models; inconsistent in infrastructure      |
+| **Domain Events**         | ❌ No      | F                       | No event publishing or domain event model                  |
+| **Specifications**        | ❌ No      | F                       | No query specifications for complex filtering              |
+| **Anti-Corruption Layer** | ❌ No      | F                       | No isolation from external systems                         |
 
 ### Overall DDD Grade: **C+ (65/100)**
 
 **Breakdown**:
+
 - Events Module: **A (90/100)** - Excellent DDD implementation
 - Other Modules: **F (10/100)** - No DDD principles applied
 - Infrastructure: **C (60/100)** - Missing repository pattern, event sourcing
@@ -1059,15 +1116,15 @@ describe("Event", () => {
 
 ### Clean Architecture Principles
 
-| Layer | Implemented? | Quality | Independence | Notes |
-|-------|-------------|---------|--------------|-------|
-| **Entities** | ✅ Partial | A (Events) | ✅ High | Event, EventRegistration independent of framework |
-| **Use Cases** | ✅ Partial | A (Events) | ✅ High | Application services implement use cases |
-| **Interface Adapters** | ✅ Yes | A | ✅ High | Server functions bridge UI and domain |
-| **Frameworks/Drivers** | ✅ Yes | B | ⚠️ Medium | Supabase used directly, not abstracted |
-| **Dependency Rule** | ⚠️ Partial | B | ⚠️ Medium | Events module follows; others violate |
-| **Testability** | ✅ Partial | A (Events) | ✅ High | Domain/application layers testable |
-| **Independence** | ⚠️ Partial | C | ⚠️ Medium | Events ok; other modules tightly coupled to Supabase |
+| Layer                  | Implemented? | Quality    | Independence | Notes                                                |
+| ---------------------- | ------------ | ---------- | ------------ | ---------------------------------------------------- |
+| **Entities**           | ✅ Partial   | A (Events) | ✅ High      | Event, EventRegistration independent of framework    |
+| **Use Cases**          | ✅ Partial   | A (Events) | ✅ High      | Application services implement use cases             |
+| **Interface Adapters** | ✅ Yes       | A          | ✅ High      | Server functions bridge UI and domain                |
+| **Frameworks/Drivers** | ✅ Yes       | B          | ⚠️ Medium    | Supabase used directly, not abstracted               |
+| **Dependency Rule**    | ⚠️ Partial   | B          | ⚠️ Medium    | Events module follows; others violate                |
+| **Testability**        | ✅ Partial   | A (Events) | ✅ High      | Domain/application layers testable                   |
+| **Independence**       | ⚠️ Partial   | C          | ⚠️ Medium    | Events ok; other modules tightly coupled to Supabase |
 
 ### Dependency Graph (Should Be Concentric Circles)
 
@@ -1098,10 +1155,11 @@ describe("Event", () => {
 ```
 
 **Current Code Violates Dependency Rule** in non-Events modules:
+
 ```typescript
 // ❌ UI Layer depends on Infrastructure (Supabase)
-const { data: members } = await supabase  // Infrastructure
-  .from("members")  // Low-level detail
+const { data: members } = await supabase // Infrastructure
+  .from("members") // Low-level detail
   .select("*")
   .eq("church_id", churchId);
 
@@ -1111,6 +1169,7 @@ const { data: members } = await supabase  // Infrastructure
 ### Overall Clean Architecture Grade: **C+ (65/100)**
 
 **Breakdown**:
+
 - Events Module: **A (90/100)** - Proper layering, dependency rule followed
 - Other Modules: **D (40/100)** - Server functions mix infrastructure and business logic
 - Dependency Direction: **C (60/100)** - Good in Events; violated elsewhere
@@ -1123,6 +1182,7 @@ const { data: members } = await supabase  // Infrastructure
 ### Priority 1: High Impact, Medium Effort
 
 **1. Apply Events Module Pattern to Finance Module**
+
 ```
 Status: ❌ Missing
 Time: ~3-5 hours
@@ -1131,7 +1191,7 @@ Impact: ⭐⭐⭐⭐⭐
 Create domain entities and application services:
 - src/modules/finance/domain/
   - contribution.ts (Entity)
-  - expense.ts (Entity)  
+  - expense.ts (Entity)
   - money.ts (Value Object)
   - ledger.ts (Aggregate Root)
 - src/modules/finance/application/
@@ -1142,6 +1202,7 @@ Move business logic from finance.functions.ts to services.
 ```
 
 **2. Introduce Repository Pattern**
+
 ```
 Status: ❌ Missing
 Time: ~4-6 hours
@@ -1156,6 +1217,7 @@ Update EventService to use repository instead of direct Supabase.
 ```
 
 **3. Create Custom Error Types**
+
 ```
 Status: ⚠️ Partial
 Time: ~1-2 hours
@@ -1166,7 +1228,7 @@ Create domain exception hierarchy:
   - domain.error.ts
   - event-error.ts
   - finance-error.ts
-  
+
 Use in domain entities and services for meaningful error codes.
 ```
 
@@ -1175,6 +1237,7 @@ Use in domain entities and services for meaningful error codes.
 ### Priority 2: Medium Impact, Medium Effort
 
 **4. Add Domain Events**
+
 ```
 Status: ❌ Missing
 Time: ~4-6 hours
@@ -1190,6 +1253,7 @@ Publish on successful operations for audit trail and notifications.
 ```
 
 **5. Create Shared DTOs & Contracts**
+
 ```
 Status: ⚠️ Partial
 Time: ~2-3 hours
@@ -1204,6 +1268,7 @@ Reuse across server functions and services.
 ```
 
 **6. Add Specification Pattern for Complex Queries**
+
 ```
 Status: ❌ Missing
 Time: ~3-4 hours
@@ -1223,6 +1288,7 @@ Reduces query building scattered across code.
 ### Priority 3: Low Impact, Lower Effort
 
 **7. Extract Utilities to Shared Lib**
+
 ```
 Status: ⚠️ Weak
 Time: ~1-2 hours
@@ -1236,6 +1302,7 @@ Expand src/lib/utils.ts with shared helpers:
 ```
 
 **8. Add Integration Tests for Events Module**
+
 ```
 Status: ❌ Missing
 Time: ~3-4 hours
@@ -1249,6 +1316,7 @@ Create integration tests:
 ```
 
 **9. Document Architecture Decisions (ADR)**
+
 ```
 Status: ⚠️ Partial (IMPLEMENTATION_GUIDE.md exists)
 Time: ~1-2 hours
@@ -1290,10 +1358,11 @@ Create Architecture Decision Records:
 ### Example 1: Finance KPIs (Before → After)
 
 **BEFORE (No DDD/Clean Architecture)**:
+
 ```typescript
 // ❌ All logic in server function
-export const getFinanceKpis = createServerFn({ method: "GET" })
-  .handler(async ({ context, data }) => {
+export const getFinanceKpis = createServerFn({ method: "GET" }).handler(
+  async ({ context, data }) => {
     const sb = context.supabase;
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
@@ -1302,24 +1371,34 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
 
     const [mtdC, prevC, ytdC] = await Promise.all([
       sb.from("contributions").select("amount").gte("occurred_on", monthStart),
-      sb.from("contributions").select("amount").gte("occurred_on", prevStart).lt("occurred_on", monthStart),
+      sb
+        .from("contributions")
+        .select("amount")
+        .gte("occurred_on", prevStart)
+        .lt("occurred_on", monthStart),
       sb.from("contributions").select("amount").gte("occurred_on", yearStart),
     ]);
 
     const sum = (r: any) => (r.data ?? []).reduce((a: number, x: any) => a + Number(x.amount), 0);
     const giving_mtd = sum(mtdC);
     const giving_prev = sum(prevC);
-    const giving_delta_pct = giving_prev > 0 ? Math.round(((giving_mtd - giving_prev) / giving_prev) * 100) : null;
+    const giving_delta_pct =
+      giving_prev > 0 ? Math.round(((giving_mtd - giving_prev) / giving_prev) * 100) : null;
 
     return { giving_mtd, giving_ytd: sum(ytdC), giving_delta_pct };
-  });
+  },
+);
 ```
 
 **AFTER (DDD/Clean Architecture)**:
+
 ```typescript
 // Domain Layer
 export class Money {
-  constructor(readonly amount: number, readonly currency: "USD" = "USD") {}
+  constructor(
+    readonly amount: number,
+    readonly currency: "USD" = "USD",
+  ) {}
   add(other: Money): Money {
     if (this.currency !== other.currency) throw new Error("Currency mismatch");
     return new Money(this.amount + other.amount, this.currency);
@@ -1342,7 +1421,12 @@ export class Contribution {
   ) {}
 
   static create(props: { amount: number; occurredOn: Date; memberId?: string }): Contribution {
-    return new Contribution(crypto.randomUUID(), new Money(props.amount), props.occurredOn, props.memberId);
+    return new Contribution(
+      crypto.randomUUID(),
+      new Money(props.amount),
+      props.occurredOn,
+      props.memberId,
+    );
   }
 }
 
@@ -1360,8 +1444,10 @@ export class Ledger {
     const month = new Date(date.getFullYear(), date.getMonth());
     const prevMonth = new Date(date.getFullYear(), date.getMonth() - 1);
 
-    const mtdContributions = this.contributions.filter(c => this.isInMonth(c.occurredOn, month));
-    const prevContributions = this.contributions.filter(c => this.isInMonth(c.occurredOn, prevMonth));
+    const mtdContributions = this.contributions.filter((c) => this.isInMonth(c.occurredOn, month));
+    const prevContributions = this.contributions.filter((c) =>
+      this.isInMonth(c.occurredOn, prevMonth),
+    );
 
     const mtdAmount = mtdContributions.reduce((sum, c) => sum.add(c.amount), new Money(0));
     const prevAmount = prevContributions.reduce((sum, c) => sum.add(c.amount), new Money(0));
@@ -1392,20 +1478,18 @@ export class FinanceService {
 }
 
 // API Layer
-export const getFinanceKpis = createServerFn({ method: "GET" })
-  .handler(async ({ context, data }) => {
+export const getFinanceKpis = createServerFn({ method: "GET" }).handler(
+  async ({ context, data }) => {
     const financeService = new FinanceService(
       context.supabase,
       new SupabaseLedgerRepository(context.supabase),
     );
 
-    const kpi = await financeService.getMonthlyKPIs(
-      data.church_id || context.churchId,
-      new Date(),
-    );
+    const kpi = await financeService.getMonthlyKPIs(data.church_id || context.churchId, new Date());
 
     return { giving_mtd: kpi.givingMTD, giving_delta_pct: kpi.givingDeltaPct };
-  });
+  },
+);
 ```
 
 ---
@@ -1414,14 +1498,14 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
 
 ### Summary Table
 
-| Aspect | Current | Target | Gap |
-|--------|---------|--------|-----|
-| DDD Adherence | **C+** (65%) | **A** (90%) | ▲ Moderate |
+| Aspect             | Current      | Target      | Gap        |
+| ------------------ | ------------ | ----------- | ---------- |
+| DDD Adherence      | **C+** (65%) | **A** (90%) | ▲ Moderate |
 | Clean Architecture | **C+** (65%) | **A** (90%) | ▲ Moderate |
-| Testability | **B** (75%) | **A** (95%) | ▲ Small |
-| Scalability | **B+** (80%) | **A** (95%) | ▲ Small |
-| Maintainability | **C** (60%) | **A** (90%) | ▲ Large |
-| Module Consistency | **C** (50%) | **A** (95%) | ▲ Large |
+| Testability        | **B** (75%)  | **A** (95%) | ▲ Small    |
+| Scalability        | **B+** (80%) | **A** (95%) | ▲ Small    |
+| Maintainability    | **C** (60%)  | **A** (90%) | ▲ Large    |
+| Module Consistency | **C** (50%)  | **A** (95%) | ▲ Large    |
 
 ### Key Takeaways
 
@@ -1475,4 +1559,3 @@ export const getFinanceKpis = createServerFn({ method: "GET" })
 - **70-79 (C)**: Some layers; unclear dependencies; partially testable
 - **60-69 (D)**: Layers mix; dependencies point inward randomly; hard to test
 - **0-59 (F)**: No layering; everything depends on everything; untestable
-

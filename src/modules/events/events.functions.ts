@@ -15,6 +15,7 @@ import { CheckInService } from "@/modules/events/application/checkin.service";
 import { AttendanceAnalyticsService } from "@/modules/events/application/attendance-analytics.service";
 import { RaffleService } from "@/modules/events/application/raffle.service";
 import { emailService } from "@/lib/email";
+import { LeadershipRoleType, leadershipRoles } from "@/lib/domain/leadership-roles";
 
 function isEventsSchemaMissingError(message: string): boolean {
   const normalized = message.toLowerCase();
@@ -66,19 +67,7 @@ const registerForEventSchema = z.object({
   sex: z.enum(["male", "female"]).nullable().optional(),
   visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).nullable().optional(),
   leadershipRole: z
-    .enum([
-      "pastor",
-      "pastor_wife",
-      "pastor_children",
-      "associate_pastor",
-      "elder",
-      "deacon",
-      "deaconess",
-      "preacher",
-      "evangelist",
-      "ministry_leader",
-      "none",
-    ])
+    .custom<LeadershipRoleType>((val) => leadershipRoles.isValid(val))
     .nullable()
     .optional(),
 });
@@ -97,19 +86,7 @@ const raffleFilterSchema = z.object({
   ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
   visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).optional(),
   leadershipRole: z
-    .enum([
-      "pastor",
-      "pastor_wife",
-      "pastor_children",
-      "associate_pastor",
-      "elder",
-      "deacon",
-      "deaconess",
-      "preacher",
-      "evangelist",
-      "ministry_leader",
-      "none",
-    ])
+    .custom<LeadershipRoleType>((val) => leadershipRoles.isValid(val))
     .optional(),
   excludePreviousWinners: z.boolean().optional(),
 });

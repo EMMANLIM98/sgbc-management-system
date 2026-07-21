@@ -23,6 +23,8 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { registerForEvent } from "@/modules/events/events.functions";
+import { LeadershipRoleType, leadershipRoles } from "@/lib/domain/leadership-roles";
+import { useLeadershipRoles } from "@/hooks/use-leadership-roles";
 
 const registrationSchema = z.object({
   eventId: z.string().uuid(),
@@ -40,19 +42,7 @@ const registrationSchema = z.object({
   sex: z.enum(["male", "female"]).nullable().optional(),
   visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).nullable().optional(),
   leadershipRole: z
-    .enum([
-      "pastor",
-      "pastor_wife",
-      "pastor_children",
-      "associate_pastor",
-      "elder",
-      "deacon",
-      "deaconess",
-      "preacher",
-      "evangelist",
-      "ministry_leader",
-      "none",
-    ])
+    .custom<LeadershipRoleType>((val) => leadershipRoles.isValid(val))
     .nullable()
     .optional(),
 });
@@ -81,6 +71,7 @@ export function EventRegistrationForm({
   onRegistered,
 }: EventRegistrationFormProps) {
   const registerFn = useServerFn(registerForEvent);
+  const { rolesByCategory } = useLeadershipRoles();
 
   const {
     register,
@@ -262,15 +253,66 @@ export function EventRegistrationForm({
                   <SelectTrigger id="leadershipRole">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="pastor">Pastor</SelectItem>
-                    <SelectItem value="pastor_wife">Pastor's Wife</SelectItem>
-                    <SelectItem value="associate_pastor">Associate Pastor</SelectItem>
-                    <SelectItem value="elder">Elder</SelectItem>
-                    <SelectItem value="deacon">Deacon</SelectItem>
-                    <SelectItem value="deaconess">Deaconess</SelectItem>
-                    <SelectItem value="ministry_leader">Ministry Leader</SelectItem>
+                  <SelectContent className="max-h-80">
+                    {/* General Roles */}
+                    <div className="px-2 py-1.5">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        General
+                      </p>
+                      {rolesByCategory.general?.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </div>
+
+                    {/* Leadership */}
+                    <div className="px-2 py-1.5 border-t border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Leadership
+                      </p>
+                      {rolesByCategory.leadership?.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </div>
+
+                    {/* Administrative */}
+                    <div className="px-2 py-1.5 border-t border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Administrative
+                      </p>
+                      {rolesByCategory.administrative?.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </div>
+
+                    {/* Ministry */}
+                    <div className="px-2 py-1.5 border-t border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Ministry
+                      </p>
+                      {rolesByCategory.ministry?.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </div>
+
+                    {/* Special Ministries */}
+                    <div className="px-2 py-1.5 border-t border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Special Ministries
+                      </p>
+                      {rolesByCategory.special_ministry?.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </div>
                   </SelectContent>
                 </Select>
               )}
