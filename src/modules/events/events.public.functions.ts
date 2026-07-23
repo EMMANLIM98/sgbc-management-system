@@ -15,6 +15,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { EventService } from "@/modules/events/application/event.service";
 import { RegistrationService } from "@/modules/events/application/registration.service";
 import { emailService } from "@/lib/email";
+import { webhookService } from "@/lib/webhooks";
 
 // Service-role client used server-side only — never exposed to the browser
 function createAdminClient() {
@@ -230,6 +231,38 @@ export const publicRegisterForEvent = createServerFn({ method: "POST" })
         registrationId: registration.id,
       })
       .catch((e) => console.error("[PublicRegister] QR email failed:", e));
+
+    // ── Trigger n8n webhook for external automation (non-blocking) ──
+    webhookService
+      .trigger("event.registration.created", {
+        registration: {
+          id: registration.id,
+          status: registration.status,
+          createdAt: registration.createdAt,
+        },
+        attendee: {
+          firstName: data.attendeeFirstName,
+          lastName: data.attendeeLastName,
+          email: data.attendeeEmail,
+          phone: data.attendeePhone || "",
+          ageCategory: data.ageCategory,
+          sex: data.sex,
+          visitorStatus: data.visitorStatus,
+          leadershipRole: data.leadershipRole,
+        },
+        event: {
+          id: data.eventId,
+          title: eventRow.title,
+          date: eventRow.event_date,
+          location: eventRow.location,
+          maxCapacity: eventRow.max_capacity,
+        },
+        qrCode: {
+          token: qrCode.token,
+          scanUrl: `https://sgbc-management-system.vercel.app/event-check-in/${qrCode.token}`,
+        },
+      })
+      .catch((e) => console.error("[PublicRegister] n8n webhook failed:", e));
 
     return {
       id: registration.id,
