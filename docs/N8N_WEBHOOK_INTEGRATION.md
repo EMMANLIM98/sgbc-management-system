@@ -1,4 +1,3 @@
-
 # n8n Webhook Integration Guide
 
 ## 🚀 Quick Start
@@ -36,24 +35,21 @@ Add a **Code** node in n8n to verify the HMAC signature:
 
 ```javascript
 // n8n Code Node
-const crypto = require('crypto');
+const crypto = require("crypto");
 
-const secret = process.env.N8N_WEBHOOK_SECRET || '';
+const secret = process.env.N8N_WEBHOOK_SECRET || "";
 const payload = JSON.stringify($input.all());
-const signature = $headers['x-event-signature'];
+const signature = $headers["x-event-signature"];
 
-const expectedSignature = crypto
-  .createHmac('sha256', secret)
-  .update(payload)
-  .digest('hex');
+const expectedSignature = crypto.createHmac("sha256", secret).update(payload).digest("hex");
 
 const isValid = signature === expectedSignature;
 
 return {
   isValid,
-  eventType: $headers['x-event-type'],
-  timestamp: $headers['x-event-timestamp'],
-  source: $headers['x-source'],
+  eventType: $headers["x-event-type"],
+  timestamp: $headers["x-event-timestamp"],
+  source: $headers["x-source"],
 };
 ```
 
@@ -164,7 +160,7 @@ Conditional Node
   ↓
 Twilio Node
   - Send SMS to: [PASTOR_PHONE_NUMBER]
-  - Message: 
+  - Message:
     Leader {{$json.data.attendee.firstName}} registered
     for {{$json.data.event.title}}
     Role: {{$json.data.attendee.leadershipRole}}
@@ -195,28 +191,25 @@ MailChimp Node
 
 Headers sent with every webhook call:
 
-| Header | Value | Purpose |
-|--------|-------|---------|
-| `X-Event-Signature` | SHA256 HMAC | Verify authenticity |
-| `X-Event-Type` | `event.registration.created` | Event identifier |
-| `X-Event-Timestamp` | ISO timestamp | Prevent replay attacks |
-| `X-Source` | `sgbc-management-system` | Source identification |
+| Header              | Value                        | Purpose                |
+| ------------------- | ---------------------------- | ---------------------- |
+| `X-Event-Signature` | SHA256 HMAC                  | Verify authenticity    |
+| `X-Event-Type`      | `event.registration.created` | Event identifier       |
+| `X-Event-Timestamp` | ISO timestamp                | Prevent replay attacks |
+| `X-Source`          | `sgbc-management-system`     | Source identification  |
 
 **Verification Example (Node.js):**
 
 ```javascript
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 function verifyWebhook(payload, signature, secret) {
   const expectedSignature = crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(JSON.stringify(payload))
-    .digest('hex');
-  
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
+    .digest("hex");
+
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
 }
 ```
 
@@ -328,14 +321,14 @@ curl -X POST https://your-n8n-instance.com/webhook/event-registrations \
 ### Using the Webhook Service
 
 ```typescript
-import { webhookService } from '@/lib/webhooks';
+import { webhookService } from "@/lib/webhooks";
 
 // In any Application layer service:
-await webhookService.trigger('event.registration.created', {
+await webhookService.trigger("event.registration.created", {
   registration: { id, status, createdAt },
   attendee: { firstName, lastName, email, phone, ageCategory, sex, visitorStatus, leadershipRole },
   event: { id, title, date, location, maxCapacity },
-  qrCode: { token, scanUrl }
+  qrCode: { token, scanUrl },
 });
 ```
 
@@ -343,10 +336,10 @@ await webhookService.trigger('event.registration.created', {
 
 ```typescript
 import type {
-  WebhookEventType,      // 'event.registration.created' | etc.
-  WebhookPayload,        // Full payload structure
-  WebhookTriggerResult,  // { success, webhookUrl, statusCode, error }
-} from '@/lib/webhooks';
+  WebhookEventType, // 'event.registration.created' | etc.
+  WebhookPayload, // Full payload structure
+  WebhookTriggerResult, // { success, webhookUrl, statusCode, error }
+} from "@/lib/webhooks";
 ```
 
 ---
@@ -367,15 +360,14 @@ import type {
 
 ## 🆘 Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Webhook not triggered | Check `N8N_EVENT_REGISTRATION_WEBHOOK` env var is set |
-| n8n not receiving data | Check firewall/network allows outbound to n8n |
-| Signature verification fails | Ensure `N8N_WEBHOOK_SECRET` matches in both places |
-| Workflow not executing | Check n8n logs, test webhook endpoint directly |
-| Data appears malformed | Webhook payload is JSON - parse in n8n with JSON.parse |
+| Issue                        | Solution                                               |
+| ---------------------------- | ------------------------------------------------------ |
+| Webhook not triggered        | Check `N8N_EVENT_REGISTRATION_WEBHOOK` env var is set  |
+| n8n not receiving data       | Check firewall/network allows outbound to n8n          |
+| Signature verification fails | Ensure `N8N_WEBHOOK_SECRET` matches in both places     |
+| Workflow not executing       | Check n8n logs, test webhook endpoint directly         |
+| Data appears malformed       | Webhook payload is JSON - parse in n8n with JSON.parse |
 
 ---
 
 **Need help?** Check n8n documentation at https://docs.n8n.io/
-
