@@ -5,7 +5,6 @@
  * Includes all attendees view with Excel export capability.
  */
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getEventRegistrations, getAllEventRegistrations } from "@/modules/events/events.functions";
@@ -156,7 +155,7 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
 
       {/* Detailed Tables */}
       <Card className="border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <Tabs defaultValue="checked_in" className="w-full">
+        <Tabs defaultValue="all_attendees" className="w-full">
           <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-white p-0 h-auto">
             <TabsTrigger value="all_attendees" className="rounded-none border-b-2 border-b-transparent text-gray-700">
               <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
