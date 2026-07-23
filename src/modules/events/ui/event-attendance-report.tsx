@@ -158,6 +158,10 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
       <Card className="border border-gray-200 bg-white shadow-sm overflow-hidden">
         <Tabs defaultValue="checked_in" className="w-full">
           <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-white p-0 h-auto">
+            <TabsTrigger value="all_attendees" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+              <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
+              All Attendees ({allData?.total || 0})
+            </TabsTrigger>
             <TabsTrigger value="checked_in" className="rounded-none border-b-2 border-b-transparent text-gray-700">
               <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
               Checked In ({checkedInCount})
@@ -170,11 +174,15 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
               <AlertCircle className="w-4 h-4 mr-2 text-gray-600" />
               No-Show ({noShowCount})
             </TabsTrigger>
-            <TabsTrigger value="all_attendees" className="rounded-none border-b-2 border-b-transparent text-gray-700">
-              <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
-              All Attendees ({allData?.total || 0})
-            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all_attendees" className="p-0">
+            <AllAttendeesTable
+              data={allData?.registrations || []}
+              isLoading={loadingAll}
+              onExport={handleExportAllAttendees}
+            />
+          </TabsContent>
 
           <TabsContent value="checked_in" className="p-0">
             <AttendanceTable
@@ -197,14 +205,6 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
               data={noShowData?.registrations || []}
               isLoading={loadingNoShow}
               status="no_show"
-            />
-          </TabsContent>
-
-          <TabsContent value="all_attendees" className="p-0">
-            <AllAttendeesTable
-              data={allData?.registrations || []}
-              isLoading={loadingAll}
-              onExport={handleExportAllAttendees}
             />
           </TabsContent>
         </Tabs>
