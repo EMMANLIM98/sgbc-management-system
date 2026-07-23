@@ -125,9 +125,9 @@ function EventDetail() {
 
       <Tabs defaultValue="checkin" className="space-y-4">
         <TabsList className="border-b border-gray-200 bg-white">
-          <TabsTrigger value="checkin">Check-In</TabsTrigger>
-          <TabsTrigger value="attendees">Checked In</TabsTrigger>
+          <TabsTrigger value="checkin">Scan QR Code</TabsTrigger>
           <TabsTrigger value="attendance">Attendance Report</TabsTrigger>
+          <TabsTrigger value="attendees">Checked In</TabsTrigger>
           <TabsTrigger value="raffle">Raffle 🎉</TabsTrigger>
         </TabsList>
 
@@ -154,12 +154,12 @@ function EventDetail() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="attendees">
-          <EventCheckinReport eventId={id} />
-        </TabsContent>
-
         <TabsContent value="attendance">
           <EventAttendanceReport eventId={id} />
+        </TabsContent>
+
+        <TabsContent value="attendees">
+          <EventCheckinReport eventId={id} />
         </TabsContent>
 
         <TabsContent value="raffle">
