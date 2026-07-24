@@ -132,15 +132,24 @@ export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
                 </TableRow>
               ) : (
                 filteredRegistrations.map((registration) => (
-                  <TableRow key={registration.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <TableRow
+                    key={registration.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
                     <TableCell className="font-medium text-gray-900">{registration.name}</TableCell>
-                    <TableCell className="text-sm text-gray-700">{registration.churchName}</TableCell>
-                    <TableCell className="text-sm text-gray-600">{registration.email || "—"}</TableCell>
-                    <TableCell className="text-sm text-gray-600">{registration.phone || "—"}</TableCell>
+                    <TableCell className="text-sm text-gray-700">
+                      {registration.churchName}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {registration.email || "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {registration.phone || "—"}
+                    </TableCell>
                     <TableCell>
                       {registration.ageCategory ? (
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal"
                         >
                           {registration.ageCategory.replace("_", " ")}
@@ -151,8 +160,8 @@ export function EventCheckinReport({ eventId }: EventCheckinReportProps) {
                     </TableCell>
                     <TableCell>
                       {registration.visitorStatus ? (
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal"
                         >
                           {registration.visitorStatus.replace("_", " ")}

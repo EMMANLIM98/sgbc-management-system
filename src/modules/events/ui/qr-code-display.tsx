@@ -47,7 +47,7 @@ export function QRCodeDisplay({
       try {
         setIsGenerating(true);
         console.log("[Event QR] Starting QR code generation for token:", token.substring(0, 20));
-        
+
         await generateQRCodeOnCanvas(canvas, token, {
           size: 300,
           faviconSize: 0.2,
@@ -91,7 +91,7 @@ export function QRCodeDisplay({
               <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
             </div>
           )}
-          <canvas 
+          <canvas
             ref={canvasRef}
             width={300}
             height={300}

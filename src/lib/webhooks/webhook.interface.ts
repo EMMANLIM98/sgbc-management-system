@@ -5,7 +5,7 @@
  * Architecture Layer: Infrastructure (Boundary)
  */
 
-export type WebhookEventType = 
+export type WebhookEventType =
   | "event.registration.created"
   | "event.checkin.created"
   | "event.cancelled"
@@ -35,10 +35,7 @@ export interface IWebhookService {
    * Does not block the main request
    * Includes built-in retry logic and error handling
    */
-  trigger(
-    eventType: WebhookEventType,
-    data: Record<string, any>,
-  ): Promise<WebhookTriggerResult>;
+  trigger(eventType: WebhookEventType, data: Record<string, any>): Promise<WebhookTriggerResult>;
 
   /**
    * Verify webhook authenticity (HMAC signature)

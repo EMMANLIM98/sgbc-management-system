@@ -90,9 +90,9 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           });
 
           console.log("✓ Camera stream obtained successfully");
-          
+
           if (!isComponentMounted) {
-            stream.getTracks().forEach(track => track.stop());
+            stream.getTracks().forEach((track) => track.stop());
             return;
           }
 
@@ -112,7 +112,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           }
 
           videoElement.srcObject = stream;
-          
+
           // Wait for video to be ready
           await new Promise((resolve) => {
             videoElement.onloadedmetadata = () => {
@@ -137,7 +137,8 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
               if (decodedText === lastScannedRef.current) return;
               lastScannedRef.current = decodedText;
 
-              onScanRef.current(decodedText)
+              onScanRef
+                .current(decodedText)
                 .then(() => {
                   if (isComponentMounted) {
                     setFeedback({ type: "success", message: "Attendee checked in successfully." });
@@ -159,13 +160,16 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
               if (errorMessage && errorMessage.length > 50) {
                 console.debug(`Scanning: ${errorMessage.substring(0, 100)}`);
               }
-            }
+            },
           );
 
           console.log("✓ Scanner initialized successfully");
           return;
         } catch (manualError) {
-          console.warn("Manual camera access failed, falling back to Html5QrcodeScanner:", manualError);
+          console.warn(
+            "Manual camera access failed, falling back to Html5QrcodeScanner:",
+            manualError,
+          );
         }
 
         // Fallback to Html5QrcodeScanner
@@ -180,7 +184,7 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         };
 
         const scanner = new Html5QrcodeScanner(containerId, config, true);
-        
+
         if (!isComponentMounted) {
           await scanner.clear();
           return;
@@ -195,7 +199,8 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
               if (decodedText === lastScannedRef.current) return;
               lastScannedRef.current = decodedText;
 
-              onScanRef.current(decodedText)
+              onScanRef
+                .current(decodedText)
                 .then(() => {
                   if (isComponentMounted) {
                     setFeedback({ type: "success", message: "Attendee checked in successfully." });
@@ -217,10 +222,10 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
                 });
             },
             (error: string) => {
-              if (error && typeof error === 'string') {
+              if (error && typeof error === "string") {
                 console.debug(`Scanning error: ${error.substring(0, 200)}`);
               }
-            }
+            },
           );
 
           console.log("✓ Html5QrcodeScanner fallback initialized");
@@ -228,10 +233,11 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           if (!isComponentMounted) return;
 
           let errorMsg = "Failed to initialize camera scanner";
-          
+
           if (error instanceof DOMException) {
             if (error.name === "NotAllowedError") {
-              errorMsg = "Camera permission denied. Please allow camera access in your browser settings.";
+              errorMsg =
+                "Camera permission denied. Please allow camera access in your browser settings.";
             } else if (error.name === "NotFoundError") {
               errorMsg = "No camera found on this device.";
               setScanState("camera-not-found");

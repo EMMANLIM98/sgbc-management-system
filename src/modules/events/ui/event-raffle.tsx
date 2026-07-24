@@ -55,7 +55,11 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
   });
 
   // Get existing winners
-  const { data: winnersData, isLoading: loadingWinners, refetch: refetchWinners } = useQuery({
+  const {
+    data: winnersData,
+    isLoading: loadingWinners,
+    refetch: refetchWinners,
+  } = useQuery({
     queryKey: ["raffleWinners", eventId],
     queryFn: () => getWinnersFn({ data: { eventId } }),
   });
@@ -76,9 +80,7 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
       });
 
       if (result.participantName) {
-        toast.success(
-          `🎉 Winner: ${result.participantName} wins ${result.prizeName}!`,
-        );
+        toast.success(`🎉 Winner: ${result.participantName} wins ${result.prizeName}!`);
         setPrizeName("");
         // Refetch winners to update the UI
         await refetchWinners();
@@ -155,7 +157,10 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
               <Button
                 onClick={handleDrawWinner}
                 disabled={
-                  isDrawing || checkedInCount === 0 || !prizeName.trim() || winners.length >= checkedInCount
+                  isDrawing ||
+                  checkedInCount === 0 ||
+                  !prizeName.trim() ||
+                  winners.length >= checkedInCount
                 }
                 className="w-full bg-gray-900 text-white hover:bg-gray-800"
               >
@@ -177,7 +182,8 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
           {winners.length >= checkedInCount && checkedInCount > 0 && (
             <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
               <p className="text-sm text-gray-700">
-                ✨ All checked-in attendees have won! {checkedInCount} winners from {checkedInCount} entries.
+                ✨ All checked-in attendees have won! {checkedInCount} winners from {checkedInCount}{" "}
+                entries.
               </p>
             </div>
           )}
@@ -268,16 +274,29 @@ export function EventRaffle({ eventId }: EventRaffleProps) {
               </TableHeader>
               <TableBody>
                 {winners.map((winner, idx) => (
-                  <TableRow key={winner.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <TableRow
+                    key={winner.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
                     <TableCell>
-                      <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 font-semibold">
+                      <Badge
+                        variant="outline"
+                        className="bg-gray-100 text-gray-700 border-gray-200 font-semibold"
+                      >
                         {idx + 1}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium text-gray-900">{winner.participantName}</TableCell>
-                    <TableCell className="text-sm text-gray-600">{winner.participantEmail || "—"}</TableCell>
+                    <TableCell className="font-medium text-gray-900">
+                      {winner.participantName}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {winner.participantEmail || "—"}
+                    </TableCell>
                     <TableCell className="font-medium">
-                      <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200">
+                      <Badge
+                        variant="outline"
+                        className="bg-gray-100 text-gray-700 border-gray-200"
+                      >
                         {winner.prizeName}
                       </Badge>
                     </TableCell>

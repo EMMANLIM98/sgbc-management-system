@@ -1,15 +1,19 @@
 # URGENT: Critical Database Trigger Issue - Signup Blocked
 
 ## Problem
+
 When attempting to sign up, you get a 500 error with empty error details: `{"message": {}, status: 500}`. This is the PostgreSQL trigger `handle_new_user()` failing when trying to process the signup.
 
 ## Root Cause
+
 The current database trigger (in migration `20260708085325_*.sql`) is trying to INSERT a new organization every time a user signs up. This causes a database constraint violation because:
+
 1. It tries to insert with slug `'main-{uuid}'` for the church
 2. The church table already has a 'main' slug for existing churches
 3. The unique constraint on (organization_id, slug) is violated
 
 ## Solution
+
 Apply the corrected trigger from migration `20260715_fix_signup_org_creation.sql`.
 
 ### Option 1: Apply Via Supabase Dashboard (FASTEST - 2 minutes)
@@ -106,6 +110,7 @@ After applying the fix:
 ## What Changed
 
 **Old Trigger (BROKEN)**:
+
 - `INSERT INTO public.organizations` on every signup ❌
 - Creates new org with slug `'sgbc-{name}-{uuid}'`
 - Creates church with slug `'main'` (duplicate!)
@@ -113,6 +118,7 @@ After applying the fix:
 - Tries to insert even if org doesn't exist
 
 **New Trigger (FIXED)**:
+
 - `SELECT` to find existing organization by name ✓
 - Only links user if org exists, doesn't create new orgs ✓
 - Uses unique slug: `'main-' || substr(user_id, 1, 8)` ✓
@@ -122,6 +128,7 @@ After applying the fix:
 ## Database Schema
 
 Organizations exist in the database:
+
 - SGBC - Antipolo
 - SGBC - Baras
 - SGBC - Boracay
@@ -148,6 +155,7 @@ After fix:
 ## Support
 
 If you still have issues after applying this fix:
+
 1. Check your Supabase email settings (Resend integration)
 2. Verify organizations exist in Settings > Organizations
 3. Check that the trigger ran successfully (no error in SQL Editor)

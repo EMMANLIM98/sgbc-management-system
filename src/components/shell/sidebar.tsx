@@ -41,7 +41,7 @@ export function Sidebar() {
       <div className="h-20 px-4 flex items-center justify-center border-b border-border">
         <Logo variant="compact" size="md" />
       </div>
-      
+
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
         {nav.map(({ to, label, icon: Icon, soon }) => {

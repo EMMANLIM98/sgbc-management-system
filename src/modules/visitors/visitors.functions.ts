@@ -26,7 +26,9 @@ export const listVisitors = createServerFn({ method: "GET" })
     if (data.source) q = q.eq("source", data.source);
     if (data.q) {
       const like = `%${data.q}%`;
-      q = q.or(`full_name.ilike.${like},address.ilike.${like},contact_number.ilike.${like},email_address.ilike.${like}`);
+      q = q.or(
+        `full_name.ilike.${like},address.ilike.${like},contact_number.ilike.${like},email_address.ilike.${like}`,
+      );
     }
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
@@ -60,8 +62,20 @@ const upsertSchema = z.object({
   invited_by: z.string().max(160).nullable().optional(),
   is_first_time_visitor: z.boolean().default(true),
   prayer_requests: z.string().max(1000).nullable().optional(),
-  interests: z.array(z.enum(["bible_study", "small_group", "volunteer_ministry", "baptism", "church_membership"])).default([]),
-  visitor_status: z.enum(["first_time", "returning", "needs_followup", "interested_membership", "prayer_request_only"]).default("first_time"),
+  interests: z
+    .array(
+      z.enum(["bible_study", "small_group", "volunteer_ministry", "baptism", "church_membership"]),
+    )
+    .default([]),
+  visitor_status: z
+    .enum([
+      "first_time",
+      "returning",
+      "needs_followup",
+      "interested_membership",
+      "prayer_request_only",
+    ])
+    .default("first_time"),
   can_visit: z.boolean().default(false),
   visit_when: z.string().nullable().optional(),
   notes: z.string().max(1000).nullable().optional(),

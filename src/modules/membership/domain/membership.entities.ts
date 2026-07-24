@@ -1,11 +1,15 @@
 /**
  * Membership Domain - Entities
- * 
+ *
  * Core membership aggregates following DDD principles.
  */
 
 import { AggregateRoot } from "@/lib/ddd-base";
-import { ValidationError, BusinessRuleViolation, InvalidStateTransition } from "@/lib/domain-errors";
+import {
+  ValidationError,
+  BusinessRuleViolation,
+  InvalidStateTransition,
+} from "@/lib/domain-errors";
 
 export type MemberStatus = "active" | "inactive" | "transferred" | "deceased";
 export type MemberCategory = "member" | "visitor" | "prospect";
@@ -95,7 +99,7 @@ export class Member extends AggregateRoot<MemberProps> {
     if (this._props.status === "transferred" || this._props.status === "deceased") {
       throw new InvalidStateTransition(
         `Cannot deactivate a ${this._props.status} member`,
-        "INVALID_TRANSITION"
+        "INVALID_TRANSITION",
       );
     }
     this._props.status = "inactive";
@@ -109,7 +113,7 @@ export class Member extends AggregateRoot<MemberProps> {
     if (this._props.status !== "inactive") {
       throw new InvalidStateTransition(
         "Only inactive members can be reactivated",
-        "INVALID_TRANSITION"
+        "INVALID_TRANSITION",
       );
     }
     this._props.status = "active";
@@ -123,7 +127,7 @@ export class Member extends AggregateRoot<MemberProps> {
     if (!this.isActive) {
       throw new BusinessRuleViolation(
         "Only active members can be transferred",
-        "MEMBER_NOT_ACTIVE"
+        "MEMBER_NOT_ACTIVE",
       );
     }
     this._props.status = "transferred";
@@ -156,7 +160,9 @@ export class Member extends AggregateRoot<MemberProps> {
   /**
    * Update member information
    */
-  updateInfo(updates: Partial<Pick<MemberProps, "email" | "phone" | "maritalStatus" | "occupation">>): void {
+  updateInfo(
+    updates: Partial<Pick<MemberProps, "email" | "phone" | "maritalStatus" | "occupation">>,
+  ): void {
     if (updates.email && !this.isValidEmail(updates.email)) {
       throw new ValidationError("Invalid email address", "INVALID_EMAIL");
     }
@@ -226,7 +232,10 @@ export interface MemberDocumentProps {
 }
 
 export class MemberDocument {
-  constructor(readonly id: string, private props: MemberDocumentProps) {
+  constructor(
+    readonly id: string,
+    private props: MemberDocumentProps,
+  ) {
     this.validate();
   }
 

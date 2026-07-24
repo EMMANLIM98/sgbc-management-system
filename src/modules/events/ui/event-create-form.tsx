@@ -130,7 +130,13 @@ export function EventCreateForm({ churchId, organizationId, onCreated }: EventCr
 
           <div className="space-y-2">
             <Label htmlFor="maxCapacity">Max capacity</Label>
-            <Input id="maxCapacity" type="number" min={1} placeholder="300" {...form.register("maxCapacity")} />
+            <Input
+              id="maxCapacity"
+              type="number"
+              min={1}
+              placeholder="300"
+              {...form.register("maxCapacity")}
+            />
           </div>
         </div>
 

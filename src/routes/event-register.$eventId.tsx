@@ -39,9 +39,7 @@ const formSchema = z.object({
   attendeePhone: z.string().max(40).optional(),
   ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
   sex: z.enum(["male", "female"]).optional(),
-  visitorStatus: z
-    .enum(["member", "visitor", "first_time_guest"])
-    .default("first_time_guest"),
+  visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).default("first_time_guest"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -139,7 +137,9 @@ function PublicRegisterPage() {
               downloadFilename={`event-registration-${result.id}.png`}
             />
 
-            <p className="text-xs text-gray-500 mt-4 font-mono break-all text-center">{result.id}</p>
+            <p className="text-xs text-gray-500 mt-4 font-mono break-all text-center">
+              {result.id}
+            </p>
           </Card>
 
           <p className="text-xs text-gray-500 text-center">

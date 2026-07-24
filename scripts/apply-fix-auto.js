@@ -2,12 +2,12 @@
 
 /**
  * Apply Signup Trigger Fix - Multiple Approaches
- * 
+ *
  * This script tries multiple methods to apply the database fix:
  * 1. Supabase CLI (if installed)
  * 2. Direct PostgreSQL connection
  * 3. Browser automation with Playwright
- * 
+ *
  * Run: npm exec node -- scripts/apply-fix-auto.js
  */
 
@@ -88,22 +88,22 @@ $$;
 async function trySupabaseCLI() {
   try {
     console.log("🔍 Method 1: Trying Supabase CLI...\n");
-    
+
     // Check if supabase CLI is installed
     execSync("supabase --version", { stdio: "pipe" });
-    
+
     // Write SQL to temp file
     const tempFile = path.join(process.cwd(), ".temp-fix.sql");
     fs.writeFileSync(tempFile, fixSQL);
-    
+
     console.log("⏳ Connecting to Supabase via CLI...");
-    
+
     // Execute via Supabase CLI
     execSync(`supabase db execute --file ${tempFile}`, { stdio: "inherit" });
-    
+
     // Clean up
     fs.unlinkSync(tempFile);
-    
+
     console.log("\n✅ Successfully applied fix via Supabase CLI!\n");
     return true;
   } catch (error) {
@@ -116,7 +116,7 @@ async function trySupabaseCLI() {
 async function tryDirectPostgres() {
   try {
     console.log("🔍 Method 2: Trying direct PostgreSQL connection...\n");
-    
+
     // Create connection pool
     const pool = new Pool({
       host: `${projectId}.supabase.co`,
@@ -139,7 +139,9 @@ async function tryDirectPostgres() {
     console.log("✅ Successfully applied fix via PostgreSQL!\n");
     return true;
   } catch (error) {
-    console.log(`⚠️  Direct PostgreSQL failed: ${error instanceof Error ? error.message : String(error)}\n`);
+    console.log(
+      `⚠️  Direct PostgreSQL failed: ${error instanceof Error ? error.message : String(error)}\n`,
+    );
     return false;
   }
 }
@@ -148,9 +150,9 @@ async function tryDirectPostgres() {
 async function tryPlaywright() {
   try {
     console.log("🔍 Method 3: Trying Playwright automation...\n");
-    
+
     const { chromium } = await import("playwright");
-    
+
     const browser = await chromium.launch({ headless: false });
     const page = await browser.newPage();
 
@@ -163,11 +165,11 @@ async function tryPlaywright() {
     await page.waitForTimeout(3000);
 
     console.log("⏳ Finding SQL editor...");
-    
+
     // Try to find and click a "New Query" button or similar
     const buttons = await page.locator("button").all();
     let found = false;
-    
+
     for (const button of buttons) {
       const text = await button.textContent();
       if (text?.toLowerCase().includes("new") || text?.toLowerCase().includes("query")) {
@@ -185,19 +187,19 @@ async function tryPlaywright() {
     await page.waitForTimeout(2000);
 
     console.log("⏳ Clicking in editor and pasting SQL...");
-    
+
     // Find text editor and paste
     const editors = await page.locator('[class*="editor"], textarea').all();
     if (editors.length > 0) {
       await editors[0].click();
       await page.keyboard.press("Control+A");
       await page.keyboard.press("Delete");
-      
+
       // Paste SQL via clipboard
       await page.evaluate((sql) => {
         navigator.clipboard.writeText(sql);
       }, fixSQL);
-      
+
       await page.keyboard.press("Control+V");
       await page.waitForTimeout(1000);
 
@@ -219,7 +221,7 @@ async function tryPlaywright() {
 
       console.log("✅ Query executed!\n");
       console.log("Browser is open for verification. Close when ready.");
-      
+
       // Keep browser open
       return true;
     }
@@ -227,7 +229,9 @@ async function tryPlaywright() {
     await browser.close();
     return false;
   } catch (error) {
-    console.log(`⚠️  Playwright automation failed: ${error instanceof Error ? error.message : String(error)}\n`);
+    console.log(
+      `⚠️  Playwright automation failed: ${error instanceof Error ? error.message : String(error)}\n`,
+    );
     return false;
   }
 }

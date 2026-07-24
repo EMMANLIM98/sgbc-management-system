@@ -32,7 +32,8 @@ export interface IVisitorRepository extends IRepository<Visitor> {
 
 export class SupabaseVisitorRepository
   extends ScopedSupabaseRepository<Visitor>
-  implements IVisitorRepository {
+  implements IVisitorRepository
+{
   constructor(supabaseClient: any) {
     super(supabaseClient, "visitors");
   }
@@ -88,7 +89,9 @@ export class SupabaseVisitorRepository
     if (query.toDate) q = q.lte("last_visit_date", query.toDate.toISOString().split("T")[0]);
 
     if (query.searchTerm) {
-      q = q.or(`name.ilike.%${query.searchTerm}%,email.ilike.%${query.searchTerm}%,phone.ilike.%${query.searchTerm}%`);
+      q = q.or(
+        `name.ilike.%${query.searchTerm}%,email.ilike.%${query.searchTerm}%,phone.ilike.%${query.searchTerm}%`,
+      );
     }
 
     q = q.order("last_visit_date", { ascending: false });
@@ -97,7 +100,7 @@ export class SupabaseVisitorRepository
 
     const { data, error } = await q;
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async countByQuery(query: VisitorQuery): Promise<number> {
@@ -123,7 +126,7 @@ export class SupabaseVisitorRepository
       .order("last_visit_date", { ascending: false });
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async getRecentVisitors(churchId: string, days: number, limit: number = 10): Promise<Visitor[]> {
@@ -139,7 +142,7 @@ export class SupabaseVisitorRepository
       .limit(limit);
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async getNewVisitorsCount(churchId: string, startDate: Date, endDate: Date): Promise<number> {
@@ -165,7 +168,7 @@ export class SupabaseVisitorRepository
       .limit(20);
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 }
 

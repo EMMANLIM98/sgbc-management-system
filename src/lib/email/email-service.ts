@@ -336,4 +336,3 @@ export class ResendEmailService implements IEmailService {
  * Export default instance
  */
 export const emailService = new ResendEmailService();
-

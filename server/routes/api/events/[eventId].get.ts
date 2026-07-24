@@ -1,10 +1,10 @@
 /**
  * Mobile REST API - Get Event Details
- * 
+ *
  * Endpoint: GET /api/events/:eventId
  * Description: Retrieve full details for a specific event
  * Authentication: None (public)
- * 
+ *
  * Response includes:
  *   - Event details
  *   - Current registration count
@@ -40,7 +40,9 @@ export default defineEventHandler(async (event) => {
     // Fetch event
     const { data: eventData, error: eventError } = await supabase
       .from("events")
-      .select("id, title, description, event_date, start_time, end_time, location, max_capacity, status, church_id, organization_id")
+      .select(
+        "id, title, description, event_date, start_time, end_time, location, max_capacity, status, church_id, organization_id",
+      )
       .eq("id", eventId)
       .in("status", ["scheduled", "active"])
       .maybeSingle();
@@ -70,7 +72,9 @@ export default defineEventHandler(async (event) => {
       .not("status", "eq", "cancelled");
 
     const remaining =
-      eventData.max_capacity != null ? Math.max(0, eventData.max_capacity - (registered || 0)) : null;
+      eventData.max_capacity != null
+        ? Math.max(0, eventData.max_capacity - (registered || 0))
+        : null;
 
     setResponseHeader(event, "content-type", "application/json");
     return {

@@ -119,9 +119,7 @@ export class N8nWebhookService implements IWebhookService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(
-          `Webhook returned ${response.status}: ${response.statusText}`,
-        );
+        throw new Error(`Webhook returned ${response.status}: ${response.statusText}`);
       }
 
       console.log(`[Webhook] ${payload.event.type} triggered successfully (${response.status})`);
@@ -168,10 +166,7 @@ export class N8nWebhookService implements IWebhookService {
     }
 
     const expectedSignature = this.createSignature(payload);
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature),
-    );
+    const isValid = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
 
     if (!isValid) {
       console.warn("[Webhook] Invalid signature - potential security issue");
@@ -185,10 +180,7 @@ export class N8nWebhookService implements IWebhookService {
    * Private helper method
    */
   private createSignature(data: string): string {
-    return crypto
-      .createHmac("sha256", this.webhookSecret)
-      .update(data)
-      .digest("hex");
+    return crypto.createHmac("sha256", this.webhookSecret).update(data).digest("hex");
   }
 
   /**

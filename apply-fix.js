@@ -3,16 +3,17 @@
 // Direct SQL execution script - applies the handle_new_user() fix
 // This must be run from a protected environment (Node backend, not browser)
 
-import { config } from 'dotenv';
-import https from 'https';
+import { config } from "dotenv";
+import https from "https";
 
 config();
 
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_SECRET_KEY =
+  process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_SECRET_KEY) {
-  console.error('❌ SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY not found in .env');
+  console.error("❌ SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY not found in .env");
   process.exit(1);
 }
 
@@ -71,39 +72,39 @@ const payload = JSON.stringify({ query: sql });
 
 const url = new URL(`${SUPABASE_URL}/rest/v1/`);
 const queryParam = new URLSearchParams();
-queryParam.append('apikey', SUPABASE_SECRET_KEY);
+queryParam.append("apikey", SUPABASE_SECRET_KEY);
 
 const options = {
   hostname: url.hostname,
   port: 443,
   path: `/rest/v1/?${queryParam.toString()}`,
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Content-Length': Buffer.byteLength(payload),
-    'apikey': SUPABASE_SECRET_KEY,
-    'Authorization': `Bearer ${SUPABASE_SECRET_KEY}`,
+    "Content-Type": "application/json",
+    "Content-Length": Buffer.byteLength(payload),
+    apikey: SUPABASE_SECRET_KEY,
+    Authorization: `Bearer ${SUPABASE_SECRET_KEY}`,
   },
 };
 
-console.log('🔄 Applying database migration...');
+console.log("🔄 Applying database migration...");
 console.log(`📍 Target: ${SUPABASE_URL}`);
 
 const req = https.request(options, (res) => {
-  let data = '';
+  let data = "";
 
-  res.on('data', (chunk) => {
+  res.on("data", (chunk) => {
     data += chunk;
   });
 
-  res.on('end', () => {
+  res.on("end", () => {
     if (res.statusCode === 200 || res.statusCode === 204) {
-      console.log('✅ Migration applied successfully!');
+      console.log("✅ Migration applied successfully!");
       console.log(`   Status: ${res.statusCode}`);
-      console.log(`   Response: ${data || '(empty)'}`);
+      console.log(`   Response: ${data || "(empty)"}`);
     } else if (res.statusCode === 201) {
-      console.log('✅ SQL executed (201 Created)');
-      console.log(`   Response: ${data || '(empty)'}`);
+      console.log("✅ SQL executed (201 Created)");
+      console.log(`   Response: ${data || "(empty)"}`);
     } else {
       console.error(`❌ Failed with status ${res.statusCode}`);
       console.error(`   Response: ${data}`);
@@ -112,8 +113,8 @@ const req = https.request(options, (res) => {
   });
 });
 
-req.on('error', (error) => {
-  console.error('❌ Error:', error.message);
+req.on("error", (error) => {
+  console.error("❌ Error:", error.message);
   process.exit(1);
 });
 

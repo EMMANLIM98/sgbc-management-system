@@ -78,7 +78,9 @@ $$;`,
     });
 
     if (!response.ok) {
-      console.log("REST API query failed, the function may need to be applied manually via Supabase dashboard.");
+      console.log(
+        "REST API query failed, the function may need to be applied manually via Supabase dashboard.",
+      );
       console.log("Please run this SQL in Supabase SQL Editor:");
       console.log(`
 -- Fix handle_new_user() to link to existing organizations
@@ -127,7 +129,9 @@ $$;
     }
 
     console.log("✓ Successfully fixed handle_new_user() function");
-    console.log("✓ New signups will now link to existing organizations instead of creating new ones");
+    console.log(
+      "✓ New signups will now link to existing organizations instead of creating new ones",
+    );
   } catch (error: any) {
     console.error("Note: Automatic SQL execution not available");
     console.log("Please apply this SQL fix manually via Supabase SQL Editor:");

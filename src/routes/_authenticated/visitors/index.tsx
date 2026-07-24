@@ -37,8 +37,11 @@ function VisitorsPage() {
     first_time: visitorList.filter((v: any) => v.visitor_status === "first_time").length,
     returning: visitorList.filter((v: any) => v.visitor_status === "returning").length,
     needs_followup: visitorList.filter((v: any) => v.visitor_status === "needs_followup").length,
-    interested_membership: visitorList.filter((v: any) => v.visitor_status === "interested_membership").length,
-    prayer_request: visitorList.filter((v: any) => v.visitor_status === "prayer_request_only").length,
+    interested_membership: visitorList.filter(
+      (v: any) => v.visitor_status === "interested_membership",
+    ).length,
+    prayer_request: visitorList.filter((v: any) => v.visitor_status === "prayer_request_only")
+      .length,
   };
 
   return (
@@ -104,7 +107,9 @@ function VisitorsPage() {
         </div>
       ) : visitorList.length === 0 ? (
         <Card className="border border-gray-200 bg-white shadow-sm p-12 text-center">
-          <p className="text-gray-500">No visitors found. Scan the QR code to register new visitors!</p>
+          <p className="text-gray-500">
+            No visitors found. Scan the QR code to register new visitors!
+          </p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

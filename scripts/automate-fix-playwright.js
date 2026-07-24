@@ -2,7 +2,7 @@
 
 /**
  * Supabase Dashboard Automation - Apply Trigger Fix
- * 
+ *
  * This opens your browser and walks you through applying the fix
  * Prerequisites: Must be logged into Supabase dashboard already
  */
@@ -79,9 +79,9 @@ async function main() {
     console.log("🔍 Looking for SQL editor...\n");
 
     // Try to find the SQL editor area
-    const editors = await page.locator(
-      'textarea, [contenteditable="true"], [class*="editor"], [class*="monaco"]'
-    ).all();
+    const editors = await page
+      .locator('textarea, [contenteditable="true"], [class*="editor"], [class*="monaco"]')
+      .all();
 
     if (editors.length === 0) {
       console.log("⚠️  Could not find SQL editor area\n");
@@ -108,7 +108,7 @@ async function main() {
 
     // Paste the SQL
     console.log("⏳ Pasting SQL fix...");
-    
+
     // Use evaluate to paste to the element
     await page.evaluate((sql) => {
       const textareas = document.querySelectorAll("textarea");
@@ -143,10 +143,7 @@ async function main() {
 
     for (const btn of buttons) {
       const text = await btn.textContent();
-      if (
-        text?.toLowerCase().includes("run") ||
-        text?.toLowerCase().includes("execute")
-      ) {
+      if (text?.toLowerCase().includes("run") || text?.toLowerCase().includes("execute")) {
         runButton = btn;
         break;
       }
@@ -184,7 +181,7 @@ async function main() {
       console.log("   1. Look for blue 'Run' or 'Execute' button");
       console.log("   2. Click it to run the SQL");
       console.log("   3. You should see confirmation message\n");
-      
+
       // Keep browser open for user
       await new Promise(() => {});
     }

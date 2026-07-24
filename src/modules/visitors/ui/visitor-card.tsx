@@ -8,7 +8,8 @@ interface VisitorCardProps {
   contact_number: string;
   email_address?: string;
   home_address?: string;
-  visitor_status: "first_time" | "returning" | "needs_followup" | "interested_membership" | "prayer_request_only";
+  visitor_status:
+    "first_time" | "returning" | "needs_followup" | "interested_membership" | "prayer_request_only";
   is_first_time_visitor?: boolean;
   interests?: string[];
   prayer_requests?: string;
@@ -83,7 +84,9 @@ export function VisitorCard({
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900">{full_name}</h3>
-          {visit_date && <p className="text-xs text-gray-500">{new Date(visit_date).toLocaleDateString()}</p>}
+          {visit_date && (
+            <p className="text-xs text-gray-500">{new Date(visit_date).toLocaleDateString()}</p>
+          )}
         </div>
         <Badge variant="outline" className={`whitespace-nowrap ${config.badgeClass}`}>
           {config.label}
@@ -126,7 +129,11 @@ export function VisitorCard({
           <p className="text-xs font-medium text-gray-700 mb-2">Interested In:</p>
           <div className="flex flex-wrap gap-1">
             {interests.map((interest) => (
-              <Badge key={interest} variant="outline" className="bg-white border-gray-200 text-gray-700 text-xs">
+              <Badge
+                key={interest}
+                variant="outline"
+                className="bg-white border-gray-200 text-gray-700 text-xs"
+              >
                 {INTERESTS_LABELS[interest] || interest}
               </Badge>
             ))}

@@ -30,7 +30,10 @@ export class Visitor extends AggregateRoot<VisitorProps> {
   }
 
   static create(
-    props: Omit<VisitorProps, "createdAt" | "updatedAt" | "status" | "visitCount" | "lastVisitDate">
+    props: Omit<
+      VisitorProps,
+      "createdAt" | "updatedAt" | "status" | "visitCount" | "lastVisitDate"
+    >,
   ): Visitor {
     const now = new Date();
     const visitor = new Visitor(crypto.randomUUID(), {
@@ -89,7 +92,11 @@ export class Visitor extends AggregateRoot<VisitorProps> {
   }
 
   get isReturning(): boolean {
-    return this._props.visitCount > 1 && this._props.status !== "converted" && this._props.status !== "inactive";
+    return (
+      this._props.visitCount > 1 &&
+      this._props.status !== "converted" &&
+      this._props.status !== "inactive"
+    );
   }
 
   /**
@@ -102,7 +109,7 @@ export class Visitor extends AggregateRoot<VisitorProps> {
 
     this._props.visitCount += 1;
     this._props.lastVisitDate = visitDate;
-    
+
     if (this._props.status === "new") {
       this._props.status = "returning";
     } else if (this._props.status === "inactive") {

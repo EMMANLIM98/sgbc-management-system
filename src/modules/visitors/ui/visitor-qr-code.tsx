@@ -3,10 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  generateQRCodeOnCanvas,
-  downloadCanvasAsImage,
-} from "@/lib/qr-code-generator";
+import { generateQRCodeOnCanvas, downloadCanvasAsImage } from "@/lib/qr-code-generator";
 
 interface VisitorQRCodeProps {
   churchId: string;
@@ -32,16 +29,16 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
     try {
       setIsGenerating(true);
       console.log("Starting QR code generation for:", registrationUrl);
-      
+
       const canvas = canvasRef.current;
       console.log("Canvas element:", canvas);
       console.log("Canvas context:", canvas.getContext("2d"));
-      
+
       await generateQRCodeOnCanvas(canvas, registrationUrl, {
         size: 300,
         faviconSize: 0.2,
       });
-      
+
       console.log("Visitor QR code generated successfully");
       console.log("Canvas data after generation:", canvas.toDataURL().substring(0, 100));
     } catch (error) {
@@ -71,12 +68,7 @@ export function VisitorQRCode({ churchId, churchName = "Church" }: VisitorQRCode
                 <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
               </div>
             ) : (
-              <canvas 
-                ref={canvasRef} 
-                width={300}
-                height={300}
-                style={{ display: "block" }}
-              />
+              <canvas ref={canvasRef} width={300} height={300} style={{ display: "block" }} />
             )}
           </div>
         </div>

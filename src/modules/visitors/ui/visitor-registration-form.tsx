@@ -117,7 +117,9 @@ export function VisitorRegistrationForm({ churchId, onSuccess }: VisitorFormProp
     <Card className="border border-gray-200 bg-white shadow-sm p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Visitor Information</h2>
-        <p className="text-sm text-gray-600 mt-1">Welcome! Please fill out your information below.</p>
+        <p className="text-sm text-gray-600 mt-1">
+          Welcome! Please fill out your information below.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -153,7 +155,9 @@ export function VisitorRegistrationForm({ churchId, onSuccess }: VisitorFormProp
 
         {/* Email Address */}
         <div>
-          <Label className="block text-sm font-medium text-gray-900 mb-2">Email Address (optional)</Label>
+          <Label className="block text-sm font-medium text-gray-900 mb-2">
+            Email Address (optional)
+          </Label>
           <Input
             type="email"
             name="email_address"
@@ -184,11 +188,16 @@ export function VisitorRegistrationForm({ churchId, onSuccess }: VisitorFormProp
           <Checkbox
             id="is_first_time_visitor"
             checked={formData.is_first_time_visitor}
-            onCheckedChange={(checked) => handleCheckboxChange(checked as boolean, "is_first_time_visitor")}
+            onCheckedChange={(checked) =>
+              handleCheckboxChange(checked as boolean, "is_first_time_visitor")
+            }
             disabled={isSubmitting}
             className="border-gray-300"
           />
-          <Label htmlFor="is_first_time_visitor" className="text-sm font-medium text-gray-900 cursor-pointer">
+          <Label
+            htmlFor="is_first_time_visitor"
+            className="text-sm font-medium text-gray-900 cursor-pointer"
+          >
             This is my first time visiting
           </Label>
         </div>
@@ -211,7 +220,9 @@ export function VisitorRegistrationForm({ churchId, onSuccess }: VisitorFormProp
 
         {/* Interests */}
         <div>
-          <Label className="block text-sm font-medium text-gray-900 mb-3">Interested In (optional)</Label>
+          <Label className="block text-sm font-medium text-gray-900 mb-3">
+            Interested In (optional)
+          </Label>
           <div className="space-y-2">
             {INTERESTS.map((interest) => (
               <div key={interest.id} className="flex items-center gap-3">
@@ -232,7 +243,9 @@ export function VisitorRegistrationForm({ churchId, onSuccess }: VisitorFormProp
 
         {/* Prayer Requests */}
         <div>
-          <Label className="block text-sm font-medium text-gray-900 mb-2">Prayer Requests (optional)</Label>
+          <Label className="block text-sm font-medium text-gray-900 mb-2">
+            Prayer Requests (optional)
+          </Label>
           <Textarea
             name="prayer_requests"
             value={formData.prayer_requests}

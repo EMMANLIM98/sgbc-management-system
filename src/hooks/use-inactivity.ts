@@ -48,15 +48,7 @@ export function useInactivity({ timeoutMs, onInactivity, enabled = true }: UseIn
     };
 
     // Activity events to track
-    const events = [
-      "mousedown",
-      "mousemove",
-      "keydown",
-      "scroll",
-      "touchstart",
-      "click",
-      "focus",
-    ];
+    const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "click", "focus"];
 
     // Add event listeners
     events.forEach((event) => {

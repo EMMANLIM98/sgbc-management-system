@@ -22,7 +22,7 @@ function loadImage(src: string, timeout = 5000): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    
+
     const timeoutId = setTimeout(() => {
       img.onload = null;
       img.onerror = null;
@@ -64,7 +64,7 @@ function loadImage(src: string, timeout = 5000): Promise<HTMLImageElement> {
 export async function generateQRCodeOnCanvas(
   canvas: HTMLCanvasElement,
   data: string,
-  options: QRCodeGenerationOptions = {}
+  options: QRCodeGenerationOptions = {},
 ): Promise<void> {
   const {
     size = 300,
@@ -89,7 +89,7 @@ export async function generateQRCodeOnCanvas(
 
     // Generate QR code - this must complete before favicon
     console.log(`[QR] Generating QR code for data:`, data.substring(0, 50));
-    
+
     await QRCode.toCanvas(canvas, data, {
       errorCorrectionLevel: "H",
       margin: 2,
@@ -98,9 +98,9 @@ export async function generateQRCodeOnCanvas(
         light: "#ffffff",
       },
     });
-    
+
     console.log("[QR] QR code generated successfully");
-    
+
     // Verify something was drawn
     const imageData = ctx.getImageData(0, 0, 1, 1);
     if (!imageData || imageData.data.length === 0) {
@@ -130,7 +130,7 @@ async function embedLogoOnCanvas(
   canvas: HTMLCanvasElement,
   logoAsset: string,
   size: number,
-  faviconSize: number
+  faviconSize: number,
 ): Promise<void> {
   try {
     const img = await loadImage(logoAsset, 3000);
@@ -168,7 +168,7 @@ async function embedLogoOnCanvas(
 
     // Draw subtle semi-transparent circular background for visibility
     // This makes the logo pop without a hard border/square
-    const bgRadius = (Math.max(displayWidth, displayHeight) / 2) + 6;
+    const bgRadius = Math.max(displayWidth, displayHeight) / 2 + 6;
     ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
     ctx.beginPath();
     ctx.arc(centerX, centerY, bgRadius, 0, 2 * Math.PI);
@@ -184,7 +184,7 @@ async function embedLogoOnCanvas(
         ") with size " +
         displayWidth.toFixed(0) +
         "x" +
-        displayHeight.toFixed(0)
+        displayHeight.toFixed(0),
     );
   } catch (error) {
     console.warn("[QR] Failed to embed SGBC logo in QR code:", error);
@@ -220,7 +220,7 @@ export function printCanvasQRCode(
     subtitle?: string;
     description?: string;
     timestamp?: Date;
-  }
+  },
 ): void {
   const printWindow = window.open("", "", "height=600,width=600");
   if (!printWindow) {

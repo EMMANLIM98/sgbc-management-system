@@ -1,14 +1,14 @@
 /**
  * Mobile REST API - Validate QR Code
- * 
+ *
  * Endpoint: POST /api/events/:eventId/validate-qr
  * Description: Validate a QR code without checking in (preview/verification)
- * 
+ *
  * Request Body:
  * {
  *   "qrToken": "token-from-qr-code"
  * }
- * 
+ *
  * Response:
  * {
  *   "valid": true,

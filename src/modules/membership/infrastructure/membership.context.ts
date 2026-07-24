@@ -3,7 +3,10 @@
  */
 
 import { SupabaseClient } from "@supabase/supabase-js";
-import { SupabaseMemberRepository, SupabaseMemberDocumentRepository } from "./membership.repositories";
+import {
+  SupabaseMemberRepository,
+  SupabaseMemberDocumentRepository,
+} from "./membership.repositories";
 import { MemberService } from "../application/membership.service";
 
 export interface MembershipContext {

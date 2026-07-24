@@ -246,7 +246,11 @@ function VisitorsPage() {
             </div>
             <Dialog open={showQRCode} onOpenChange={setShowQRCode}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="border-gray-200 text-gray-900 hover:bg-gray-50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-200 text-gray-900 hover:bg-gray-50"
+                >
                   <QrCode className="w-4 h-4 mr-2" />
                   Show QR Code
                 </Button>
@@ -266,10 +270,11 @@ function VisitorsPage() {
               </DialogContent>
             </Dialog>
           </div>
-          
+
           <Card className="p-4 border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-sm">
             <p className="text-sm text-gray-600 mb-3">
-              Visitors can scan this QR code to register themselves using a simple form. Share this QR code at the entrance or on your bulletin.
+              Visitors can scan this QR code to register themselves using a simple form. Share this
+              QR code at the entrance or on your bulletin.
             </p>
             {targetChurchId && (
               <VisitorQRCode

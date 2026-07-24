@@ -74,7 +74,12 @@ export function EventListing({ churchId, futureOnly = true, onEventClick }: Even
         <p className="text-sm text-gray-500 mb-4">
           {error instanceof Error ? error.message : "Please try again later"}
         </p>
-        <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-gray-200 text-gray-900 hover:bg-gray-50">
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+          size="sm"
+          className="border-gray-200 text-gray-900 hover:bg-gray-50"
+        >
           Retry
         </Button>
       </div>
@@ -91,7 +96,12 @@ export function EventListing({ churchId, futureOnly = true, onEventClick }: Even
           {data.setupMessage ||
             "Run the Supabase events migration before using event creation and registration."}
         </p>
-        <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-gray-200 text-gray-900 hover:bg-gray-50">
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+          size="sm"
+          className="border-gray-200 text-gray-900 hover:bg-gray-50"
+        >
           Recheck
         </Button>
       </div>

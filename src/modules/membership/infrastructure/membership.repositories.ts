@@ -4,11 +4,16 @@
 
 import { ScopedSupabaseRepository } from "@/lib/repository";
 import { Member, MemberDocument } from "../domain/membership.entities";
-import { IMemberRepository, IMemberDocumentRepository, type MemberQuery } from "../domain/membership.repositories";
+import {
+  IMemberRepository,
+  IMemberDocumentRepository,
+  type MemberQuery,
+} from "../domain/membership.repositories";
 
 export class SupabaseMemberRepository
   extends ScopedSupabaseRepository<Member>
-  implements IMemberRepository {
+  implements IMemberRepository
+{
   constructor(supabaseClient: any) {
     super(supabaseClient, "members");
   }
@@ -74,7 +79,7 @@ export class SupabaseMemberRepository
 
     const { data, error } = await q;
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async countByQuery(query: MemberQuery): Promise<number> {
@@ -84,7 +89,8 @@ export class SupabaseMemberRepository
     if (query.organizationId) q = q.eq("organization_id", query.organizationId);
     if (query.status) q = q.eq("status", query.status);
     if (query.category) q = q.eq("category", query.category);
-    if (query.searchTerm) q = q.or(`name.ilike.%${query.searchTerm}%,email.ilike.%${query.searchTerm}%`);
+    if (query.searchTerm)
+      q = q.or(`name.ilike.%${query.searchTerm}%,email.ilike.%${query.searchTerm}%`);
 
     const { count, error } = await q;
     if (error) throw new Error(`Query failed: ${error.message}`);
@@ -111,7 +117,7 @@ export class SupabaseMemberRepository
       .order("name", { ascending: true });
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async getRecentlyJoined(churchId: string, days: number): Promise<Member[]> {
@@ -126,7 +132,7 @@ export class SupabaseMemberRepository
       .order("join_date", { ascending: false });
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async findByCategory(churchId: string, category: string): Promise<Member[]> {
@@ -138,7 +144,7 @@ export class SupabaseMemberRepository
       .order("name", { ascending: true });
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 
   async search(churchId: string, searchTerm: string): Promise<Member[]> {
@@ -151,7 +157,7 @@ export class SupabaseMemberRepository
       .limit(20);
 
     if (error) throw new Error(`Query failed: ${error.message}`);
-    return (data || []).map(row => this.toDomain(row));
+    return (data || []).map((row) => this.toDomain(row));
   }
 }
 
@@ -194,15 +200,12 @@ export class SupabaseMemberDocumentRepository implements IMemberDocumentReposito
         type: row.type,
         url: row.url,
         uploadedAt: new Date(row.uploaded_at),
-      })
+      }),
     );
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await this.supabaseClient
-      .from("member_documents")
-      .delete()
-      .eq("id", id);
+    const { error } = await this.supabaseClient.from("member_documents").delete().eq("id", id);
 
     if (error) throw new Error(`Failed to delete: ${error.message}`);
   }

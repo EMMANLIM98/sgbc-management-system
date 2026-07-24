@@ -4,15 +4,21 @@
 
 import { NotFoundError, ValidationError } from "@/lib/domain-errors";
 import { Member, MemberDocument, type MemberProps, type MemberStatus } from "./membership.entities";
-import { IMemberRepository, IMemberDocumentRepository, type MemberQuery } from "./membership.repositories";
+import {
+  IMemberRepository,
+  IMemberDocumentRepository,
+  type MemberQuery,
+} from "./membership.repositories";
 
 export class MemberService {
   constructor(
     private memberRepository: IMemberRepository,
-    private documentRepository: IMemberDocumentRepository
+    private documentRepository: IMemberDocumentRepository,
   ) {}
 
-  async recordMember(props: Omit<MemberProps, "createdAt" | "updatedAt" | "status">): Promise<Member> {
+  async recordMember(
+    props: Omit<MemberProps, "createdAt" | "updatedAt" | "status">,
+  ): Promise<Member> {
     const member = Member.create(props);
     return this.memberRepository.save(member);
   }
@@ -57,7 +63,7 @@ export class MemberService {
 
   async updateMemberInfo(
     id: string,
-    updates: Parameters<Member["updateInfo"]>[0]
+    updates: Parameters<Member["updateInfo"]>[0],
   ): Promise<Member> {
     const member = await this.getMember(id);
     member.updateInfo(updates);

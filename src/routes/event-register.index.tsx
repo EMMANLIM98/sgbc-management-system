@@ -26,8 +26,12 @@ function PublicEventsListPage() {
     <div className="min-h-screen bg-white">
       <div className="border-b border-gray-200 px-6 py-10">
         <div className="max-w-4xl mx-auto">
-          <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">Public Registration</p>
-          <h1 className="text-3xl font-light text-gray-900 tracking-tight">Register for an Event</h1>
+          <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
+            Public Registration
+          </p>
+          <h1 className="text-3xl font-light text-gray-900 tracking-tight">
+            Register for an Event
+          </h1>
           <p className="mt-2 text-sm text-gray-600">
             No login required. Pick an event and complete your registration.
           </p>
@@ -42,7 +46,9 @@ function PublicEventsListPage() {
           </Card>
         ) : error ? (
           <Card className="p-6 border-red-200 bg-red-50">
-            <p className="text-sm text-red-700">Unable to load events right now. Please try again later.</p>
+            <p className="text-sm text-red-700">
+              Unable to load events right now. Please try again later.
+            </p>
           </Card>
         ) : events.length === 0 ? (
           <Card className="p-10 text-center">

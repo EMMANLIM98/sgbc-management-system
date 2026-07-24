@@ -31,7 +31,11 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
   const getRegistrationsFn = useServerFn(getEventRegistrations);
   const getAllRegistrationsFn = useServerFn(getAllEventRegistrations);
 
-  const { data: checkedInData, isLoading: loadingCheckedIn, error: errorCheckedIn } = useQuery({
+  const {
+    data: checkedInData,
+    isLoading: loadingCheckedIn,
+    error: errorCheckedIn,
+  } = useQuery({
     queryKey: ["registrations", eventId, "checked_in"],
     queryFn: () =>
       getRegistrationsFn({
@@ -45,7 +49,11 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
     retry: 2,
   });
 
-  const { data: registeredData, isLoading: loadingRegistered, error: errorRegistered } = useQuery({
+  const {
+    data: registeredData,
+    isLoading: loadingRegistered,
+    error: errorRegistered,
+  } = useQuery({
     queryKey: ["registrations", eventId, "registered"],
     queryFn: () =>
       getRegistrationsFn({
@@ -59,7 +67,11 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
     retry: 2,
   });
 
-  const { data: noShowData, isLoading: loadingNoShow, error: errorNoShow } = useQuery({
+  const {
+    data: noShowData,
+    isLoading: loadingNoShow,
+    error: errorNoShow,
+  } = useQuery({
     queryKey: ["registrations", eventId, "no_show"],
     queryFn: () =>
       getRegistrationsFn({
@@ -73,7 +85,11 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
     retry: 2,
   });
 
-  const { data: allData, isLoading: loadingAll, error: errorAll } = useQuery({
+  const {
+    data: allData,
+    isLoading: loadingAll,
+    error: errorAll,
+  } = useQuery({
     queryKey: ["registrations", eventId, "all"],
     queryFn: () =>
       getAllRegistrationsFn({
@@ -90,7 +106,7 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
   const totalRegistered = checkedInCount + registeredCount + noShowCount;
   const attendanceRate =
     totalRegistered > 0 ? Math.round((checkedInCount / totalRegistered) * 100) : 0;
-  
+
   const isLoading = loadingCheckedIn || loadingRegistered || loadingNoShow;
 
   if (isLoading) {
@@ -103,7 +119,11 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
   }
 
   if (errorCheckedIn || errorRegistered || errorNoShow) {
-    const errorMsg = errorCheckedIn?.message || errorRegistered?.message || errorNoShow?.message || "Unknown error";
+    const errorMsg =
+      errorCheckedIn?.message ||
+      errorRegistered?.message ||
+      errorNoShow?.message ||
+      "Unknown error";
     console.error("Attendance report error:", { errorCheckedIn, errorRegistered, errorNoShow });
     return (
       <Card className="p-6 border border-gray-200 bg-white">
@@ -157,19 +177,31 @@ export function EventAttendanceReport({ eventId }: EventAttendanceReportProps) {
       <Card className="border border-gray-200 bg-white shadow-sm overflow-hidden">
         <Tabs defaultValue="all_attendees" className="w-full">
           <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-white p-0 h-auto">
-            <TabsTrigger value="all_attendees" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+            <TabsTrigger
+              value="all_attendees"
+              className="rounded-none border-b-2 border-b-transparent text-gray-700"
+            >
               <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
               All Attendees ({allData?.total || 0})
             </TabsTrigger>
-            <TabsTrigger value="checked_in" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+            <TabsTrigger
+              value="checked_in"
+              className="rounded-none border-b-2 border-b-transparent text-gray-700"
+            >
               <CheckCircle2 className="w-4 h-4 mr-2 text-gray-600" />
               Checked In ({checkedInCount})
             </TabsTrigger>
-            <TabsTrigger value="registered" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+            <TabsTrigger
+              value="registered"
+              className="rounded-none border-b-2 border-b-transparent text-gray-700"
+            >
               <Clock className="w-4 h-4 mr-2 text-gray-600" />
               Registered ({registeredCount})
             </TabsTrigger>
-            <TabsTrigger value="no_show" className="rounded-none border-b-2 border-b-transparent text-gray-700">
+            <TabsTrigger
+              value="no_show"
+              className="rounded-none border-b-2 border-b-transparent text-gray-700"
+            >
               <AlertCircle className="w-4 h-4 mr-2 text-gray-600" />
               No-Show ({noShowCount})
             </TabsTrigger>
@@ -223,21 +255,30 @@ function AttendanceTable({ data, isLoading, status }: AttendanceTableProps) {
     switch (status) {
       case "checked_in":
         return (
-          <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal">
+          <Badge
+            variant="outline"
+            className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal"
+          >
             <CheckCircle2 className="w-3 h-3" />
             Checked In
           </Badge>
         );
       case "registered":
         return (
-          <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal">
+          <Badge
+            variant="outline"
+            className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal"
+          >
             <Clock className="w-3 h-3" />
             Registered
           </Badge>
         );
       case "no_show":
         return (
-          <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal">
+          <Badge
+            variant="outline"
+            className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1 w-fit font-normal"
+          >
             <AlertCircle className="w-3 h-3" />
             No-Show
           </Badge>
@@ -272,13 +313,19 @@ function AttendanceTable({ data, isLoading, status }: AttendanceTableProps) {
           </TableHeader>
           <TableBody>
             {data.map((registration) => (
-              <TableRow key={registration.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <TableRow
+                key={registration.id}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
                 <TableCell className="font-medium text-gray-900">{registration.name}</TableCell>
                 <TableCell className="text-sm text-gray-600">{registration.email || "—"}</TableCell>
                 <TableCell className="text-sm text-gray-600">{registration.phone || "—"}</TableCell>
                 <TableCell>
                   {registration.ageCategory ? (
-                    <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal">
+                    <Badge
+                      variant="outline"
+                      className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal"
+                    >
                       {registration.ageCategory.replace("_", " ")}
                     </Badge>
                   ) : (
@@ -318,21 +365,30 @@ function AllAttendeesTable({ data, isLoading, onExport }: AllAttendeesTableProps
     switch (status) {
       case "checked_in":
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 w-fit font-normal">
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 w-fit font-normal"
+          >
             <CheckCircle2 className="w-3 h-3" />
             Checked In
           </Badge>
         );
       case "registered":
         return (
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1 w-fit font-normal">
+          <Badge
+            variant="outline"
+            className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1 w-fit font-normal"
+          >
             <Clock className="w-3 h-3" />
             Registered
           </Badge>
         );
       case "no_show":
         return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1 w-fit font-normal">
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1 w-fit font-normal"
+          >
             <AlertCircle className="w-3 h-3" />
             No-Show
           </Badge>
@@ -384,13 +440,23 @@ function AllAttendeesTable({ data, isLoading, onExport }: AllAttendeesTableProps
             </TableHeader>
             <TableBody>
               {data.map((registration) => (
-                <TableRow key={registration.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                <TableRow
+                  key={registration.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
                   <TableCell className="font-medium text-gray-900">{registration.name}</TableCell>
-                  <TableCell className="text-sm text-gray-600">{registration.email || "—"}</TableCell>
-                  <TableCell className="text-sm text-gray-600">{registration.phone || "—"}</TableCell>
+                  <TableCell className="text-sm text-gray-600">
+                    {registration.email || "—"}
+                  </TableCell>
+                  <TableCell className="text-sm text-gray-600">
+                    {registration.phone || "—"}
+                  </TableCell>
                   <TableCell>
                     {registration.ageCategory ? (
-                      <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal">
+                      <Badge
+                        variant="outline"
+                        className="bg-gray-100 text-gray-700 border-gray-200 capitalize font-normal"
+                      >
                         {registration.ageCategory.replace("_", " ")}
                       </Badge>
                     ) : (
@@ -413,9 +479,13 @@ function AllAttendeesTable({ data, isLoading, onExport }: AllAttendeesTableProps
                     )}
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">
-                    {registration.leadershipRole ? registration.leadershipRole.replace("_", " ") : "—"}
+                    {registration.leadershipRole
+                      ? registration.leadershipRole.replace("_", " ")
+                      : "—"}
                   </TableCell>
-                  <TableCell className="text-center">{getStatusBadge(registration.status)}</TableCell>
+                  <TableCell className="text-center">
+                    {getStatusBadge(registration.status)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

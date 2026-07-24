@@ -91,13 +91,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         property: "og:title",
         content: "Shekinah Glory Baptist Church — Centralized Church Management",
       },
-      { property: "og:description", content: "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more." },
+      {
+        property: "og:description",
+        content:
+          "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Shekinah Glory Baptist Church — Centralized Church Management" },
-      { name: "twitter:description", content: "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/045d15c1-bb8c-4a86-9df9-0c6614633d7e/id-preview-03cd9f1e--57a05e22-2047-4662-8570-2a83e87552fc.lovable.app-1784285618109.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/045d15c1-bb8c-4a86-9df9-0c6614633d7e/id-preview-03cd9f1e--57a05e22-2047-4662-8570-2a83e87552fc.lovable.app-1784285618109.png" },
+      {
+        name: "twitter:title",
+        content: "Shekinah Glory Baptist Church — Centralized Church Management",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Run all your churches from one calm, modern dashboard. Membership, finance, ministry, events, and more.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/045d15c1-bb8c-4a86-9df9-0c6614633d7e/id-preview-03cd9f1e--57a05e22-2047-4662-8570-2a83e87552fc.lovable.app-1784285618109.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/045d15c1-bb8c-4a86-9df9-0c6614633d7e/id-preview-03cd9f1e--57a05e22-2047-4662-8570-2a83e87552fc.lovable.app-1784285618109.png",
+      },
     ],
     links: [
       {

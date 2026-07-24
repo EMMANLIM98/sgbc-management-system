@@ -1,10 +1,10 @@
 /**
  * Mobile REST API - List Public Events
- * 
+ *
  * Endpoint: GET /api/events
  * Description: Retrieve all public/active events for mobile apps
  * Authentication: None (public)
- * 
+ *
  * Query Parameters:
  *   - limit: number (1-100, default 50)
  *   - offset: number (default 0)
@@ -42,7 +42,9 @@ export default defineEventHandler(async (event) => {
     // Fetch events
     const { data: events, error } = await supabase
       .from("events")
-      .select("id, title, description, event_date, start_time, end_time, location, max_capacity, status")
+      .select(
+        "id, title, description, event_date, start_time, end_time, location, max_capacity, status",
+      )
       .in("status", ["scheduled", "active"])
       .gte("event_date", fromDate)
       .order("event_date", { ascending: true })
@@ -83,7 +85,7 @@ export default defineEventHandler(async (event) => {
           total: total ?? 0,
           limit: params.limit,
           offset: params.offset,
-          hasMore: (params.offset + params.limit) < (total ?? 0),
+          hasMore: params.offset + params.limit < (total ?? 0),
         },
       },
     };

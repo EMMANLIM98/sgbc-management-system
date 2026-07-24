@@ -1,22 +1,22 @@
 /**
  * Mobile REST API - Check-In with QR Code
- * 
+ *
  * Endpoint: POST /api/events/:eventId/check-in
  * Description: Process check-in by scanning QR code
- * 
+ *
  * Request Body:
  * {
  *   "qrToken": "token-from-qr-code",
  *   "checkedInBy": "user-id-or-device-id"
  * }
- * 
+ *
  * Optional:
  * {
  *   "deviceId": "mobile-device-uuid",
  *   "deviceName": "iPhone 14",
  *   "location": "Main Entrance"
  * }
- * 
+ *
  * Response:
  * {
  *   "success": true,
@@ -125,15 +125,17 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: {
         message: result.message,
-        registration: result.registration ? {
-          id: result.registration.id,
-          name: result.registration.attendeeName,
-          email: result.registration.attendeeEmail,
-          phone: result.registration.attendeePhone,
-          status: result.registration.status,
-          ageCategory: result.registration.ageCategory,
-          sex: result.registration.sex,
-        } : undefined,
+        registration: result.registration
+          ? {
+              id: result.registration.id,
+              name: result.registration.attendeeName,
+              email: result.registration.attendeeEmail,
+              phone: result.registration.attendeePhone,
+              status: result.registration.status,
+              ageCategory: result.registration.ageCategory,
+              sex: result.registration.sex,
+            }
+          : undefined,
         checkedInAt: result.checkedInAt,
       },
     };

@@ -7,17 +7,17 @@ export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
-    
+
     if (error) {
       console.error("[Auth] Failed to get user:", error);
       throw redirect({ to: "/auth" });
     }
-    
+
     if (!data.user) {
       console.warn("[Auth] No user found in session");
       throw redirect({ to: "/auth" });
     }
-    
+
     console.log("[Auth] User authenticated:", data.user.id);
     return { user: data.user };
   },

@@ -85,9 +85,7 @@ const raffleFilterSchema = z.object({
   churchId: z.string().uuid().optional(),
   ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
   visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).optional(),
-  leadershipRole: z
-    .custom<LeadershipRoleType>((val) => leadershipRoles.isValid(val))
-    .optional(),
+  leadershipRole: z.custom<LeadershipRoleType>((val) => leadershipRoles.isValid(val)).optional(),
   excludePreviousWinners: z.boolean().optional(),
 });
 

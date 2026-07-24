@@ -19,13 +19,15 @@ GET /api/events
 **Description:** Retrieve all active events with pagination
 
 **Query Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| limit | number | 50 | Results per page (1-100) |
-| offset | number | 0 | Pagination offset |
-| fromDate | ISO date | today | Filter events from this date |
+
+| Parameter | Type     | Default | Description                  |
+| --------- | -------- | ------- | ---------------------------- |
+| limit     | number   | 50      | Results per page (1-100)     |
+| offset    | number   | 0       | Pagination offset            |
+| fromDate  | ISO date | today   | Filter events from this date |
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -54,6 +56,7 @@ GET /api/events
 ```
 
 **Error (400):**
+
 ```json
 {
   "success": false,
@@ -73,11 +76,13 @@ GET /api/events/:eventId
 **Description:** Get full details for a specific event including capacity info
 
 **Path Parameters:**
+
 | Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| eventId | UUID | Yes | Event ID |
+| --------- | ---- | -------- | ----------- |
+| eventId   | UUID | Yes      | Event ID    |
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -100,6 +105,7 @@ GET /api/events/:eventId
 ```
 
 **Error (404):**
+
 ```json
 {
   "success": false,
@@ -118,11 +124,13 @@ POST /api/events/:eventId/register
 **Description:** Register an attendee for an event (public, no authentication)
 
 **Path Parameters:**
+
 | Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| eventId | UUID | Yes | Event ID |
+| --------- | ---- | -------- | ----------- |
+| eventId   | UUID | Yes      | Event ID    |
 
 **Request Body:**
+
 ```json
 {
   "firstName": "John",
@@ -137,18 +145,20 @@ POST /api/events/:eventId/register
 ```
 
 **Field Details:**
-| Field | Type | Required | Options |
-|-------|------|----------|---------|
-| firstName | string | Yes | 1-80 chars |
-| lastName | string | Yes | 1-80 chars |
-| email | string | Yes | Valid email |
-| phone | string | No | Max 40 chars |
-| ageCategory | enum | No | children, youth, young_adults, adults, seniors |
-| sex | enum | No | male, female |
-| visitorStatus | enum | No | member, visitor, first_time_guest (default: first_time_guest) |
-| leadershipRole | enum | No | pastor, pastor_wife, pastor_children, associate_pastor, elder, deacon, preacher, evangelist, ministry_leader, none (default: none) |
+
+| Field          | Type   | Required | Options                                                                                                                            |
+| -------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| firstName      | string | Yes      | 1-80 chars                                                                                                                         |
+| lastName       | string | Yes      | 1-80 chars                                                                                                                         |
+| email          | string | Yes      | Valid email                                                                                                                        |
+| phone          | string | No       | Max 40 chars                                                                                                                       |
+| ageCategory    | enum   | No       | children, youth, young_adults, adults, seniors                                                                                     |
+| sex            | enum   | No       | male, female                                                                                                                       |
+| visitorStatus  | enum   | No       | member, visitor, first_time_guest (default: first_time_guest)                                                                      |
+| leadershipRole | enum   | No       | pastor, pastor_wife, pastor_children, associate_pastor, elder, deacon, preacher, evangelist, ministry_leader, none (default: none) |
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -162,6 +172,7 @@ POST /api/events/:eventId/register
 ```
 
 **Response (429) - Rate Limited:**
+
 ```json
 {
   "success": false,
@@ -171,6 +182,7 @@ POST /api/events/:eventId/register
 ```
 
 **Response (409) - Duplicate/Full:**
+
 ```json
 {
   "success": false,
@@ -180,6 +192,7 @@ POST /api/events/:eventId/register
 ```
 
 **Response (400) - Validation Error:**
+
 ```json
 {
   "success": false,
@@ -207,11 +220,13 @@ POST /api/events/:eventId/check-in
 **Description:** Process check-in by scanning QR code from registration
 
 **Path Parameters:**
+
 | Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| eventId | UUID | Yes | Event ID |
+| --------- | ---- | -------- | ----------- |
+| eventId   | UUID | Yes      | Event ID    |
 
 **Request Body:**
+
 ```json
 {
   "qrToken": "token-from-qr-scan",
@@ -223,15 +238,17 @@ POST /api/events/:eventId/check-in
 ```
 
 **Field Details:**
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| qrToken | string | Yes | QR token from registration |
-| checkedInBy | string | Yes | Staff ID or device identifier |
-| deviceId | string | No | Mobile device UUID for audit trail |
-| deviceName | string | No | Device name (iPhone, iPad, etc.) |
-| location | string | No | Check-in location (entrance, etc.) |
+
+| Field       | Type   | Required | Description                        |
+| ----------- | ------ | -------- | ---------------------------------- |
+| qrToken     | string | Yes      | QR token from registration         |
+| checkedInBy | string | Yes      | Staff ID or device identifier      |
+| deviceId    | string | No       | Mobile device UUID for audit trail |
+| deviceName  | string | No       | Device name (iPhone, iPad, etc.)   |
+| location    | string | No       | Check-in location (entrance, etc.) |
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -252,6 +269,7 @@ POST /api/events/:eventId/check-in
 ```
 
 **Response (400) - Invalid QR:**
+
 ```json
 {
   "success": false,
@@ -261,14 +279,15 @@ POST /api/events/:eventId/check-in
 ```
 
 **Error Codes:**
-| Code | Meaning |
-|------|---------|
-| QR_NOT_FOUND | QR code doesn't exist |
-| QR_EVENT_MISMATCH | QR code for different event |
-| EVENT_NOT_FOUND | Event doesn't exist |
-| EVENT_NOT_ACTIVE | Event not active for check-ins |
-| REGISTRATION_NOT_FOUND | Registration doesn't exist |
-| REGISTRATION_CANCELLED | Registration was cancelled |
+
+| Code                         | Meaning                                      |
+| ---------------------------- | -------------------------------------------- |
+| QR_NOT_FOUND                 | QR code doesn't exist                        |
+| QR_EVENT_MISMATCH            | QR code for different event                  |
+| EVENT_NOT_FOUND              | Event doesn't exist                          |
+| EVENT_NOT_ACTIVE             | Event not active for check-ins               |
+| REGISTRATION_NOT_FOUND       | Registration doesn't exist                   |
+| REGISTRATION_CANCELLED       | Registration was cancelled                   |
 | REGISTRATION_ALREADY_CHECKED | Already checked in (if multiple not allowed) |
 
 ---
@@ -282,11 +301,13 @@ POST /api/events/:eventId/validate-qr
 **Description:** Validate a QR code without checking in (preview/verification)
 
 **Path Parameters:**
+
 | Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| eventId | UUID | Yes | Event ID |
+| --------- | ---- | -------- | ----------- |
+| eventId   | UUID | Yes      | Event ID    |
 
 **Request Body:**
+
 ```json
 {
   "qrToken": "token-from-qr-scan"
@@ -294,6 +315,7 @@ POST /api/events/:eventId/validate-qr
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -312,6 +334,7 @@ POST /api/events/:eventId/validate-qr
 ```
 
 **Response (400) - Invalid:**
+
 ```json
 {
   "success": false,
@@ -337,7 +360,7 @@ class EventAPI {
     final response = await http.get(
       Uri.parse('$baseUrl/events?limit=$limit&offset=$offset'),
     );
-    
+
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       return (json['data']['events'] as List)
@@ -401,49 +424,41 @@ class EventAPI {
 
 ```javascript
 const eventAPI = {
-  baseURL: 'https://sgbc-management-system.vercel.app/api',
+  baseURL: "https://sgbc-management-system.vercel.app/api",
 
   async getEvents(limit = 50, offset = 0) {
-    const response = await fetch(
-      `${this.baseURL}/events?limit=${limit}&offset=${offset}`
-    );
+    const response = await fetch(`${this.baseURL}/events?limit=${limit}&offset=${offset}`);
     const data = await response.json();
     return data.data.events;
   },
 
   async registerForEvent(eventId, { firstName, lastName, email, phone }) {
-    const response = await fetch(
-      `${this.baseURL}/events/${eventId}/register`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          phone,
-          visitorStatus: 'visitor',
-          leadershipRole: 'none',
-        }),
-      }
-    );
+    const response = await fetch(`${this.baseURL}/events/${eventId}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        phone,
+        visitorStatus: "visitor",
+        leadershipRole: "none",
+      }),
+    });
     const data = await response.json();
     if (!data.success) throw new Error(data.error);
     return data.data;
   },
 
   async checkIn(eventId, qrToken, staffId) {
-    const response = await fetch(
-      `${this.baseURL}/events/${eventId}/check-in`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          qrToken,
-          checkedInBy: staffId,
-        }),
-      }
-    );
+    const response = await fetch(`${this.baseURL}/events/${eventId}/check-in`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        qrToken,
+        checkedInBy: staffId,
+      }),
+    });
     const data = await response.json();
     if (!data.success) throw new Error(data.error);
     return data.data;
@@ -477,7 +492,7 @@ class EventAPI {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         let body = [
             "firstName": firstName,
             "lastName": lastName,
@@ -487,7 +502,7 @@ class EventAPI {
             "leadershipRole": "none",
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        
+
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(RegisterResponse.self, from: data)
         return response.data
@@ -502,13 +517,13 @@ class EventAPI {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         let body = [
             "qrToken": qrToken,
             "checkedInBy": staffId,
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        
+
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(CheckInResponseWrapper.self, from: data)
         return response.data
@@ -521,10 +536,12 @@ class EventAPI {
 ## ✅ Rate Limiting & Security
 
 ### Rate Limiting
+
 - **Registration endpoint:** Max 3 registrations per email address per 5 minutes
 - **Other endpoints:** No limit (suitable for mobile apps)
 
 ### Best Practices
+
 1. **Store QR tokens securely** - Don't expose in logs
 2. **Use HTTPS only** - All requests must be encrypted
 3. **Validate email addresses** - Mobile apps should confirm emails
@@ -532,6 +549,7 @@ class EventAPI {
 5. **Cache events locally** - Reduce API calls for event lists
 
 ### Error Handling
+
 All endpoints follow standard error response format:
 
 ```json
@@ -547,6 +565,7 @@ All endpoints follow standard error response format:
 ## 🔄 Workflows
 
 ### Registration Workflow
+
 ```
 1. User opens mobile app
 2. User sees list: GET /api/events
@@ -557,6 +576,7 @@ All endpoints follow standard error response format:
 ```
 
 ### Check-In Workflow
+
 ```
 1. Staff member scans QR code
 2. QR scanner decodes token
@@ -567,6 +587,7 @@ All endpoints follow standard error response format:
 ```
 
 ### QR Verification Workflow
+
 ```
 1. Staff scans QR
 2. Verify before full check-in: POST /api/events/:eventId/validate-qr
@@ -579,6 +600,7 @@ All endpoints follow standard error response format:
 ## 📊 Automatic Features
 
 These happen automatically after registration:
+
 - ✅ **Confirmation email** sent to attendee
 - ✅ **QR code email** with scannable code
 - ✅ **n8n webhook** triggered (CRM sync, email lists, etc.)
@@ -590,19 +612,20 @@ These happen automatically after registration:
 
 ## 🆘 Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| 429 Too Many Requests | Wait 5 minutes before retrying same email |
-| 409 Already Registered | Email already registered for this event |
-| 404 Event Not Found | Event doesn't exist or not accepting registrations |
-| Invalid QR Code | QR code expired or incorrect event |
-| Validation errors | Check field types and required fields |
+| Issue                  | Solution                                           |
+| ---------------------- | -------------------------------------------------- |
+| 429 Too Many Requests  | Wait 5 minutes before retrying same email          |
+| 409 Already Registered | Email already registered for this event            |
+| 404 Event Not Found    | Event doesn't exist or not accepting registrations |
+| Invalid QR Code        | QR code expired or incorrect event                 |
+| Validation errors      | Check field types and required fields              |
 
 ---
 
 ## 📞 Support
 
 For issues or questions:
+
 1. Check endpoint response format matches examples
 2. Verify all required fields are provided
 3. Ensure HTTP method is correct (GET vs POST)
@@ -611,4 +634,3 @@ For issues or questions:
 **API Status:** ✅ Production Ready
 **Last Updated:** 2026-07-23
 **Version:** 1.0
-

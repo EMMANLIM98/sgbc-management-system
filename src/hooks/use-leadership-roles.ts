@@ -21,9 +21,7 @@ interface UseLeadershipRolesReturn {
   /** Get all roles grouped by category */
   rolesByCategory: Record<string, LeadershipRoleMetadata[]>;
   /** Get roles for a specific category */
-  getRolesByCategory: (
-    category: LeadershipRoleMetadata["category"]
-  ) => LeadershipRoleMetadata[];
+  getRolesByCategory: (category: LeadershipRoleMetadata["category"]) => LeadershipRoleMetadata[];
   /** Get display label for a role */
   getLabel: (role: LeadershipRoleType) => string;
   /** Get full role metadata */
@@ -37,33 +35,27 @@ interface UseLeadershipRolesReturn {
 export function useLeadershipRoles(): UseLeadershipRolesReturn {
   const roles = useMemo(() => leadershipRoles.getAll(), []);
 
-  const rolesByCategory = useMemo(
-    () => leadershipRoles.groupByCategory(),
-    []
-  );
+  const rolesByCategory = useMemo(() => leadershipRoles.groupByCategory(), []);
 
   const categories = useMemo(() => leadershipRoles.getCategories(), []);
 
   const getRolesByCategory = useMemo(
-    () => (category: LeadershipRoleMetadata["category"]) =>
-      leadershipRoles.getByCategory(category),
-    []
+    () => (category: LeadershipRoleMetadata["category"]) => leadershipRoles.getByCategory(category),
+    [],
   );
 
-  const getLabel = useMemo(
-    () => (role: LeadershipRoleType) => leadershipRoles.getLabel(role),
-    []
-  );
+  const getLabel = useMemo(() => (role: LeadershipRoleType) => leadershipRoles.getLabel(role), []);
 
   const getRole = useMemo(
     () => (value: LeadershipRoleType) => leadershipRoles.getByValue(value),
-    []
+    [],
   );
 
   const isValidRole = useMemo(
-    () => (value: unknown): value is LeadershipRoleType =>
-      leadershipRoles.isValid(value),
-    []
+    () =>
+      (value: unknown): value is LeadershipRoleType =>
+        leadershipRoles.isValid(value),
+    [],
   );
 
   return {

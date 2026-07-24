@@ -107,9 +107,7 @@ export class RegistrationService {
           (input.attendeeEmail && duplicate.attendeeEmail === input.attendeeEmail) ||
           (input.attendeePhone && duplicate.attendeePhone === input.attendeePhone)
         ) {
-          throw new Error(
-            "This email or phone number is already registered for this event",
-          );
+          throw new Error("This email or phone number is already registered for this event");
         }
       }
     }

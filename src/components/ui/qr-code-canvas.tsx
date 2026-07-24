@@ -173,12 +173,7 @@ export function QRCodeCanvas({
           >
             <div className="text-center">
               <p className="text-sm text-red-600">Failed to generate QR code</p>
-              <Button
-                onClick={() => generateQRCode()}
-                variant="outline"
-                size="sm"
-                className="mt-2"
-              >
+              <Button onClick={() => generateQRCode()} variant="outline" size="sm" className="mt-2">
                 Retry
               </Button>
             </div>

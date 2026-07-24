@@ -1,9 +1,9 @@
 /**
  * Mobile REST API - Register for Event
- * 
+ *
  * Endpoint: POST /api/events/:eventId/register
  * Description: Register an attendee for an event (public, no authentication required)
- * 
+ *
  * Request Body:
  * {
  *   "firstName": "John",
@@ -15,7 +15,7 @@
  *   "visitorStatus": "member",
  *   "leadershipRole": "pastor"
  * }
- * 
+ *
  * Response:
  * {
  *   "id": "registration-uuid",

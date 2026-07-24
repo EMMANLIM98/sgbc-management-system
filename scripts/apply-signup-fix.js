@@ -2,7 +2,7 @@
 
 /**
  * Automated Fix for handle_new_user() Trigger
- * 
+ *
  * This script applies the database trigger fix to Supabase directly.
  * Run: npm exec node -- scripts/apply-signup-fix.js
  */
@@ -89,7 +89,7 @@ async function applyFix() {
     if (error) {
       // If exec RPC doesn't exist, try direct SQL execution
       console.log("⏳ Executing SQL directly...");
-      
+
       // Use the rest API to execute SQL
       const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec`, {
         method: "POST",

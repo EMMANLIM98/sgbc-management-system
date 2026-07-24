@@ -11,21 +11,21 @@ export const Route = createFileRoute("/visitor-register/$churchId")({
 });
 
 // Public function to get church details (no auth required)
-const getChurchPublic = createServerFn({ method: "GET" }).inputValidator((d: unknown) =>
-  z.object({ id: z.string().uuid() }).parse(d),
-).handler(async ({ data, context }) => {
-  const { data: church, error } = await context.supabase
-    .from("churches")
-    .select("id, name, address")
-    .eq("id", data.id)
-    .maybeSingle();
+const getChurchPublic = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: church, error } = await context.supabase
+      .from("churches")
+      .select("id, name, address")
+      .eq("id", data.id)
+      .maybeSingle();
 
-  if (error || !church) {
-    throw new Error("Church not found");
-  }
+    if (error || !church) {
+      throw new Error("Church not found");
+    }
 
-  return church;
-});
+    return church;
+  });
 
 function VisitorRegisterPage() {
   const { churchId } = Route.useParams();
@@ -33,7 +33,11 @@ function VisitorRegisterPage() {
 
   const getChurchPublicFn = useServerFn(getChurchPublic);
 
-  const { data: church, isLoading, error } = useQuery({
+  const {
+    data: church,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["church-public", churchId],
     queryFn: () => getChurchPublicFn({ id: churchId }),
   });

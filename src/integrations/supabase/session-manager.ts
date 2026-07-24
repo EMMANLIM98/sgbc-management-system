@@ -14,7 +14,7 @@ export class SessionManager {
     try {
       // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         console.error("Error during inactivity logout:", error);
       }

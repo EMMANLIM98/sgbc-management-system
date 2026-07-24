@@ -75,9 +75,7 @@ export function Logo({
         />
         {showText && (
           <div className="flex flex-col gap-0.5">
-            <span className="font-semibold text-sm text-gray-900 leading-tight">
-              {orgName}
-            </span>
+            <span className="font-semibold text-sm text-gray-900 leading-tight">{orgName}</span>
             <span className="text-xs text-gray-500">Management</span>
           </div>
         )}

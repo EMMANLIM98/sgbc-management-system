@@ -382,9 +382,7 @@ export class LeadershipRolesRepository {
   /**
    * Get roles filtered by category
    */
-  getByCategory(
-    category: LeadershipRoleMetadata["category"]
-  ): LeadershipRoleMetadata[] {
+  getByCategory(category: LeadershipRoleMetadata["category"]): LeadershipRoleMetadata[] {
     return this.catalog.filter((role) => role.category === category);
   }
 
@@ -420,14 +418,8 @@ export class LeadershipRolesRepository {
   /**
    * Group roles by category
    */
-  groupByCategory(): Record<
-    LeadershipRoleMetadata["category"],
-    LeadershipRoleMetadata[]
-  > {
-    const grouped: Record<
-      LeadershipRoleMetadata["category"],
-      LeadershipRoleMetadata[]
-    > = {
+  groupByCategory(): Record<LeadershipRoleMetadata["category"], LeadershipRoleMetadata[]> {
+    const grouped: Record<LeadershipRoleMetadata["category"], LeadershipRoleMetadata[]> = {
       general: [],
       leadership: [],
       administrative: [],

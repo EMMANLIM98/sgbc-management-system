@@ -28,14 +28,18 @@ function createAdminClient() {
 }
 
 export const listPublicEvents = createServerFn({ method: "GET" })
-  .inputValidator((d: unknown) => z.object({ limit: z.number().int().min(1).max(100).optional() }).parse(d))
+  .inputValidator((d: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(100).optional() }).parse(d),
+  )
   .handler(async ({ data }) => {
     const supabase = createAdminClient();
     const today = new Date().toISOString().split("T")[0];
 
     const { data: events, error } = await supabase
       .from("events")
-      .select("id, title, description, event_date, start_time, end_time, location, max_capacity, status")
+      .select(
+        "id, title, description, event_date, start_time, end_time, location, max_capacity, status",
+      )
       .in("status", ["scheduled", "active"])
       .gte("event_date", today)
       .order("event_date", { ascending: true })
@@ -148,9 +152,7 @@ export const publicRegisterForEvent = createServerFn({ method: "POST" })
       .gte("created_at", fiveMinsAgo);
 
     if ((recentCount || 0) >= 3) {
-      throw new Error(
-        "Too many registration attempts. Please wait a few minutes and try again.",
-      );
+      throw new Error("Too many registration attempts. Please wait a few minutes and try again.");
     }
 
     // ── Duplicate check ──

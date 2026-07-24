@@ -70,12 +70,12 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    
+
     // Wait for session to be fully established
     let retries = 0;
     const maxRetries = 10;
     let sessionReady = false;
-    
+
     while (!sessionReady && retries < maxRetries) {
       const { data } = await supabase.auth.getSession();
       if (data?.session?.user) {
@@ -83,15 +83,15 @@ function AuthPage() {
         break;
       }
       retries++;
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    
+
     if (!sessionReady) {
       toast.error("Session failed to initialize", { description: "Please try signing in again." });
       setBusy(false);
       return;
     }
-    
+
     navigate({ to: "/dashboard", replace: true });
   }
 
@@ -148,12 +148,12 @@ function AuthPage() {
       } else if (search.mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        
+
         // Wait for session to be fully established
         let retries = 0;
         const maxRetries = 10;
         let sessionReady = false;
-        
+
         while (!sessionReady && retries < maxRetries) {
           const { data } = await supabase.auth.getSession();
           if (data?.session?.user) {
@@ -161,13 +161,13 @@ function AuthPage() {
             break;
           }
           retries++;
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        
+
         if (!sessionReady) {
           throw new Error("Session failed to initialize. Please try signing in again.");
         }
-        
+
         navigate({ to: "/dashboard", replace: true });
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -246,7 +246,9 @@ function AuthPage() {
                 <Field label="Which Church?" hint="You can add churches after signup.">
                   <Select value={orgName} onValueChange={setOrgName}>
                     <SelectTrigger disabled={orgsLoading}>
-                      <SelectValue placeholder={orgsLoading ? "Loading..." : "Select your church"} />
+                      <SelectValue
+                        placeholder={orgsLoading ? "Loading..." : "Select your church"}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {organizations.map((org) => (
@@ -297,15 +299,24 @@ function AuthPage() {
           <div className="mt-4 flex items-center justify-between text-[12px] text-muted-foreground">
             {search.mode === "signin" ? (
               <>
-                <button className="hover:text-foreground" onClick={() => navigate({ search: { mode: "forgot" } })}>
+                <button
+                  className="hover:text-foreground"
+                  onClick={() => navigate({ search: { mode: "forgot" } })}
+                >
                   Forgot password?
                 </button>
-                <button className="hover:text-foreground" onClick={() => navigate({ search: { mode: "signup" } })}>
+                <button
+                  className="hover:text-foreground"
+                  onClick={() => navigate({ search: { mode: "signup" } })}
+                >
                   Create account
                 </button>
               </>
             ) : (
-              <button className="hover:text-foreground" onClick={() => navigate({ search: { mode: "signin" } })}>
+              <button
+                className="hover:text-foreground"
+                onClick={() => navigate({ search: { mode: "signin" } })}
+              >
                 ← Back to sign in
               </button>
             )}
