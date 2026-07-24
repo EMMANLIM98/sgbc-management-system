@@ -192,9 +192,9 @@ async function embedLogoOnCanvas(
     );
 
     // Draw WHITE SQUARE background behind logo
-    // CRITICAL for QR readability: Use FULLY OPAQUE white with minimal padding
+    // CRITICAL for QR readability: Use FULLY OPAQUE white with adequate padding
     // Standard QR practice: logo maximum 20% of QR code, with white square background
-    const bgPadding = 3; // Minimal padding (3px) around logo
+    const bgPadding = 6; // Padding around logo (6px on all sides)
     const bgWidth = displayWidth + bgPadding * 2;
     const bgHeight = displayHeight + bgPadding * 2;
     const bgX = exactCenterX - bgWidth / 2;

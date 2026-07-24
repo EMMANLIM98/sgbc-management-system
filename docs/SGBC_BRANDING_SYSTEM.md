@@ -247,7 +247,7 @@ public/
 ### QR Code Branding
 
 - SGBC logo embedded in center
-- 20% of QR code size (optimized)
+- 15% of QR code size (optimized for scanner compatibility)
 - White background square behind logo
 - Professional dark border around logo background
 

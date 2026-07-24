@@ -25,8 +25,8 @@ The QR code image you provided is the **design template** for all SGBC QR codes.
 | Aspect | Specification |
 |--------|---------------|
 | **Logo Placement** | 🎯 **PERFECTLY CENTERED** (50% H, 50% V) |
-| **Logo Size** | 20% of QR code total size |
-| **Logo Background** | Semi-transparent white circle (87% opacity) |
+| **Logo Size** | 15% of QR code total size (scanner optimized) |
+| **Logo Background** | White square (100% opaque) with 6px padding |
 | **QR Pattern** | Black modules on white |
 | **Quiet Zone** | White border (4+ modules) |
 | **Aspect Ratio** | Square (1:1) |
@@ -50,8 +50,8 @@ import { QRCodeCanvas } from '@/components/ui/qr-code-canvas';
 
 **Output**: QR code that matches template design:
 - ✅ SGBC logo centered
-- ✅ 20% logo size
-- ✅ White quiet zone
+- ✅ 15% logo size (scanner-friendly)
+- ✅ White square background with padding
 - ✅ Black on white
 
 ### 2. Download Template-Matching QR Code
@@ -77,12 +77,10 @@ All sizes maintain template design:
 
 | Size | Use Case | Logo Size |
 |------|----------|-----------|
-| 150×150 | Mobile app | 30×30 |
-| 300×300 | Standard | 60×60 |
-| 600×600 | Printed | 120×120 |
-| 1000×1000 | Posters | 200×200 |
-
-## 📁 Files Created
+| 150×150 | Mobile app | 22×22 |
+| 300×300 | Standard | 45×45 |
+| 600×600 | Printed | 90×90 |
+| 1000×1000 | Posters | 150×150 |
 
 ```
 assets/qr-code-examples/
@@ -99,23 +97,25 @@ assets/qr-code-examples/
 
 ## ✅ Current Status
 
-- ✅ QRCodeCanvas component generates template-matching QR codes
-- ✅ SGBC logo automatically embedded at 20%
+- ✅ QRCodeCanvas component generates scanner-friendly QR codes
+- ✅ SGBC logo automatically embedded at 15% (optimized for readability)
+- ✅ White square background (100% opaque) with 6px padding
 - ✅ High error correction (30% recovery)
 - ✅ Download and print support
 - ✅ Fully responsive across sizes
+- ✅ **All QR scanners can read the code**
 
 ## 🎯 Summary
 
-The QR code template image shows how all SGBC QR codes should look:
+The QR code system generates scannable QR codes with embedded SGBC logos:
 
 1. **SGBC logo** centered in middle
-2. **20% logo size** of total QR code
-3. **White background** behind logo
+2. **15% logo size** of total QR code (scanner optimized)
+3. **White square background** (opaque) with padding
 4. **Black QR pattern** with white quiet zone
-5. **Scannable** with any QR reader
+5. **✅ Scannable** with any QR reader
 
-Your current system **already implements** this template design!
+Your current system **already implements** this design!
 
 ---
 

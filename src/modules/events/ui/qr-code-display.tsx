@@ -50,7 +50,7 @@ export function QRCodeDisplay({
 
         await generateQRCodeOnCanvas(canvas, token, {
           size: 300,
-          faviconSize: 0.2,
+          faviconSize: 0.15, // 15% logo for scanner compatibility
         });
         console.log("[Event QR] QR code generated successfully with SGBC logo");
       } catch (error) {

@@ -9,7 +9,7 @@ This guide explains how the SGBC QR code system uses the provided template image
 The reference QR code image demonstrates:
 
 ### Visual Elements
-- ✅ **SGBC Logo**: 🎯 **PERFECTLY CENTERED** at exact center (50% horizontal, 50% vertical) - 20% of QR code size
+- ✅ **SGBC Logo**: 🎯 **PERFECTLY CENTERED** at exact center (50% horizontal, 50% vertical) - 15% of QR code size
 - ✅ **Logo Background**: Semi-transparent white circular background (87% opacity) for maximum contrast
 - ✅ **QR Pattern**: Black modules on white background
 - ✅ **Quiet Zone**: White border around entire QR code (minimum 4 modules)
@@ -63,7 +63,7 @@ Handles low-level QR code generation with logo embedding:
 ```typescript
 await generateQRCodeOnCanvas(canvas, data, {
   size: 300,
-  faviconSize: 0.2  // 20% for logo
+  faviconSize: 0.15  // 15% for logo (optimized for scanner readability)
 });
 ```
 
@@ -175,7 +175,7 @@ export function BatchEventQRCodes() {
 When generating QR codes, verify:
 
 - [ ] **Logo Visibility**: SGBC logo clearly visible and centered
-- [ ] **Logo Size**: Logo is approximately 20% of QR code size
+- [ ] **Logo Size**: Logo is approximately 15% of QR code size
 - [ ] **White Background**: Logo has white background for contrast
 - [ ] **Quiet Zone**: White border visible on all 4 sides
 - [ ] **Aspect Ratio**: QR code is perfectly square

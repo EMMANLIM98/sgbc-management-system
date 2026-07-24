@@ -22,12 +22,12 @@ The reference QR code image (included in this folder) demonstrates the desired:
 - **Aspect Ratio**: Always square (1:1)
 
 ### Logo Embedding
-- **Logo Size**: 20% of total QR code size
+- **Logo Size**: 15% of total QR code size (optimized for scanner readability)
 - **Position**: ✅ **PERFECTLY CENTERED** - both horizontally and vertically at exact center (50%, 50%)
 - **Centering Formula**: 
   - X position: `(qrSize / 2) - (logoWidth / 2)`
   - Y position: `(qrSize / 2) - (logoHeight / 2)`
-- **Background**: Semi-transparent white circular background (87% opacity) for maximum contrast
+- **Background**: White square (opaque) with 6px padding for contrast and scanner compatibility
 - **Aspect Ratio Handling**: Logo image preserves original aspect ratio while scaling to 20% container
 - **Preservation**: Logo obscures maximum 20% of QR code data (within High error correction tolerance)
 - **Current Logo**: SGBC branding logo from `src/lib/domain/branding.service.ts`
