@@ -9,8 +9,8 @@ This guide explains how the SGBC QR code system uses the provided template image
 The reference QR code image demonstrates:
 
 ### Visual Elements
-- ✅ **SGBC Logo**: Centered in the middle (20% of QR code size)
-- ✅ **Logo Background**: White square behind logo for contrast
+- ✅ **SGBC Logo**: 🎯 **PERFECTLY CENTERED** at exact center (50% horizontal, 50% vertical) - 20% of QR code size
+- ✅ **Logo Background**: Semi-transparent white circular background (87% opacity) for maximum contrast
 - ✅ **QR Pattern**: Black modules on white background
 - ✅ **Quiet Zone**: White border around entire QR code (minimum 4 modules)
 - ✅ **Aspect Ratio**: Square (1:1)

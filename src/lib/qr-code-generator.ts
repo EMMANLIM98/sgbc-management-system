@@ -161,6 +161,9 @@ async function embedLogoOnCanvas(
     // If aspect ratio is 1 (square), use calculated size as-is
 
     // Center image perfectly in the QR code
+    // 🎯 CENTERED at exact center: 50% horizontal (centerX), 50% vertical (centerY)
+    // Formula: position = centerPoint - (dimension / 2)
+    // This ensures logo is mathematically centered regardless of QR or logo size
     const centerX = size / 2;
     const centerY = size / 2;
     const imgX = centerX - displayWidth / 2;

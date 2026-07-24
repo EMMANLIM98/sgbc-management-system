@@ -7,10 +7,12 @@
  *
  * Design Template: See assets/qr-code-examples/QR_CODE_TEMPLATE.md
  * This component generates QR codes following SGBC design specifications:
- * - 20% embedded SGBC logo (centered)
+ * - 🎯 SGBC logo PERFECTLY CENTERED (50% horizontal, 50% vertical)
+ * - 20% embedded logo size with aspect ratio preservation
+ * - Semi-transparent white circular background (87% opacity)
  * - High error correction (30% recovery)
  * - Black on white, square format
- * - White quiet zone border
+ * - White quiet zone border (4+ modules)
  *
  * Usage:
  * <QRCodeCanvas

@@ -23,9 +23,13 @@ The reference QR code image (included in this folder) demonstrates the desired:
 
 ### Logo Embedding
 - **Logo Size**: 20% of total QR code size
-- **Position**: Centered both horizontally and vertically
-- **Background**: White square behind logo for contrast
-- **Preservation**: Logo should not obscure more than 20% of QR code data
+- **Position**: ✅ **PERFECTLY CENTERED** - both horizontally and vertically at exact center (50%, 50%)
+- **Centering Formula**: 
+  - X position: `(qrSize / 2) - (logoWidth / 2)`
+  - Y position: `(qrSize / 2) - (logoHeight / 2)`
+- **Background**: Semi-transparent white circular background (87% opacity) for maximum contrast
+- **Aspect Ratio Handling**: Logo image preserves original aspect ratio while scaling to 20% container
+- **Preservation**: Logo obscures maximum 20% of QR code data (within High error correction tolerance)
 - **Current Logo**: SGBC branding logo from `src/lib/domain/branding.service.ts`
 
 ### Color Scheme
@@ -80,22 +84,27 @@ export function EventRegistrationQR() {
 
 ## Visual Specifications
 
-### Layout
+### Layout - Perfect Centering
 ```
-┌─────────────────────────────────────┐
-│          Quiet Zone (White)         │
-│  ┌─────────────────────────────┐   │
-│  │                             │   │
-│  │      QR Code (Black)        │   │
-│  │      ┌──────────────┐       │   │
-│  │      │  SGBC Logo   │       │   │
-│  │      │   (20% size) │       │   │
-│  │      └──────────────┘       │   │
-│  │                             │   │
-│  └─────────────────────────────┘   │
-│          Quiet Zone (White)         │
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│              Quiet Zone (White)                 │
+│  ┌───────────────────────────────────────┐     │
+│  │                                       │     │
+│  │         QR Code Pattern (Black)       │     │
+│  │                                       │     │
+│  │      ┌─────────────────────────┐     │     │
+│  │      │   ⭕ SGBC Logo ⭕       │     │     │
+│  │      │   (Centered at 50%,50%) │     │     │
+│  │      │   20% of QR size        │     │     │
+│  │      └─────────────────────────┘     │     │
+│  │      (White circular background)     │     │
+│  │                                       │     │
+│  └───────────────────────────────────────┘     │
+│              Quiet Zone (White)                 │
+└─────────────────────────────────────────────────┘
 ```
+
+**Key**: Logo is positioned at the exact mathematical center of the QR code using perfect centering calculations.
 
 ### Dimensions Breakdown (300×300 example)
 - Total Size: 300×300 px

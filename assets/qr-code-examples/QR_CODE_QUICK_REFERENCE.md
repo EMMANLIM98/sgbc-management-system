@@ -24,9 +24,9 @@ The QR code image you provided is the **design template** for all SGBC QR codes.
 
 | Aspect | Specification |
 |--------|---------------|
-| **Logo Placement** | Centered (horizontal & vertical) |
+| **Logo Placement** | 🎯 **PERFECTLY CENTERED** (50% H, 50% V) |
 | **Logo Size** | 20% of QR code total size |
-| **Logo Background** | White square (for contrast) |
+| **Logo Background** | Semi-transparent white circle (87% opacity) |
 | **QR Pattern** | Black modules on white |
 | **Quiet Zone** | White border (4+ modules) |
 | **Aspect Ratio** | Square (1:1) |
