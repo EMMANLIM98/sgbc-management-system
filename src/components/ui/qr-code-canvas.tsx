@@ -153,14 +153,17 @@ export function QRCodeCanvas({
       {/* QR Code Canvas Container - Canvas always rendered, UI overlaid on top */}
       <div className="relative flex justify-center p-4 bg-white border border-gray-200 rounded-lg mb-4">
         {/* Canvas - ALWAYS rendered and mounted */}
+        {/* CRITICAL: No CSS scaling! Canvas dimensions must match rendering dimensions */}
+        {/* to ensure logo centering calculations are accurate */}
         <canvas
           ref={canvasRef}
           width={size}
           height={size}
           style={{
             display: "block",
-            maxWidth: "100%",
-            height: "auto",
+            width: `${size}px`,
+            height: `${size}px`,
+            imageRendering: "pixelated",
           }}
         />
 

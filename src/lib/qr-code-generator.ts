@@ -87,7 +87,7 @@ export async function generateQRCodeOnCanvas(
     // Clear canvas first
     ctx.clearRect(0, 0, size, size);
 
-    // Generate QR code - this must complete before favicon
+    // Generate QR code - this must complete before logo
     console.log(`[QR] Generating QR code for data:`, data.substring(0, 50));
 
     await QRCode.toCanvas(canvas, data, {
@@ -108,11 +108,13 @@ export async function generateQRCodeOnCanvas(
     }
 
     // Try to add SGBC logo to center AFTER QR is drawn (non-blocking)
-    // This will happen asynchronously but won't prevent QR from displaying
+    // Use timeout to ensure QR code is fully rendered before adding logo
     if (includeLogoAsset) {
-      embedLogoOnCanvas(canvas, includeLogoAsset, size, faviconSize).catch((err) => {
-        console.warn("[QR] Logo embedding failed (non-blocking):", err);
-      });
+      setTimeout(() => {
+        embedLogoOnCanvas(canvas, includeLogoAsset, size, faviconSize).catch((err) => {
+          console.warn("[QR] Logo embedding failed (non-blocking):", err);
+        });
+      }, 50); // Small delay to ensure QR rendering is complete
     }
   } catch (error) {
     console.error("[QR] Failed to generate QR code:", error);
@@ -125,6 +127,8 @@ export async function generateQRCodeOnCanvas(
  * This won't prevent the QR code from displaying if it fails
  * Properly centers the logo image while preserving aspect ratio
  * Clean modern design: semi-transparent circular background, no border
+ * 
+ * 🎯 CENTERING GUARANTEE: Logo is mathematically centered at (50%, 50%)
  */
 async function embedLogoOnCanvas(
   canvas: HTMLCanvasElement,
@@ -141,53 +145,69 @@ async function embedLogoOnCanvas(
       return;
     }
 
-    // Calculate logo dimensions - size it as a percentage of the QR code
-    const logoDisplaySize = size * faviconSize;
+    // Verify canvas still has content
+    if (canvas.width === 0 || canvas.height === 0) {
+      console.warn("[QR] Canvas dimensions invalid");
+      return;
+    }
 
-    // Calculate image scaling to fit within container while preserving aspect ratio
+    // Calculate exact center point of the QR code canvas
+    // This is the pivot point for all centering calculations
+    const exactCenterX = canvas.width / 2;
+    const exactCenterY = canvas.height / 2;
+    console.log(`[QR] Exact canvas center: (${exactCenterX}, ${exactCenterY})`);
+
+    // Calculate logo container size as percentage of QR code
+    const logoContainerSize = size * faviconSize;
+
+    // Calculate image dimensions with aspect ratio preservation
     const imgAspectRatio = img.width / img.height;
-    let displayWidth = logoDisplaySize;
-    let displayHeight = logoDisplaySize;
+    let displayWidth = logoContainerSize;
+    let displayHeight = logoContainerSize;
 
     if (imgAspectRatio > 1) {
-      // Image is wider than tall - scale by height
-      displayHeight = logoDisplaySize;
-      displayWidth = logoDisplaySize * imgAspectRatio;
+      // Wider image - constrain by height
+      displayHeight = logoContainerSize;
+      displayWidth = logoContainerSize * imgAspectRatio;
     } else if (imgAspectRatio < 1) {
-      // Image is taller than wide - scale by width
-      displayWidth = logoDisplaySize;
-      displayHeight = logoDisplaySize / imgAspectRatio;
+      // Taller image - constrain by width
+      displayWidth = logoContainerSize;
+      displayHeight = logoContainerSize / imgAspectRatio;
     }
-    // If aspect ratio is 1 (square), use calculated size as-is
 
-    // Center image perfectly in the QR code
-    // 🎯 CENTERED at exact center: 50% horizontal (centerX), 50% vertical (centerY)
-    // Formula: position = centerPoint - (dimension / 2)
-    // This ensures logo is mathematically centered regardless of QR or logo size
-    const centerX = size / 2;
-    const centerY = size / 2;
-    const imgX = centerX - displayWidth / 2;
-    const imgY = centerY - displayHeight / 2;
+    console.log(
+      `[QR] Logo dimensions: ${displayWidth.toFixed(0)}x${displayHeight.toFixed(0)} ` +
+      `(aspect ratio: ${imgAspectRatio.toFixed(2)})`,
+    );
 
-    // Draw subtle semi-transparent circular background for visibility
-    // This makes the logo pop without a hard border/square
+    // Calculate exact positions to center the logo
+    // Position formula: topLeft = centerPoint - (dimension / 2)
+    // This puts the logo with its CENTER at the exact canvas center
+    const logoX = exactCenterX - displayWidth / 2;
+    const logoY = exactCenterY - displayHeight / 2;
+
+    console.log(
+      `[QR] Logo position: top-left (${logoX.toFixed(1)}, ${logoY.toFixed(1)}) ` +
+      `→ centered at (${(logoX + displayWidth / 2).toFixed(1)}, ${(logoY + displayHeight / 2).toFixed(1)})`,
+    );
+
+    // Draw semi-transparent circular background centered at exact center
     const bgRadius = Math.max(displayWidth, displayHeight) / 2 + 6;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; // Increased opacity to 90%
     ctx.beginPath();
-    ctx.arc(centerX, centerY, bgRadius, 0, 2 * Math.PI);
+    ctx.arc(exactCenterX, exactCenterY, bgRadius, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Draw logo image centered on the background
-    ctx.drawImage(img, imgX, imgY, displayWidth, displayHeight);
     console.log(
-      "[QR] SGBC logo embedded successfully - centered at (" +
-        centerX.toFixed(1) +
-        ", " +
-        centerY.toFixed(1) +
-        ") with size " +
-        displayWidth.toFixed(0) +
-        "x" +
-        displayHeight.toFixed(0),
+      `[QR] Background circle: center (${exactCenterX}, ${exactCenterY}), radius ${bgRadius.toFixed(1)}`,
+    );
+
+    // Draw logo image centered on the background
+    // The drawImage API uses top-left corner as origin, so logoX/logoY are correct
+    ctx.drawImage(img, logoX, logoY, displayWidth, displayHeight);
+
+    console.log(
+      `[QR] ✅ SGBC logo embedded successfully - CENTERED at (${exactCenterX.toFixed(1)}, ${exactCenterY.toFixed(1)})`,
     );
   } catch (error) {
     console.warn("[QR] Failed to embed SGBC logo in QR code:", error);
