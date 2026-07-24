@@ -71,7 +71,7 @@ Handles low-level QR code generation with logo embedding:
 ```typescript
 await generateQRCodeOnCanvas(canvas, data, {
   size: 300,
-  faviconSize: 0.15, // 15% for logo (optimized for scanner readability)
+  faviconSize: 0.12, // 12% for logo (optimized for scanner readability)
 });
 ```
 

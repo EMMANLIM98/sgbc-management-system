@@ -92,9 +92,9 @@ export async function generateQRCodeOnCanvas(
 
     await QRCode.toCanvas(canvas, data, {
       errorCorrectionLevel: "H",
-      margin: 2,
+      margin: 4,
       color: {
-        dark: "#111827",
+        dark: "#000000",
         light: "#ffffff",
       },
     });

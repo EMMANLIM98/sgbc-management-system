@@ -128,10 +128,10 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           const qrcodeInstance = new Html5Qrcode(containerId);
           scannerRef.current = qrcodeInstance as any;
 
-          // Start continuous scanning
+          // Start continuous scanning with larger detection area
           await qrcodeInstance.start(
             { facingMode: "environment" },
-            { fps: 10, qrbox: 280 },
+            { fps: 10, qrbox: 350 },
             (decodedText: string) => {
               console.log("QR code detected:", decodedText);
               if (decodedText === lastScannedRef.current) return;
@@ -175,8 +175,8 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         // Fallback to Html5QrcodeScanner
         console.log("Using Html5QrcodeScanner fallback...");
         const config = {
-          fps: 15,
-          qrbox: { width: 280, height: 280 },
+          fps: 10,
+          qrbox: { width: 350, height: 350 },
           rememberLastUsedCamera: true,
           disableFlip: false,
           showTorchButtonIfSupported: true,

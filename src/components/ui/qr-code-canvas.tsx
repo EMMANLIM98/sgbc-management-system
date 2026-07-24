@@ -101,10 +101,10 @@ export function QRCodeCanvas({
       }
 
       // Use domain layer function for logo-embedded QR code
-      // Logo size: 15% of QR code (smaller than 20% for better scanner compatibility)
+      // Logo size: 12% of QR code (smaller for better scanner compatibility)
       await generateQRCodeOnCanvas(canvasRef.current, value, {
         size,
-        faviconSize: 0.15, // 15% of QR code size for logo (scanner-friendly)
+        faviconSize: 0.12, // 12% of QR code size for logo (maximum scanner-friendly)
       });
 
       console.log("[QR Canvas] QR code generated successfully");

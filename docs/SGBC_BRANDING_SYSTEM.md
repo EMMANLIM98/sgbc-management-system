@@ -109,7 +109,7 @@ Now uses `BrandingService` for logo configuration instead of hardcoded favicon.
 ```typescript
 await generateQRCodeOnCanvas(canvas, data, {
   size: 300,
-  faviconSize: 0.2,
+  faviconSize: 0.12,
   // includeLogoAsset defaults to BrandingService.getLogoPath()
 });
 ```
