@@ -22,16 +22,16 @@ The QR code image you provided is the **design template** for all SGBC QR codes.
 
 ### Key Specifications
 
-| Aspect | Specification |
-|--------|---------------|
-| **Logo Placement** | 🎯 **PERFECTLY CENTERED** (50% H, 50% V) |
-| **Logo Size** | 15% of QR code total size (scanner optimized) |
-| **Logo Background** | White square (100% opaque) with 6px padding |
-| **QR Pattern** | Black modules on white |
-| **Quiet Zone** | White border (4+ modules) |
-| **Aspect Ratio** | Square (1:1) |
-| **Error Correction** | High (30% recovery) |
-| **Scannable** | ✅ Yes |
+| Aspect               | Specification                                 |
+| -------------------- | --------------------------------------------- |
+| **Logo Placement**   | 🎯 **PERFECTLY CENTERED** (50% H, 50% V)      |
+| **Logo Size**        | 15% of QR code total size (scanner optimized) |
+| **Logo Background**  | White square (100% opaque) with 6px padding   |
+| **QR Pattern**       | Black modules on white                        |
+| **Quiet Zone**       | White border (4+ modules)                     |
+| **Aspect Ratio**     | Square (1:1)                                  |
+| **Error Correction** | High (30% recovery)                           |
+| **Scannable**        | ✅ Yes                                        |
 
 ## 🚀 Using in Your Project
 
@@ -49,6 +49,7 @@ import { QRCodeCanvas } from '@/components/ui/qr-code-canvas';
 ```
 
 **Output**: QR code that matches template design:
+
 - ✅ SGBC logo centered
 - ✅ 15% logo size (scanner-friendly)
 - ✅ White square background with padding
@@ -65,6 +66,7 @@ import { QRCodeCanvas } from '@/components/ui/qr-code-canvas';
 ### 3. Verify QR Code Matches Template
 
 Checklist:
+
 - [ ] Logo is visible and centered
 - [ ] Logo background is white
 - [ ] White border exists around code
@@ -75,12 +77,12 @@ Checklist:
 
 All sizes maintain template design:
 
-| Size | Use Case | Logo Size |
-|------|----------|-----------|
-| 150×150 | Mobile app | 22×22 |
-| 300×300 | Standard | 45×45 |
-| 600×600 | Printed | 90×90 |
-| 1000×1000 | Posters | 150×150 |
+| Size      | Use Case   | Logo Size |
+| --------- | ---------- | --------- |
+| 150×150   | Mobile app | 22×22     |
+| 300×300   | Standard   | 45×45     |
+| 600×600   | Printed    | 90×90     |
+| 1000×1000 | Posters    | 150×150   |
 
 ```
 assets/qr-code-examples/

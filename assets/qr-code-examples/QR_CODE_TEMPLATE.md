@@ -7,6 +7,7 @@ This document describes the SGBC QR code template and design standards. All gene
 ## Template Reference
 
 The reference QR code image (included in this folder) demonstrates the desired:
+
 - **Logo Placement**: SGBC logo centered at 20% of QR code size
 - **Error Correction**: High level (QR code remains scannable with ~30% data loss)
 - **Color Scheme**: Black QR code on white background
@@ -16,15 +17,17 @@ The reference QR code image (included in this folder) demonstrates the desired:
 ## QR Code Specifications
 
 ### Dimensions
+
 - **Default Size**: 300×300 pixels
 - **Minimum Size**: 100×100 pixels (for small displays)
 - **Maximum Size**: 1000×1000 pixels (for posters)
 - **Aspect Ratio**: Always square (1:1)
 
 ### Logo Embedding
+
 - **Logo Size**: 15% of total QR code size (optimized for scanner readability)
 - **Position**: ✅ **PERFECTLY CENTERED** - both horizontally and vertically at exact center (50%, 50%)
-- **Centering Formula**: 
+- **Centering Formula**:
   - X position: `(qrSize / 2) - (logoWidth / 2)`
   - Y position: `(qrSize / 2) - (logoHeight / 2)`
 - **Background**: White square (opaque) with 6px padding for contrast and scanner compatibility
@@ -33,11 +36,13 @@ The reference QR code image (included in this folder) demonstrates the desired:
 - **Current Logo**: SGBC branding logo from `src/lib/domain/branding.service.ts`
 
 ### Color Scheme
+
 - **Foreground (QR Modules)**: #000000 (Black)
 - **Background (Quiet Zone)**: #FFFFFF (White)
 - **Logo Container**: #FFFFFF (White background for logo contrast)
 
 ### Error Correction Level
+
 - **Level Used**: High (30% recovery capacity)
 - **Reason**: Allows logo to obscure up to 20% without affecting scannability
 - **Standard**: QR Code ISO/IEC 18004
@@ -45,9 +50,11 @@ The reference QR code image (included in this folder) demonstrates the desired:
 ## Implementation
 
 ### Current Component
+
 Location: `src/components/ui/qr-code-canvas.tsx`
 
 **Features**:
+
 - ✅ Logo embedding with automatic scaling
 - ✅ Download as PNG
 - ✅ Print functionality
@@ -55,9 +62,11 @@ Location: `src/components/ui/qr-code-canvas.tsx`
 - ✅ Responsive sizing
 
 ### QR Code Generator
+
 Location: `src/lib/qr-code-generator.ts`
 
 **Methods**:
+
 - `generateQRCodeOnCanvas()` - Generates QR code with logo on canvas
 - `downloadCanvasAsImage()` - Downloads as PNG
 - `printCanvasQRCode()` - Prints QR code
@@ -85,6 +94,7 @@ export function EventRegistrationQR() {
 ## Visual Specifications
 
 ### Layout - Perfect Centering
+
 ```
 ┌─────────────────────────────────────────────────┐
 │              Quiet Zone (White)                 │
@@ -107,6 +117,7 @@ export function EventRegistrationQR() {
 **Key**: Logo is positioned at the exact mathematical center of the QR code using perfect centering calculations.
 
 ### Dimensions Breakdown (300×300 example)
+
 - Total Size: 300×300 px
 - Quiet Zone: ~12 px on each side (4 QR modules)
 - QR Pattern Area: 276×276 px
@@ -116,6 +127,7 @@ export function EventRegistrationQR() {
 ## Use Cases
 
 ### 1. Event Registration
+
 ```
 Size: 300×300 px
 Title: "Event Registration"
@@ -123,6 +135,7 @@ Data: https://sgbc.app/register/event/[eventId]
 ```
 
 ### 2. Visitor Check-in
+
 ```
 Size: 250×250 px
 Title: "Visitor Check-in"
@@ -130,6 +143,7 @@ Data: https://sgbc.app/visitors/check-in/[visitorId]
 ```
 
 ### 3. Mobile Verification
+
 ```
 Size: 200×200 px
 Title: "Verify Attendance"
@@ -137,6 +151,7 @@ Data: https://sgbc.app/verify/[token]
 ```
 
 ### 4. Printed Materials (Posters)
+
 ```
 Size: 600×600 px
 Title: "Sunday Service Registration"
@@ -180,20 +195,25 @@ To verify a generated QR code:
 ## Customization Guidelines
 
 ### Logo Changes
+
 To use a different logo:
+
 1. Update `src/lib/domain/branding.service.ts`
 2. Change `getLogoUrl()` method
 3. Logo should be square (1:1 aspect ratio)
 4. Keep file size minimal (~50KB)
 
 ### Size Variations
+
 - **Small (100×100)**: Mobile in-app displays
 - **Medium (300×300)**: Standard (default)
 - **Large (600×600)**: Printed materials
 - **Extra Large (1000×1000)**: Banners/signage
 
 ### Color Variations
+
 Standard QR codes are black and white. Do NOT use:
+
 - ❌ Colors other than black/white
 - ❌ Gradients or patterns
 - ❌ Transparency (except logo background)
@@ -209,18 +229,21 @@ Standard QR codes are black and white. Do NOT use:
 ## Troubleshooting
 
 ### QR Code Won't Scan
+
 1. ✅ Increase error correction level in generator
 2. ✅ Reduce logo size from 20% to 15%
 3. ✅ Ensure adequate quiet zone (white border)
 4. ✅ Increase contrast (pure black on pure white)
 
 ### Logo Not Appearing
+
 1. ✅ Check logo URL is accessible
 2. ✅ Verify image format (PNG recommended)
 3. ✅ Check CORS headers if loading externally
 4. ✅ Ensure logo is square (1:1)
 
 ### Download/Print Issues
+
 1. ✅ Try different browser
 2. ✅ Check browser permissions
 3. ✅ Verify printer is ready (for print)

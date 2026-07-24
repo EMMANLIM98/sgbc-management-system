@@ -9,6 +9,7 @@ This guide explains how the SGBC QR code system uses the provided template image
 The reference QR code image demonstrates:
 
 ### Visual Elements
+
 - ✅ **SGBC Logo**: 🎯 **PERFECTLY CENTERED** at exact center (50% horizontal, 50% vertical) - 15% of QR code size
 - ✅ **Logo Background**: Semi-transparent white circular background (87% opacity) for maximum contrast
 - ✅ **QR Pattern**: Black modules on white background
@@ -16,6 +17,7 @@ The reference QR code image demonstrates:
 - ✅ **Aspect Ratio**: Square (1:1)
 
 ### Technical Specifications
+
 - **Error Correction Level**: High (30% data recovery)
 - **Color Depth**: Monochrome (Black #000000 on White #FFFFFF)
 - **Module Size**: Scalable (maintaining aspect ratio)
@@ -25,6 +27,7 @@ The reference QR code image demonstrates:
 ## 🔧 How It's Implemented
 
 ### Component: QRCodeCanvas
+
 **Location**: `src/components/ui/qr-code-canvas.tsx`
 
 The component automatically generates QR codes matching the template:
@@ -41,6 +44,7 @@ The component automatically generates QR codes matching the template:
 ```
 
 **Output**: A QR code with:
+
 - ✅ SGBC logo centered at 20%
 - ✅ White background behind logo
 - ✅ Black QR pattern
@@ -48,26 +52,31 @@ The component automatically generates QR codes matching the template:
 - ✅ High error correction
 
 ### Service: BrandingService
+
 **Location**: `src/lib/domain/branding.service.ts`
 
 Provides the SGBC logo used in all QR codes:
+
 ```typescript
 const logoPath = brandingService.getLogoPath();
 // Returns: Path to SGBC branding logo
 ```
 
 ### Utility: QR Code Generator
+
 **Location**: `src/lib/qr-code-generator.ts`
 
 Handles low-level QR code generation with logo embedding:
+
 ```typescript
 await generateQRCodeOnCanvas(canvas, data, {
   size: 300,
-  faviconSize: 0.15  // 15% for logo (optimized for scanner readability)
+  faviconSize: 0.15, // 15% for logo (optimized for scanner readability)
 });
 ```
 
 **Features**:
+
 - Generates base QR code with high error correction
 - Loads SGBC logo asynchronously
 - Embeds logo in center with white background
@@ -79,16 +88,17 @@ Based on the template, here are recommended sizes:
 
 ### Display Contexts
 
-| Use Case | Size | Context |
-|----------|------|---------|
-| Mobile In-App | 150×150 | Mobile app displays |
-| Standard (Default) | 300×300 | Web, email, receipts |
-| Large | 600×600 | Printed handouts |
-| Extra Large | 1000×1000 | Posters, banners |
+| Use Case           | Size      | Context              |
+| ------------------ | --------- | -------------------- |
+| Mobile In-App      | 150×150   | Mobile app displays  |
+| Standard (Default) | 300×300   | Web, email, receipts |
+| Large              | 600×600   | Printed handouts     |
+| Extra Large        | 1000×1000 | Posters, banners     |
 
 ### Scale Preservation
 
 All sizes maintain:
+
 - ✅ Same logo size ratio (20%)
 - ✅ Same quiet zone ratio (4 modules)
 - ✅ Same visual appearance
@@ -119,6 +129,7 @@ export function EventRegistrationPage() {
 ```
 
 **Generated QR Code**:
+
 - Points to: Event registration page
 - Logo: SGBC branding centered
 - Scannable: Yes ✅
@@ -189,6 +200,7 @@ When generating QR codes, verify:
 ### Scan Testing
 
 1. **Mobile Camera** (iOS/Android)
+
    ```
    Open native camera app
    Point at QR code
@@ -197,6 +209,7 @@ When generating QR codes, verify:
    ```
 
 2. **QR Scanner App**
+
    ```
    Google Lens
    Barcode Scanner app
@@ -281,6 +294,7 @@ All QR codes in SGBC system maintain:
 ## 📚 File References
 
 ### Core Files
+
 - `src/components/ui/qr-code-canvas.tsx` - React component
 - `src/lib/qr-code-generator.ts` - Generation utility
 - `src/lib/domain/branding.service.ts` - Logo configuration
@@ -288,6 +302,7 @@ All QR codes in SGBC system maintain:
 - `assets/qr-code-examples/SGBC_QR_Template_Usage.md` - This file
 
 ### Related Documentation
+
 - Event Registration: `docs/ENDPOINT_REFACTORING_EXAMPLE.md`
 - API Response Format: `src/lib/api/response.ts`
 
@@ -329,13 +344,13 @@ function MyQRCode() {
 
 ## 🔧 Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Logo not appearing | Check logo URL is accessible, CORS enabled |
-| QR won't scan | Reduce logo size, ensure adequate white space |
-| Low image quality | Use larger size (600+ px) before scaling |
+| Issue                | Solution                                         |
+| -------------------- | ------------------------------------------------ |
+| Logo not appearing   | Check logo URL is accessible, CORS enabled       |
+| QR won't scan        | Reduce logo size, ensure adequate white space    |
+| Low image quality    | Use larger size (600+ px) before scaling         |
 | Download not working | Check browser permissions, try different browser |
-| Print quality poor | Ensure printer settings are set to best quality |
+| Print quality poor   | Ensure printer settings are set to best quality  |
 
 ## 📝 Notes
 
