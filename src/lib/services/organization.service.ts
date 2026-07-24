@@ -122,18 +122,69 @@ export class OrganizationService {
   }
 
   /**
-   * Assign user role in organization
+   * Assign or update a user's role in an organization
+   * 
+   * Business Logic:
+   * 1. Verify organization exists
+   * 2. Verify user (member) exists
+   * 3. Verify user is member of organization
+   * 4. Enforce business rule: Can't remove last owner
+   * 5. Update role flags (is_owner, is_org_admin)
+   * 6. Return updated member profile
+   * 
+   * @param orgId - Organization ID
+   * @param userId - User ID (member to update)
+   * @param role - New role: 'owner' | 'admin' | 'member'
+   * @returns Updated member with new role
+   * @throws Error if org/user not found or business rule violated
    */
   async assignUserRole(
     orgId: string,
     userId: string,
     role: 'owner' | 'admin' | 'member'
-  ): Promise<boolean> {
-    // TODO: Check user is member of organization
-    // TODO: Update user role
-    // TODO: Return success
+  ): Promise<any> {
+    // Step 1: Verify organization exists
+    const organization = await this.repository.findById(orgId);
+    if (!organization) {
+      throw new Error(`Organization not found: ${orgId}`);
+    }
 
-    return true; // TODO: Implement
+    // Step 2: Verify user (member) exists
+    const member = await (new (await import('@/lib/repositories')).MemberRepository()).findById(userId);
+    if (!member) {
+      throw new Error(`Member not found: ${userId}`);
+    }
+
+    // Step 3: Verify user is already in organization
+    const orgMembers = await (new (await import('@/lib/repositories')).MemberRepository()).findByOrganizationId(orgId);
+    const isMember = orgMembers.some(m => m.id === userId);
+    if (!isMember) {
+      throw new Error(`User is not a member of this organization`);
+    }
+
+    // Step 4: Business rule - Can't remove last owner
+    if (role !== 'owner') {
+      const currentOwners = orgMembers.filter((m: any) => m.is_owner);
+      const currentUserIsOwner = currentOwners.some((m: any) => m.id === userId);
+      
+      if (currentUserIsOwner && currentOwners.length === 1) {
+        throw new Error('Cannot remove the only owner from organization');
+      }
+    }
+
+    // Step 5: Update member with new role flags
+    const memberRepository = new (await import('@/lib/repositories')).MemberRepository();
+    const updatedMember = await memberRepository.update(userId, {
+      is_owner: role === 'owner',
+      is_org_admin: role === 'admin' || role === 'owner',
+    } as any);
+
+    if (!updatedMember) {
+      throw new Error(`Failed to update member role`);
+    }
+
+    // Step 6: Return updated member
+    return updatedMember;
   }
 
   /**
