@@ -43,6 +43,7 @@ The Dashboard module follows the 4-layer clean architecture pattern:
 ## Files Created
 
 ### Service Layer
+
 - **`src/lib/services/dashboard.service.ts`** - Core business logic for data aggregation
   - `getKpis(churchId?)` - Aggregates member counts and statistics
   - `getMembershipGrowth(months, churchId?)` - Calculates cumulative growth
@@ -50,12 +51,14 @@ The Dashboard module follows the 4-layer clean architecture pattern:
   - `getChurchesOverview()` - Gets churches with member counts
 
 ### API Layer
+
 - **`server/routes/api/dashboard/kpis.get.ts`** - GET /api/v1/dashboard/kpis
 - **`server/routes/api/dashboard/membership-growth.get.ts`** - GET /api/v1/dashboard/membership-growth
 - **`server/routes/api/dashboard/activities.get.ts`** - GET /api/v1/dashboard/activities
 - **`server/routes/api/dashboard/churches.get.ts`** - GET /api/v1/dashboard/churches
 
 ### Data Transfer Objects
+
 - **`src/lib/api/dto/dashboard.dto.ts`** - DTOs and mapper functions
   - `KpiDTO` - Dashboard KPI metrics
   - `MembershipGrowthDTO` - Growth chart data
@@ -63,6 +66,7 @@ The Dashboard module follows the 4-layer clean architecture pattern:
   - `ChurchesOverviewDTO` - Church summaries
 
 ### Validation Schemas
+
 - **`src/lib/api/request-schemas.ts`** - Zod validation schemas added
   - `dashboardKpisQuerySchema`
   - `membershipGrowthQuerySchema`
@@ -77,11 +81,13 @@ Get key performance indicators for the dashboard.
 **Authentication**: Required (Bearer token)
 
 **Query Parameters**:
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| churchId | UUID (optional) | - | Filter KPIs for specific church |
+
+| Parameter | Type            | Default | Description                     |
+| --------- | --------------- | ------- | ------------------------------- |
+| churchId  | UUID (optional) | -       | Filter KPIs for specific church |
 
 **Response (200 OK)**:
+
 ```json
 {
   "status": "success",
@@ -92,7 +98,7 @@ Get key performance indicators for the dashboard.
     "visitors": 35,
     "churches": 1,
     "newLast30": 15,
-    "totalOfferingsMtd": 5000.00,
+    "totalOfferingsMtd": 5000.0,
     "offeringsDeltaPct": 12.5
   },
   "meta": {
@@ -103,6 +109,7 @@ Get key performance indicators for the dashboard.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `422 Unprocessable Entity` - Invalid query parameters
 - `500 Internal Server Error` - Server error
@@ -128,12 +135,14 @@ Get cumulative membership growth data for chart display.
 **Authentication**: Required (Bearer token)
 
 **Query Parameters**:
-| Parameter | Type | Default | Min/Max | Description |
-|-----------|------|---------|---------|-------------|
-| churchId | UUID (optional) | - | - | Filter growth data for specific church |
-| months | number | 6 | 3-24 | Number of months to retrieve |
+
+| Parameter | Type            | Default | Min/Max | Description                            |
+| --------- | --------------- | ------- | ------- | -------------------------------------- |
+| churchId  | UUID (optional) | -       | -       | Filter growth data for specific church |
+| months    | number          | 6       | 3-24    | Number of months to retrieve           |
 
 **Response (200 OK)**:
+
 ```json
 {
   "status": "success",
@@ -178,6 +187,7 @@ Get cumulative membership growth data for chart display.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `422 Unprocessable Entity` - Invalid query parameters (months < 3 or > 24)
 - `500 Internal Server Error` - Server error
@@ -207,12 +217,14 @@ Get recent activity feed for the dashboard.
 **Authentication**: Required (Bearer token)
 
 **Query Parameters**:
-| Parameter | Type | Default | Min/Max | Description |
-|-----------|------|---------|---------|-------------|
-| churchId | UUID (optional) | - | - | Filter activities for specific church |
-| limit | number | 10 | 1-50 | Number of activities to retrieve |
+
+| Parameter | Type            | Default | Min/Max | Description                           |
+| --------- | --------------- | ------- | ------- | ------------------------------------- |
+| churchId  | UUID (optional) | -       | -       | Filter activities for specific church |
+| limit     | number          | 10      | 1-50    | Number of activities to retrieve      |
 
 **Response (200 OK)**:
+
 ```json
 {
   "status": "success",
@@ -266,6 +278,7 @@ Get recent activity feed for the dashboard.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `422 Unprocessable Entity` - Invalid query parameters (limit < 1 or > 50)
 - `500 Internal Server Error` - Server error
@@ -297,6 +310,7 @@ Get overview of all churches with member counts.
 **Query Parameters**: None
 
 **Response (200 OK)**:
+
 ```json
 {
   "status": "success",
@@ -332,6 +346,7 @@ Get overview of all churches with member counts.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `500 Internal Server Error` - Server error
 
@@ -372,12 +387,12 @@ All endpoints follow a consistent error response format:
 
 ### Common Error Codes
 
-| Code | Status | Meaning |
-|------|--------|---------|
-| ValidationError | 422 | Request validation failed |
-| Unauthorized | 401 | Authentication required |
-| ServerError | 500 | Supabase query failed |
-| InternalServerError | 500 | Unexpected server error |
+| Code                | Status | Meaning                   |
+| ------------------- | ------ | ------------------------- |
+| ValidationError     | 422    | Request validation failed |
+| Unauthorized        | 401    | Authentication required   |
+| ServerError         | 500    | Supabase query failed     |
+| InternalServerError | 500    | Unexpected server error   |
 
 ---
 

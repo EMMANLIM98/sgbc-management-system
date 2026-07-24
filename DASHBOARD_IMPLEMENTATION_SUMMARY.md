@@ -7,24 +7,29 @@
 ## 📋 What Was Implemented
 
 ### 1. **DashboardService** (`src/lib/services/dashboard.service.ts`)
+
 Service layer for all dashboard data aggregation and business logic.
 
 **Methods**:
+
 - `getKpis(churchId?)` - KPI aggregation (total/active members, visitors, churches, growth, offerings)
 - `getMembershipGrowth(months, churchId?)` - Cumulative membership growth over time
 - `getRecentActivities(limit, churchId?)` - Activity feed with actor/church details
 - `getChurchesOverview()` - All churches with member counts
 
 **Features**:
+
 - ✅ Filters by church when churchId provided
 - ✅ Comprehensive error handling
 - ✅ Validation of input parameters (3-24 months, 1-50 limit)
 - ✅ Efficient data aggregation using Supabase queries
 
 ### 2. **Dashboard DTOs** (`src/lib/api/dto/dashboard.dto.ts`)
+
 Data transfer objects for API responses with proper field mapping.
 
 **DTOs Created**:
+
 - `KpiDTO` - Dashboard KPI metrics
 - `MembershipGrowthDTO` - Growth chart data points
 - `ActivityEntryDTO` - Individual activity entries
@@ -33,6 +38,7 @@ Data transfer objects for API responses with proper field mapping.
 - `ChurchesOverviewDTO` - Array of churches
 
 **Mappers**:
+
 - `toKpiDTO()` - Map service data to DTO
 - `toMembershipGrowthDTO()` - Map growth points to DTO
 - `toActivityEntryDTO()` - Map activity to DTO
@@ -43,6 +49,7 @@ Data transfer objects for API responses with proper field mapping.
 ### 3. **RESTful API Endpoints** (4 new endpoints)
 
 #### Endpoint 1: `GET /api/v1/dashboard/kpis`
+
 - Get dashboard KPIs
 - Query: `churchId` (optional)
 - Response: KPI metrics (total members, active, visitors, churches, new_last_30, offerings)
@@ -50,6 +57,7 @@ Data transfer objects for API responses with proper field mapping.
 - Status: 200 OK, 401 Unauthorized, 422 Invalid params, 500 Server error
 
 #### Endpoint 2: `GET /api/v1/dashboard/membership-growth`
+
 - Get cumulative membership growth chart data
 - Query: `churchId` (optional), `months` (3-24, default 6)
 - Response: Array of growth points with label, date, cumulative count
@@ -57,6 +65,7 @@ Data transfer objects for API responses with proper field mapping.
 - Status: 200 OK, 401 Unauthorized, 422 Invalid params, 500 Server error
 
 #### Endpoint 3: `GET /api/v1/dashboard/activities`
+
 - Get recent activity feed
 - Query: `churchId` (optional), `limit` (1-50, default 10)
 - Response: Array of activities with actor, subject, metadata, timestamp
@@ -64,6 +73,7 @@ Data transfer objects for API responses with proper field mapping.
 - Status: 200 OK, 401 Unauthorized, 422 Invalid params, 500 Server error
 
 #### Endpoint 4: `GET /api/v1/dashboard/churches`
+
 - Get churches overview with member counts
 - Query: None
 - Response: Array of churches with id, name, city, photoUrl, members
@@ -71,13 +81,17 @@ Data transfer objects for API responses with proper field mapping.
 - Status: 200 OK, 401 Unauthorized, 500 Server error
 
 ### 4. **Validation Schemas** (updated `request-schemas.ts`)
+
 Added Zod schemas for dashboard query validation:
+
 - `dashboardKpisQuerySchema` - KPIs query validation
 - `membershipGrowthQuerySchema` - Growth query validation
 - `recentActivitiesQuerySchema` - Activities query validation
 
 ### 5. **Documentation** (`docs/DASHBOARD_API_IMPLEMENTATION.md`)
+
 Comprehensive guide with:
+
 - Architecture diagram (4-layer clean architecture)
 - Detailed endpoint specifications
 - Request/response examples with JSON
@@ -90,6 +104,7 @@ Comprehensive guide with:
 ## 📁 Files Created/Modified
 
 ### Created:
+
 ```
 ✅ src/lib/services/dashboard.service.ts (200 lines)
 ✅ src/lib/api/dto/dashboard.dto.ts (260 lines)
@@ -101,6 +116,7 @@ Comprehensive guide with:
 ```
 
 ### Modified:
+
 ```
 ✅ src/lib/services/index.ts (export DashboardService)
 ✅ src/lib/api/request-schemas.ts (added 3 schemas + types)
@@ -118,6 +134,7 @@ Layer 4 (Database)     → PostgreSQL tables
 ```
 
 ### Data Flow Example (KPIs)
+
 ```
 GET /api/v1/dashboard/kpis
     ↓ (API Handler)
@@ -135,6 +152,7 @@ ApiResponse.success(dto)
 ## ✨ Features Implemented
 
 ### Data Aggregation
+
 - ✅ Total members count (all statuses)
 - ✅ Active members count (member/regular status)
 - ✅ Visitors count (visitor status)
@@ -144,12 +162,14 @@ ApiResponse.success(dto)
 - ✅ Activity feed with actor information
 
 ### Filtering & Pagination
+
 - ✅ Church-specific KPIs and activities (by churchId)
 - ✅ Customizable time periods (3-24 months)
 - ✅ Activity limit (1-50, default 10)
 - ✅ Efficient aggregation queries
 
 ### Error Handling
+
 - ✅ 401 Unauthorized - Authentication required
 - ✅ 422 Unprocessable Entity - Invalid parameters
 - ✅ 500 Internal Server Error - Query failures
@@ -157,6 +177,7 @@ ApiResponse.success(dto)
 - ✅ Zod schema validation for all queries
 
 ### API Compliance
+
 - ✅ RESTful resource naming
 - ✅ Proper HTTP status codes
 - ✅ Consistent response format (ApiResponse)
@@ -186,6 +207,7 @@ curl -X GET "http://localhost:3000/api/v1/dashboard/churches" \
 ```
 
 ### Test Scenarios
+
 - ✅ Global KPIs (no churchId)
 - ✅ Church-specific KPIs (with churchId)
 - ✅ Invalid churchId format (422)
@@ -197,6 +219,7 @@ curl -X GET "http://localhost:3000/api/v1/dashboard/churches" \
 ## 📊 Statistics
 
 ### Code Metrics
+
 - **Total Lines of Code**: 1,120+
 - **Files Created**: 7
 - **Files Modified**: 2
@@ -207,6 +230,7 @@ curl -X GET "http://localhost:3000/api/v1/dashboard/churches" \
 - **Documentation**: 400+ lines
 
 ### Endpoint Coverage
+
 - KPIs aggregation: ✅
 - Growth charting: ✅
 - Activity feeds: ✅
@@ -215,6 +239,7 @@ curl -X GET "http://localhost:3000/api/v1/dashboard/churches" \
 ## 🔄 Service Integration
 
 The DashboardService integrates with:
+
 - ✅ Supabase client for member/church/activity queries
 - ✅ Authentication context for user verification
 - ✅ ApiResponse builder for consistent responses
@@ -224,6 +249,7 @@ The DashboardService integrates with:
 ## 🚀 Next Steps
 
 ### Phase 6 Options (Priority Order)
+
 1. **Refactor Remaining 37 Endpoints** (from Phase 3 pattern)
    - Use DashboardService as reference
    - Apply 4-layer pattern to all endpoints
@@ -265,6 +291,7 @@ The DashboardService integrates with:
 ## 📝 Conclusion
 
 The Dashboard module is now fully implemented with:
+
 - ✅ 4 production-ready API endpoints
 - ✅ Clean service layer architecture
 - ✅ Proper data aggregation and filtering

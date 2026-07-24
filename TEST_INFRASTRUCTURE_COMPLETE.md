@@ -9,6 +9,7 @@ This session establishes a complete, production-ready testing infrastructure for
 ### 1. **Test Configuration Files**
 
 #### `vitest.config.ts` ✅
+
 - Vitest framework configuration
 - Coverage settings: 80% lines/functions, 75% branches, 80% statements
 - jsdom environment for browser-like testing
@@ -16,6 +17,7 @@ This session establishes a complete, production-ready testing infrastructure for
 - Path aliases configured (@/ → src/)
 
 #### `vitest.setup.ts` ✅
+
 - Global test setup
 - Environment variables for Supabase mock (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
 - Custom matcher: `toBeValidUUID()` for UUID validation
@@ -25,6 +27,7 @@ This session establishes a complete, production-ready testing infrastructure for
 ### 2. **Test Utilities** (`src/lib/test-utils.ts`)
 
 **Mock Repository Builders** (all 6 repositories):
+
 - `createMockMemberRepository()` → All 17 member methods mocked
 - `createMockOrganizationRepository()` → All 14 org methods mocked
 - `createMockContributionRepository()` → All 13 contribution methods mocked
@@ -33,6 +36,7 @@ This session establishes a complete, production-ready testing infrastructure for
 - `createMockExpenseRepository()` → All 13 expense methods mocked
 
 **Mock DTO Builders** (realistic test data):
+
 - `createMockOrganization(overrides?)` → Pre-configured org data
 - `createMockMember(overrides?)` → Pre-configured member data
 - `createMockEvent(overrides?)` → Pre-configured event data
@@ -41,6 +45,7 @@ This session establishes a complete, production-ready testing infrastructure for
 - `createMockExpense(overrides?)` → Pre-configured expense data
 
 **Pre-configured Test Data**:
+
 ```typescript
 mockDTOs = {
   organization: { id: 'org-123', name: 'Test Organization', ... },
@@ -53,6 +58,7 @@ mockDTOs = {
 ### 3. **Example Test Suites** (Complete and Ready to Copy)
 
 #### `src/lib/services/organization.service.test.ts` ✅
+
 - **18 comprehensive tests** covering:
   - Listing organizations (pagination, filtering, sorting)
   - Getting organization by ID
@@ -67,6 +73,7 @@ mockDTOs = {
 - Fully commented and production-ready
 
 #### `src/lib/services/member.service.test.ts` ✅
+
 - **15 comprehensive tests** covering:
   - Listing members (pagination, filtering)
   - Getting member by ID
@@ -81,6 +88,7 @@ mockDTOs = {
 - Ready to use as template
 
 #### `docs/TEST_EXAMPLES.test.ts` ✅ (COMPREHENSIVE REFERENCE)
+
 - **30+ test examples** in a single file
 - Shows EVERY testing pattern:
   - ✅ Success cases (happy path)
@@ -96,6 +104,7 @@ mockDTOs = {
 ### 4. **Documentation** (Complete Guides)
 
 #### `docs/SERVICE_TESTING_GUIDE.md` ✅
+
 - **300+ lines** of comprehensive testing documentation
 - Sections:
   - Why test services
@@ -111,6 +120,7 @@ mockDTOs = {
   - Resources and links
 
 #### `TEST_INFRASTRUCTURE_SETUP.md` ✅
+
 - **Complete setup guide** with:
   - What was created (overview of all files)
   - Quick start instructions
@@ -126,6 +136,7 @@ mockDTOs = {
 ### 5. **Package.json Updates**
 
 **Test Scripts Added**:
+
 ```json
 "scripts": {
   "test": "vitest run",              // Run all tests once
@@ -136,6 +147,7 @@ mockDTOs = {
 ```
 
 **Dependencies Added**:
+
 ```json
 "vitest": "^2.1.0",                  // Test runner
 "@vitest/ui": "^2.1.0",             // Interactive UI for tests
@@ -149,11 +161,13 @@ mockDTOs = {
 ## 🚀 Quick Start Guide
 
 ### Step 1: Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### Step 2: Run Tests
+
 ```bash
 # Run all tests
 npm run test
@@ -169,11 +183,14 @@ npm run test:ui
 ```
 
 ### Step 3: Verify Setup Works
+
 Test files are already in place:
+
 - ✅ `src/lib/services/organization.service.test.ts` (18 tests)
 - ✅ `src/lib/services/member.service.test.ts` (15 tests)
 
 Run them:
+
 ```bash
 npm run test src/lib/services/organization.service.test.ts
 ```
@@ -225,15 +242,16 @@ Expected output: Tests pass with no errors
 ## 📚 Testing Pattern Reference
 
 ### Pattern 1: Basic Success Test
+
 ```typescript
-it('should create new organization', async () => {
+it("should create new organization", async () => {
   // Arrange - Setup test data
-  const newOrg = { name: 'Church', description: 'A church' };
+  const newOrg = { name: "Church", description: "A church" };
   const created = createMockOrganization(newOrg);
   mockOrgRepo.create.mockResolvedValue(created);
 
   // Act - Execute service method
-  const result = await service.createOrganization(newOrg, 'creator-id');
+  const result = await service.createOrganization(newOrg, "creator-id");
 
   // Assert - Verify result
   expect(result).toEqual(created);
@@ -241,42 +259,43 @@ it('should create new organization', async () => {
 ```
 
 ### Pattern 2: Error Case Test
+
 ```typescript
-it('should throw error if organization not found', async () => {
+it("should throw error if organization not found", async () => {
   // Arrange
   mockOrgRepo.findById.mockResolvedValue(null);
 
   // Act & Assert
-  await expect(
-    service.getOrganizationById('org-999')
-  ).rejects.toThrow('Organization not found');
+  await expect(service.getOrganizationById("org-999")).rejects.toThrow("Organization not found");
 });
 ```
 
 ### Pattern 3: Business Rule Test
+
 ```typescript
-it('should prevent removing last owner', async () => {
+it("should prevent removing last owner", async () => {
   // Arrange
-  const lastOwner = createMockMember({ id: 'user-1', is_owner: true });
+  const lastOwner = createMockMember({ id: "user-1", is_owner: true });
   mockMemberRepo.findByOrganizationId.mockResolvedValue([lastOwner]);
 
   // Act & Assert
-  await expect(
-    service.assignUserRole('org-123', 'user-1', 'member')
-  ).rejects.toThrow('Cannot remove the only owner');
+  await expect(service.assignUserRole("org-123", "user-1", "member")).rejects.toThrow(
+    "Cannot remove the only owner",
+  );
 });
 ```
 
 ### Pattern 4: Mock Verification
+
 ```typescript
-it('should call repositories in correct order', async () => {
+it("should call repositories in correct order", async () => {
   // Setup...
 
   // Execute
   await service.method();
 
   // Assert - Verify calls
-  expect(mockOrgRepo.findById).toHaveBeenCalledWith('org-123');
+  expect(mockOrgRepo.findById).toHaveBeenCalledWith("org-123");
   expect(mockMemberRepo.update).toHaveBeenCalled();
   expect(mockMemberRepo.update).toHaveBeenCalledTimes(1);
 });
@@ -289,14 +308,11 @@ it('should call repositories in correct order', async () => {
 ### Quick Template (Copy & Adapt)
 
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { YourService } from '@/lib/services/your.service';
-import {
-  createMockYourRepository,
-  createMockYourDto,
-} from '@/lib/test-utils';
+import { describe, it, expect, beforeEach } from "vitest";
+import { YourService } from "@/lib/services/your.service";
+import { createMockYourRepository, createMockYourDto } from "@/lib/test-utils";
 
-describe('YourService', () => {
+describe("YourService", () => {
   let service: YourService;
   let mockRepo: any;
 
@@ -305,27 +321,25 @@ describe('YourService', () => {
     service = new YourService(mockRepo);
   });
 
-  describe('methodName', () => {
-    it('should do something', async () => {
+  describe("methodName", () => {
+    it("should do something", async () => {
       // Arrange
       const mockData = createMockYourDto();
       mockRepo.someMethod.mockResolvedValue(mockData);
 
       // Act
-      const result = await service.methodName('param');
+      const result = await service.methodName("param");
 
       // Assert
       expect(result).toEqual(mockData);
     });
 
-    it('should throw error when precondition fails', async () => {
+    it("should throw error when precondition fails", async () => {
       // Arrange
       mockRepo.someMethod.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(
-        service.methodName('param')
-      ).rejects.toThrow('Expected error message');
+      await expect(service.methodName("param")).rejects.toThrow("Expected error message");
     });
   });
 });
@@ -336,17 +350,20 @@ describe('YourService', () => {
 ## 📊 Coverage Goals
 
 **Target Coverage** (per service):
+
 - Lines: **80%+**
 - Functions: **80%+**
 - Branches: **75%+**
 - Statements: **80%+**
 
 **View Coverage Report**:
+
 ```bash
 npm run test:coverage
 ```
 
 Opens `test-results/index.html` in browser showing:
+
 - Line-by-line coverage
 - Uncovered code highlighting
 - Branch coverage details
@@ -400,10 +417,13 @@ Before committing, verify:
 ## 🔍 Troubleshooting
 
 ### Problem: Tests not found
+
 **Solution**: Ensure test files end with `.test.ts` or `.spec.ts`
 
 ### Problem: Mock not working
+
 **Solution**: Set up mock BEFORE calling service
+
 ```typescript
 // ✅ CORRECT
 mockRepo.findById.mockResolvedValue(data);
@@ -415,10 +435,13 @@ mockRepo.findById.mockResolvedValue(data);
 ```
 
 ### Problem: Import errors with @/ paths
+
 **Solution**: Verify tsconfig.json has path aliases configured
 
 ### Problem: Timeout errors
+
 **Solution**: Increase timeout in vitest.config.ts
+
 ```typescript
 test: {
   testTimeout: 10000, // 10 seconds
@@ -426,6 +449,7 @@ test: {
 ```
 
 ### Problem: Dependencies not installed
+
 **Solution**: Run `npm install` after pulling new changes
 
 ---
@@ -467,23 +491,27 @@ project-root/
 ## 🎓 Next Steps
 
 ### Immediate (Required)
+
 1. Run `npm install` to install dependencies
 2. Verify setup: `npm run test`
 3. Check coverage: `npm run test:coverage`
 
 ### Short Term (Recommended)
+
 1. Write tests for remaining 4 services (EventService, ContributionService, PledgeService, ExpenseService)
 2. Use the provided templates and patterns
 3. Target 80% coverage per service
 4. Update service implementations if tests reveal issues
 
 ### Medium Term (Enhancement)
+
 1. Add integration tests for endpoints
 2. Set up pre-commit hooks to run tests
 3. Add GitHub Actions CI/CD workflow
 4. Track coverage trends over time
 
 ### Long Term (Optimization)
+
 1. Refactor endpoint routes using service layer (Phase 3 pattern)
 2. Add E2E tests with real database
 3. Performance testing for critical paths
@@ -505,29 +533,34 @@ All documentation is available in the repo:
 ## ✨ Key Achievements
 
 ✅ **Complete Test Infrastructure**
+
 - Vitest configured and ready
 - Mock utilities for all 6 repositories
 - Test data builders for all DTOs
 - Global test setup with custom matchers
 
 ✅ **Example Test Suites**
+
 - 33 tests across 2 services (OrganizationService, MemberService)
 - 30+ comprehensive test examples in one file
 - All patterns documented and ready to copy
 
 ✅ **Comprehensive Documentation**
+
 - Service testing guide (300+ lines)
 - Test examples with detailed comments
 - Infrastructure setup walkthrough
 - Best practices and troubleshooting
 
 ✅ **NPM Scripts Ready**
+
 - `npm run test` - Run all tests
 - `npm run test:watch` - Watch mode
 - `npm run test:coverage` - Coverage report
 - `npm run test:ui` - Interactive UI
 
 ✅ **Production Ready**
+
 - Zero dependencies on external services (all mocked)
 - Fast test execution (no database calls)
 - Comprehensive error handling
@@ -550,6 +583,7 @@ Happy testing! 🎉
 ---
 
 **Questions? Refer to:**
+
 - [SERVICE_TESTING_GUIDE.md](docs/SERVICE_TESTING_GUIDE.md) for detailed patterns
 - [TEST_EXAMPLES.test.ts](docs/TEST_EXAMPLES.test.ts) for code examples
 - [Vitest Documentation](https://vitest.dev/) for framework specifics
