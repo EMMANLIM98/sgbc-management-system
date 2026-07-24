@@ -27,6 +27,7 @@ export type {
 export * from "./dto/events.dto";
 export * from "./dto/finance.dto";
 export * from "./dto/membership.dto";
+export * from "./dto/tenancy.dto";
 
 export type {
   EventDTO,
@@ -40,5 +41,9 @@ export type {
   ExpenseDTO,
   MemberDTO,
   MemberDetailDTO,
-  FamilyLinkDTO
+  FamilyLinkDTO,
+  OrganizationDTO,
+  OrganizationDetailDTO,
+  OrganizationMemberDTO,
+  OrganizationStatisticsDTO
 } from "./dto/events.dto";

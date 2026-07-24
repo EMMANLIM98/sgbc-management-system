@@ -160,6 +160,41 @@ export type UpdateMemberRequest = z.infer<typeof updateMemberSchema>;
 export type MemberSearchQuery = z.infer<typeof memberSearchQuerySchema>;
 
 /**
+ * Tenancy API Schemas
+ */
+export const organizationListQuerySchema = paginationQuerySchema.extend({
+  status: z.enum(["active", "inactive"]).optional(),
+  sortBy: z.enum(["name", "createdAt", "memberCount"]).default("name")
+});
+
+export const createOrganizationSchema = z.object({
+  name: z.string().min(2, "Organization name must be at least 2 characters").max(100),
+  description: z.string().max(500).optional()
+});
+
+export const updateOrganizationSchema = createOrganizationSchema.partial();
+
+export const inviteMemberSchema = z.object({
+  email: z.string().email("Valid email is required"),
+  role: z.enum(["admin", "member"]).default("member")
+});
+
+export const assignRoleSchema = z.object({
+  role: z.enum(["owner", "admin", "member"])
+});
+
+export const organizationMembersQuerySchema = paginationQuerySchema.extend({
+  role: z.enum(["owner", "admin", "member"]).optional(),
+  sortBy: z.enum(["name", "joinedAt"]).default("name")
+});
+
+export type OrganizationListQuery = z.infer<typeof organizationListQuerySchema>;
+export type CreateOrganizationRequest = z.infer<typeof createOrganizationSchema>;
+export type UpdateOrganizationRequest = z.infer<typeof updateOrganizationSchema>;
+export type InviteMemberRequest = z.infer<typeof inviteMemberSchema>;
+export type AssignRoleRequest = z.infer<typeof assignRoleSchema>;
+
+/**
  * Validation Error Extractor
  *
  * Converts Zod validation errors to API error details
