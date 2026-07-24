@@ -17,21 +17,24 @@ Complete REST API for event management with full CRUD operations, attendee manag
 ### 1. List Events
 
 **Request:**
+
 ```
 GET /api/v1/organizations/:orgId/events
 ```
 
 **Query Parameters:**
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| page | number | No | 1 | Page number (min: 1) |
-| pageSize | number | No | 20 | Items per page (1-100) |
-| status | enum | No | - | Filter by status: `scheduled`, `active`, `completed`, `cancelled` |
-| futureOnly | boolean | No | true | Filter to future events only |
-| sortBy | string | No | eventDate | Sort field: `eventDate`, `title`, `createdAt` |
-| order | string | No | asc | Sort order: `asc`, `desc` |
+
+| Parameter  | Type    | Required | Default   | Description                                                       |
+| ---------- | ------- | -------- | --------- | ----------------------------------------------------------------- |
+| page       | number  | No       | 1         | Page number (min: 1)                                              |
+| pageSize   | number  | No       | 20        | Items per page (1-100)                                            |
+| status     | enum    | No       | -         | Filter by status: `scheduled`, `active`, `completed`, `cancelled` |
+| futureOnly | boolean | No       | true      | Filter to future events only                                      |
+| sortBy     | string  | No       | eventDate | Sort field: `eventDate`, `title`, `createdAt`                     |
+| order      | string  | No       | asc       | Sort order: `asc`, `desc`                                         |
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -72,6 +75,7 @@ GET /api/v1/organizations/:orgId/events
 ```
 
 **Status Codes:**
+
 - `200 OK` - Success
 - `400 Bad Request` - Invalid organization ID
 - `401 Unauthorized` - Authentication required
@@ -83,17 +87,20 @@ GET /api/v1/organizations/:orgId/events
 ### 2. Create Event
 
 **Request:**
+
 ```
 POST /api/v1/organizations/:orgId/events
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "churchId": "uuid",
@@ -109,19 +116,21 @@ Content-Type: application/json
 ```
 
 **Field Validation:**
-| Field | Type | Required | Constraints |
-|-------|------|----------|-------------|
-| churchId | UUID | Yes | Must be valid UUID |
-| title | string | Yes | 1-200 characters |
-| description | string | No | Max 2000 characters |
-| eventDate | ISO 8601 | Yes | Valid datetime |
-| startTime | string | No | HH:MM format |
-| endTime | string | No | HH:MM format |
-| location | string | No | Max 500 characters |
-| maxCapacity | number | No | Positive integer |
-| allowMultipleCheckins | boolean | No | Default: false |
+
+| Field                 | Type     | Required | Constraints         |
+| --------------------- | -------- | -------- | ------------------- |
+| churchId              | UUID     | Yes      | Must be valid UUID  |
+| title                 | string   | Yes      | 1-200 characters    |
+| description           | string   | No       | Max 2000 characters |
+| eventDate             | ISO 8601 | Yes      | Valid datetime      |
+| startTime             | string   | No       | HH:MM format        |
+| endTime               | string   | No       | HH:MM format        |
+| location              | string   | No       | Max 500 characters  |
+| maxCapacity           | number   | No       | Positive integer    |
+| allowMultipleCheckins | boolean  | No       | Default: false      |
 
 **Response (201 Created):**
+
 ```json
 {
   "status": "created",
@@ -151,11 +160,13 @@ Content-Type: application/json
 ```
 
 **Headers in Response:**
+
 ```
 Location: /api/v1/organizations/:orgId/events/:eventId
 ```
 
 **Status Codes:**
+
 - `201 Created` - Event created successfully
 - `400 Bad Request` - Missing organization ID
 - `401 Unauthorized` - Authentication required
@@ -168,16 +179,19 @@ Location: /api/v1/organizations/:orgId/events/:eventId
 ### 3. Get Event Details
 
 **Request:**
+
 ```
 GET /api/v1/organizations/:orgId/events/:eventId
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -228,6 +242,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200 OK` - Success
 - `400 Bad Request` - Invalid IDs
 - `401 Unauthorized` - Authentication required
@@ -240,17 +255,20 @@ Authorization: Bearer <token>
 ### 4. Update Event
 
 **Request:**
+
 ```
 PATCH /api/v1/organizations/:orgId/events/:eventId
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 Content-Type: application/json
 ```
 
 **Request Body (All fields optional):**
+
 ```json
 {
   "title": "Updated Title",
@@ -266,6 +284,7 @@ Content-Type: application/json
 ```
 
 **Status Update Values:**
+
 - `draft` - Draft status
 - `scheduled` - Scheduled for future
 - `active` - Currently ongoing
@@ -273,6 +292,7 @@ Content-Type: application/json
 - `cancelled` - Cancelled
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "success",
@@ -302,6 +322,7 @@ Content-Type: application/json
 ```
 
 **Status Codes:**
+
 - `200 OK` - Updated successfully
 - `400 Bad Request` - Invalid IDs
 - `401 Unauthorized` - Authentication required
@@ -315,21 +336,25 @@ Content-Type: application/json
 ### 5. Delete Event
 
 **Request:**
+
 ```
 DELETE /api/v1/organizations/:orgId/events/:eventId
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```
 204 No Content
 ```
 
 **Status Codes:**
+
 - `204 No Content` - Deleted successfully
 - `400 Bad Request` - Invalid IDs
 - `401 Unauthorized` - Authentication required
@@ -342,20 +367,23 @@ Authorization: Bearer <token>
 ### 6. List Event Attendees
 
 **Request:**
+
 ```
 GET /api/v1/organizations/:orgId/events/:eventId/attendees
 ```
 
 **Query Parameters:**
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| page | number | No | 1 | Page number (min: 1) |
-| pageSize | number | No | 20 | Items per page (1-100) |
-| status | enum | No | - | Filter by status: `registered`, `checked_in`, `no_show`, `cancelled` |
-| sortBy | string | No | registeredAt | Sort field |
-| order | string | No | desc | Sort order: `asc`, `desc` |
+
+| Parameter | Type   | Required | Default      | Description                                                          |
+| --------- | ------ | -------- | ------------ | -------------------------------------------------------------------- |
+| page      | number | No       | 1            | Page number (min: 1)                                                 |
+| pageSize  | number | No       | 20           | Items per page (1-100)                                               |
+| status    | enum   | No       | -            | Filter by status: `registered`, `checked_in`, `no_show`, `cancelled` |
+| sortBy    | string | No       | registeredAt | Sort field                                                           |
+| order     | string | No       | desc         | Sort order: `asc`, `desc`                                            |
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -397,6 +425,7 @@ GET /api/v1/organizations/:orgId/events/:eventId/attendees
 ```
 
 **Status Codes:**
+
 - `200 OK` - Success
 - `400 Bad Request` - Invalid IDs
 - `401 Unauthorized` - Authentication required
@@ -410,16 +439,19 @@ GET /api/v1/organizations/:orgId/events/:eventId/attendees
 ### 7. Get Event Statistics
 
 **Request:**
+
 ```
 GET /api/v1/organizations/:orgId/events/:eventId/statistics
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -499,6 +531,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200 OK` - Success
 - `400 Bad Request` - Invalid IDs
 - `401 Unauthorized` - Authentication required
@@ -530,15 +563,15 @@ All error responses follow this format:
 
 ### Common Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| INVALID_REQUEST | 400 | Invalid request format |
-| UNAUTHORIZED | 401 | Authentication required |
-| FORBIDDEN | 403 | Access denied |
-| NOT_FOUND | 404 | Resource not found |
-| VALIDATION_ERROR | 422 | Field validation failed |
-| CONFLICT | 409 | Invalid state or duplicate |
-| SERVER_ERROR | 500 | Internal server error |
+| Code             | HTTP Status | Description                |
+| ---------------- | ----------- | -------------------------- |
+| INVALID_REQUEST  | 400         | Invalid request format     |
+| UNAUTHORIZED     | 401         | Authentication required    |
+| FORBIDDEN        | 403         | Access denied              |
+| NOT_FOUND        | 404         | Resource not found         |
+| VALIDATION_ERROR | 422         | Field validation failed    |
+| CONFLICT         | 409         | Invalid state or duplicate |
+| SERVER_ERROR     | 500         | Internal server error      |
 
 ---
 
@@ -568,12 +601,14 @@ List endpoints support pagination with the following parameters:
 ```
 
 **Default values:**
+
 - `page`: 1
 - `pageSize`: 20
 - `sortBy`: depends on endpoint
 - `order`: asc
 
 **Constraints:**
+
 - Minimum pageSize: 1
 - Maximum pageSize: 100
 
@@ -582,12 +617,14 @@ List endpoints support pagination with the following parameters:
 ## Example Usage
 
 ### List all upcoming events
+
 ```bash
 curl -H "Authorization: Bearer <token>" \
   "https://api.example.com/api/v1/organizations/org-id/events?futureOnly=true&pageSize=10"
 ```
 
 ### Create a new event
+
 ```bash
 curl -X POST \
   -H "Authorization: Bearer <token>" \
@@ -602,6 +639,7 @@ curl -X POST \
 ```
 
 ### Get event statistics
+
 ```bash
 curl -H "Authorization: Bearer <token>" \
   "https://api.example.com/api/v1/organizations/org-id/events/event-id/statistics"
