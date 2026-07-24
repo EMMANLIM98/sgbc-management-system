@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AlertCircle, X, CheckCircle, Zap } from "lucide-react";
+import { AlertCircle, X, CheckCircle, Zap, ZoomIn, ZoomOut } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export interface QRScannerProps {
@@ -27,8 +27,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
     null,
   );
   const [torchActive, setTorchActive] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [maxZoom, setMaxZoom] = useState(3);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const lastScannedRef = useRef<string>("");
   const onScanRef = useRef(onScan);
 
@@ -90,10 +94,21 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           });
 
           console.log("✓ Camera stream obtained successfully");
+          streamRef.current = stream;
 
           if (!isComponentMounted) {
             stream.getTracks().forEach((track) => track.stop());
             return;
+          }
+
+          // Check camera capabilities for max zoom
+          const videoTrack = stream.getVideoTracks()[0];
+          if (videoTrack && "getCapabilities" in videoTrack) {
+            const capabilities = (videoTrack as any).getCapabilities();
+            if (capabilities.zoom) {
+              setMaxZoom(Math.min(capabilities.zoom.max || 3, 5));
+              console.log(`Max zoom capability: ${capabilities.zoom.max || 3}x`);
+            }
           }
 
           // Create video element
@@ -106,11 +121,13 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
             videoElement.style.width = "100%";
             videoElement.style.height = "100%";
             videoElement.style.objectFit = "cover";
+            videoElement.style.transition = "transform 0.2s ease-out";
             container.innerHTML = "";
             container.appendChild(videoElement);
             console.log("Created video element");
           }
 
+          videoRef.current = videoElement;
           videoElement.srcObject = stream;
 
           // Wait for video to be ready
@@ -276,6 +293,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         }
         scannerRef.current = null;
       }
+      // Stop media stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+      videoRef.current = null;
     };
   }, [scanState, eventId]);
 
@@ -296,6 +319,41 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
         // Torch not supported on this device
         console.debug("Torch not supported on this device");
       }
+    }
+  };
+
+  const adjustZoom = async (direction: "in" | "out") => {
+    const increment = 0.5;
+    const newZoom = direction === "in" ? zoom + increment : Math.max(1, zoom - increment);
+
+    if (newZoom > maxZoom) {
+      console.log(`Max zoom (${maxZoom}x) reached`);
+      return;
+    }
+
+    setZoom(newZoom);
+
+    // Apply zoom to camera if stream is available
+    if (streamRef.current) {
+      try {
+        const videoTrack = streamRef.current.getVideoTracks()[0];
+        if (videoTrack && "getCapabilities" in videoTrack && "applyConstraints" in videoTrack) {
+          const capabilities = (videoTrack as any).getCapabilities();
+          if (capabilities.zoom) {
+            await (videoTrack as any).applyConstraints({
+              advanced: [{ zoom: Math.min(newZoom, capabilities.zoom.max) }],
+            });
+            console.log(`Zoom set to ${newZoom}x`);
+          }
+        }
+      } catch (error) {
+        console.debug("Zoom adjustment not supported on this device:", error);
+      }
+    }
+
+    // Also scale the video element for visual feedback
+    if (videoRef.current) {
+      videoRef.current.style.transform = `scale(${newZoom})`;
     }
   };
 
@@ -329,7 +387,32 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
               ref={containerRef}
               style={{ aspectRatio: "1/1" }}
             />
-            <div className="flex gap-2">
+            <div className="w-full max-w-md flex gap-2">
+              <Button
+                onClick={() => adjustZoom("out")}
+                variant="outline"
+                size="sm"
+                disabled={zoom <= 1}
+                className="flex-1"
+              >
+                <ZoomOut className="w-4 h-4 mr-2" />
+                Zoom Out
+              </Button>
+              <div className="flex items-center justify-center px-3 py-2 bg-gray-100 rounded border border-gray-300 flex-1 text-sm font-medium">
+                {zoom.toFixed(1)}x
+              </div>
+              <Button
+                onClick={() => adjustZoom("in")}
+                variant="outline"
+                size="sm"
+                disabled={zoom >= maxZoom}
+                className="flex-1"
+              >
+                <ZoomIn className="w-4 h-4 mr-2" />
+                Zoom In
+              </Button>
+            </div>
+            <div className="flex gap-2 w-full max-w-md">
               <Button onClick={toggleTorch} variant="outline" size="sm" className="flex-1">
                 <Zap className="w-4 h-4 mr-2" />
                 {torchActive ? "Flash Off" : "Flash On"}
