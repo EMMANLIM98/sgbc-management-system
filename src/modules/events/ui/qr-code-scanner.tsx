@@ -33,12 +33,20 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const lastScannedRef = useRef<string>("");
+  const lastScannedRef = useRef<{ code: string; time: number } | null>(null);
   const onScanRef = useRef(onScan);
 
   useEffect(() => {
     onScanRef.current = onScan;
   }, [onScan]);
+
+  // Check if QR code was recently scanned (within 2 seconds) to prevent accidental double-scans
+  const isRecentDuplicate = (code: string): boolean => {
+    const lastScanned = lastScannedRef.current;
+    if (!lastScanned) return false;
+    const timeSinceLastScan = Date.now() - lastScanned.time;
+    return lastScanned.code === code && timeSinceLastScan < 2000; // 2 second window
+  };
 
   // Camera permission and scanner management
   const handleStartScanning = () => {
@@ -151,8 +159,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
             { fps: 10, qrbox: 350 },
             (decodedText: string) => {
               console.log("QR code detected:", decodedText);
-              if (decodedText === lastScannedRef.current) return;
-              lastScannedRef.current = decodedText;
+              // Prevent accidental duplicate scans within 2 seconds
+              if (isRecentDuplicate(decodedText)) {
+                console.log("Duplicate scan prevented (same code within 2 seconds)");
+                return;
+              }
+              lastScannedRef.current = { code: decodedText, time: Date.now() };
 
               onScanRef
                 .current(decodedText)
@@ -213,8 +225,12 @@ export function QRCodeScanner({ onScan, isLoading = false, eventId }: QRScannerP
           await scanner.render(
             (decodedText: string) => {
               console.debug("QR code scanned:", decodedText);
-              if (decodedText === lastScannedRef.current) return;
-              lastScannedRef.current = decodedText;
+              // Prevent accidental duplicate scans within 2 seconds
+              if (isRecentDuplicate(decodedText)) {
+                console.log("Duplicate scan prevented (same code within 2 seconds)");
+                return;
+              }
+              lastScannedRef.current = { code: decodedText, time: Date.now() };
 
               onScanRef
                 .current(decodedText)
