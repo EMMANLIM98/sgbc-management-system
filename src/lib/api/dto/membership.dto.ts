@@ -155,6 +155,30 @@ export function toMemberSummaryDTO(member: Member): MemberSummaryDTO {
 }
 
 /**
+ * Convert Member entity to detail DTO with additional statistics
+ */
+export function toMemberDetailDTO(
+  member: Member,
+  stats?: {
+    totalContributions?: number;
+    pledges?: Array<{ id: string; amount: number; frequency: string; status: string }>;
+    eventAttendance?: number;
+    lastAttendanceDate?: string;
+    notes?: string;
+  }
+): MemberDetailDTO {
+  const baseDTO = toMemberDTO(member);
+  return {
+    ...baseDTO,
+    totalContributions: stats?.totalContributions || 0,
+    pledges: stats?.pledges || [],
+    eventAttendance: stats?.eventAttendance || 0,
+    lastAttendanceDate: stats?.lastAttendanceDate,
+    notes: stats?.notes,
+  };
+}
+
+/**
  * Convert Member list to DTOs
  */
 export function toMemberDTOs(members: Member[]): MemberDTO[] {
