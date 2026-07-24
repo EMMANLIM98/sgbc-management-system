@@ -5,6 +5,13 @@
  * Application Layer: Canvas management, state handling, user interactions
  * Presentation Layer: UI rendering, download/print buttons
  *
+ * Design Template: See assets/qr-code-examples/QR_CODE_TEMPLATE.md
+ * This component generates QR codes following SGBC design specifications:
+ * - 20% embedded SGBC logo (centered)
+ * - High error correction (30% recovery)
+ * - Black on white, square format
+ * - White quiet zone border
+ *
  * Usage:
  * <QRCodeCanvas
  *   value="https://example.com/register"
