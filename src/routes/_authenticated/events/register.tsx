@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { PageHeader } from "@/components/shell/page-header";
 import { EventRegistrationForm } from "@/modules/events/ui/event-registration-form";
-import { EventRegistrationQR } from "@/modules/events/ui/event-registration-qr";
+import { QRCodeDisplay } from "@/modules/events/ui/qr-code-display";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { listEvents } from "@/modules/events/events.functions";
@@ -74,11 +74,11 @@ function EventRegister() {
           description="Your QR code has been emailed to you"
         />
 
-        <EventRegistrationQR
-          qrToken={registered.qrToken}
-          registrationId={registered.id}
-          attendeeName={registered.attendeeName}
+        <QRCodeDisplay
+          token={registered.qrToken}
           eventName={selectedEvent?.title || "Event"}
+          attendeeName={registered.attendeeName}
+          registrationId={registered.id}
         />
 
         <div className="mt-6 text-center">
