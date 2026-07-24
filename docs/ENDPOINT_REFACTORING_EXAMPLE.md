@@ -80,14 +80,11 @@ export default defineEventHandler(async (event) => {
         joinedAt: "2026-02-01T10:00:00Z",
         updatedAt: new Date().toISOString(),
       },
-      200
+      200,
     );
   } catch (error) {
     console.error("Error assigning role:", error);
-    return ApiResponse.serverError(
-      "Failed to assign role",
-      "ASSIGN_ROLE_FAILED"
-    );
+    return ApiResponse.serverError("Failed to assign role", "ASSIGN_ROLE_FAILED");
   }
 });
 
@@ -98,6 +95,7 @@ function isValidUUID(uuid: string): boolean {
 ```
 
 **Problems**:
+
 - 🔴 Endpoint has TODO comments (incomplete)
 - 🔴 Mixed concerns: validation, authorization, data access, mapping
 - 🔴 Business logic scattered in routes
@@ -121,32 +119,29 @@ import {
   MemberRepository,
   type IOrganizationRepository,
   type IMemberRepository,
-} from '@/lib/repositories';
-import type { OrganizationMemberDTO } from '@/lib/api/dto/tenancy.dto';
-import { toOrganizationMemberDTO } from '@/lib/api/dto/tenancy.dto';
+} from "@/lib/repositories";
+import type { OrganizationMemberDTO } from "@/lib/api/dto/tenancy.dto";
+import { toOrganizationMemberDTO } from "@/lib/api/dto/tenancy.dto";
 
 export class OrganizationService {
   private orgRepository: IOrganizationRepository;
   private memberRepository: IMemberRepository;
 
-  constructor(
-    orgRepository?: IOrganizationRepository,
-    memberRepository?: IMemberRepository
-  ) {
+  constructor(orgRepository?: IOrganizationRepository, memberRepository?: IMemberRepository) {
     this.orgRepository = orgRepository || new OrganizationRepository();
     this.memberRepository = memberRepository || new MemberRepository();
   }
 
   /**
    * Assign or update a user's role in an organization
-   * 
+   *
    * Business Logic:
    * 1. Check if user exists
    * 2. Check if user is member of organization
    * 3. Validate role assignment (e.g., can't have multiple owners)
    * 4. Update role flags (is_owner, is_org_admin)
    * 5. Return updated member profile
-   * 
+   *
    * @param orgId - Organization ID
    * @param userId - User ID
    * @param role - New role: 'owner' | 'admin' | 'member'
@@ -156,7 +151,7 @@ export class OrganizationService {
   async assignUserRole(
     orgId: string,
     userId: string,
-    role: 'owner' | 'admin' | 'member'
+    role: "owner" | "admin" | "member",
   ): Promise<OrganizationMemberDTO> {
     // ✅ Business Logic Layer - All validation and orchestration happens here
 
@@ -174,25 +169,25 @@ export class OrganizationService {
 
     // 3. Verify user is already in organization
     const orgMembers = await this.memberRepository.findByOrganizationId(orgId);
-    const isMember = orgMembers.some(m => m.id === userId);
+    const isMember = orgMembers.some((m) => m.id === userId);
     if (!isMember) {
       throw new Error(`User is not a member of this organization`);
     }
 
     // 4. Business rule: Can't remove last owner
-    if (role !== 'owner') {
-      const currentOwners = orgMembers.filter(m => m.is_owner);
-      const currentUserIsOwner = currentOwners.some(m => m.id === userId);
-      
+    if (role !== "owner") {
+      const currentOwners = orgMembers.filter((m) => m.is_owner);
+      const currentUserIsOwner = currentOwners.some((m) => m.id === userId);
+
       if (currentUserIsOwner && currentOwners.length === 1) {
-        throw new Error('Cannot remove the only owner from organization');
+        throw new Error("Cannot remove the only owner from organization");
       }
     }
 
     // 5. Update member with new role flags
     const updatedMember = await this.memberRepository.update(userId, {
-      is_owner: role === 'owner',
-      is_org_admin: role === 'admin' || role === 'owner',
+      is_owner: role === "owner",
+      is_org_admin: role === "admin" || role === "owner",
     });
 
     if (!updatedMember) {
@@ -227,7 +222,7 @@ export const organizationService = new OrganizationService();
 ```typescript
 /**
  * server/routes/api/tenancy/[orgId]/members/[userId].assign-role.post.ts
- * 
+ *
  * Layer: Route Handler (HTTP Concerns Only)
  * Responsibility: Request validation, authorization check, response formatting
  * Delegates to: OrganizationService for business logic
@@ -276,17 +271,11 @@ export default defineEventHandler(async (event) => {
       (await organizationService.isUserOwner(orgId, currentUserId));
 
     if (!isAuthorized) {
-      return ApiResponse.forbidden(
-        "Only organization admins can assign roles"
-      );
+      return ApiResponse.forbidden("Only organization admins can assign roles");
     }
 
     // ✅ LAYER 3: Delegate to service (business logic orchestration)
-    const updatedMember = await organizationService.assignUserRole(
-      orgId,
-      userId,
-      role
-    );
+    const updatedMember = await organizationService.assignUserRole(orgId, userId, role);
 
     // ✅ LAYER 1: Format response (HTTP concerns)
     return ApiResponse.success(updatedMember, 200, "Role assigned successfully");
@@ -303,10 +292,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    return ApiResponse.serverError(
-      "Failed to assign role",
-      "ASSIGN_ROLE_FAILED"
-    );
+    return ApiResponse.serverError("Failed to assign role", "ASSIGN_ROLE_FAILED");
   }
 });
 ```
@@ -315,24 +301,25 @@ export default defineEventHandler(async (event) => {
 
 ## 📊 Comparison: Before vs After
 
-| Aspect | Before ❌ | After ✅ |
-|--------|----------|----------|
-| **Concerns** | Mixed (validation, auth, DB, mapping) | Separated (routing, business, data access) |
-| **Code** | 70+ lines procedural | 20 line clean handler + 80 line service |
-| **Logic** | Scattered, hard to find | Centralized in service |
-| **Testability** | Hard to test (needs full HTTP setup) | Easy to test (mock dependencies) |
-| **Reusability** | Can't reuse logic from other endpoints | Service methods reusable across endpoints |
-| **Maintainability** | Changes ripple through handlers | Changes isolated to service |
-| **TODOs** | Full of TODOs ❌ | All implemented ✅ |
-| **Error Handling** | Generic catch-all | Type-specific error responses |
-| **Authorization** | No business rule validation | Role validation, ownership check |
-| **Data Layer** | Direct queries needed | Repository methods used |
+| Aspect              | Before ❌                              | After ✅                                   |
+| ------------------- | -------------------------------------- | ------------------------------------------ |
+| **Concerns**        | Mixed (validation, auth, DB, mapping)  | Separated (routing, business, data access) |
+| **Code**            | 70+ lines procedural                   | 20 line clean handler + 80 line service    |
+| **Logic**           | Scattered, hard to find                | Centralized in service                     |
+| **Testability**     | Hard to test (needs full HTTP setup)   | Easy to test (mock dependencies)           |
+| **Reusability**     | Can't reuse logic from other endpoints | Service methods reusable across endpoints  |
+| **Maintainability** | Changes ripple through handlers        | Changes isolated to service                |
+| **TODOs**           | Full of TODOs ❌                       | All implemented ✅                         |
+| **Error Handling**  | Generic catch-all                      | Type-specific error responses              |
+| **Authorization**   | No business rule validation            | Role validation, ownership check           |
+| **Data Layer**      | Direct queries needed                  | Repository methods used                    |
 
 ---
 
 ## 🏗️ Layer Breakdown
 
 ### Route Handler (HTTP Layer)
+
 ```
 Input (HTTP Request)
     ↓
@@ -348,6 +335,7 @@ Output (HTTP Response)
 ```
 
 ### Service Layer (Business Logic)
+
 ```
 Input (orgId, userId, role)
     ↓
@@ -361,6 +349,7 @@ Output (OrganizationMemberDTO)
 ```
 
 ### Repository Layer (Data Access)
+
 ```
 Service → Repository.findById()
         → Repository.findByOrganizationId()
@@ -374,11 +363,13 @@ Service → Repository.findById()
 ## 🎯 Key Patterns Applied
 
 ### 1. **Single Responsibility** ✅
+
 - **Route Handler**: Only HTTP concerns (request/response)
 - **Service**: Only business logic (validation, orchestration)
 - **Repository**: Only data access (queries)
 
 ### 2. **Dependency Injection** ✅
+
 ```typescript
 // Service accepts dependencies
 constructor(
@@ -392,6 +383,7 @@ const service = new OrganizationService(mockOrgRepo);
 ```
 
 ### 3. **Error Handling** ✅
+
 ```typescript
 // Service throws meaningful errors
 throw new Error(`Organization not found: ${orgId}`);
@@ -404,6 +396,7 @@ if (error.message.includes("not found")) {
 ```
 
 ### 4. **DTO Mapping** ✅
+
 ```typescript
 // Raw DB data → DTO (clean API contract)
 return toOrganizationMemberDTO(updatedMember);
@@ -413,6 +406,7 @@ return ApiResponse.success(updatedMember, 200);
 ```
 
 ### 5. **Authorization Abstraction** ✅
+
 ```typescript
 // Service provides methods to check permissions
 await organizationService.isUserAdmin(orgId, currentUserId);
@@ -429,6 +423,7 @@ if (!isAuthorized) {
 ## 🧪 Testing Examples
 
 ### Before: Hard to Test ❌
+
 ```typescript
 // Need to mock entire H3 event, database, etc.
 // No way to test business logic in isolation
@@ -437,25 +432,26 @@ if (!isAuthorized) {
 ### After: Easy to Test ✅
 
 **Service Unit Test**:
-```typescript
-import { describe, it, expect } from 'vitest';
-import { OrganizationService } from '@/lib/services';
 
-describe('OrganizationService.assignUserRole', () => {
-  it('should assign admin role to member', async () => {
+```typescript
+import { describe, it, expect } from "vitest";
+import { OrganizationService } from "@/lib/services";
+
+describe("OrganizationService.assignUserRole", () => {
+  it("should assign admin role to member", async () => {
     // Arrange - Create mocks
     const mockOrgRepo = {
-      findById: vi.fn().mockResolvedValue({ id: 'org-1' }),
+      findById: vi.fn().mockResolvedValue({ id: "org-1" }),
       isUserAdmin: vi.fn().mockResolvedValue(true),
     };
     const mockMemberRepo = {
-      findById: vi.fn().mockResolvedValue({ id: 'user-2' }),
+      findById: vi.fn().mockResolvedValue({ id: "user-2" }),
       findByOrganizationId: vi.fn().mockResolvedValue([
-        { id: 'user-1', is_owner: true },
-        { id: 'user-2', is_owner: false },
+        { id: "user-1", is_owner: true },
+        { id: "user-2", is_owner: false },
       ]),
       update: vi.fn().mockResolvedValue({
-        id: 'user-2',
+        id: "user-2",
         is_org_admin: true,
         is_owner: false,
       }),
@@ -464,55 +460,56 @@ describe('OrganizationService.assignUserRole', () => {
     const service = new OrganizationService(mockOrgRepo, mockMemberRepo);
 
     // Act
-    const result = await service.assignUserRole('org-1', 'user-2', 'admin');
+    const result = await service.assignUserRole("org-1", "user-2", "admin");
 
     // Assert
-    expect(mockMemberRepo.update).toHaveBeenCalledWith('user-2', {
+    expect(mockMemberRepo.update).toHaveBeenCalledWith("user-2", {
       is_owner: false,
       is_org_admin: true,
     });
     expect(result.is_org_admin).toBe(true);
   });
 
-  it('should throw if user not found', async () => {
+  it("should throw if user not found", async () => {
     const mockMemberRepo = {
       findById: vi.fn().mockResolvedValue(null),
     };
     const service = new OrganizationService(undefined, mockMemberRepo);
 
-    await expect(
-      service.assignUserRole('org-1', 'user-999', 'admin')
-    ).rejects.toThrow('User not found');
+    await expect(service.assignUserRole("org-1", "user-999", "admin")).rejects.toThrow(
+      "User not found",
+    );
   });
 
-  it('should prevent removing last owner', async () => {
-    const mockOrgRepo = { findById: vi.fn().mockResolvedValue({ id: 'org-1' }) };
+  it("should prevent removing last owner", async () => {
+    const mockOrgRepo = { findById: vi.fn().mockResolvedValue({ id: "org-1" }) };
     const mockMemberRepo = {
-      findById: vi.fn().mockResolvedValue({ id: 'user-1', is_owner: true }),
+      findById: vi.fn().mockResolvedValue({ id: "user-1", is_owner: true }),
       findByOrganizationId: vi.fn().mockResolvedValue([
-        { id: 'user-1', is_owner: true }, // Only owner
+        { id: "user-1", is_owner: true }, // Only owner
       ]),
     };
 
     const service = new OrganizationService(mockOrgRepo, mockMemberRepo);
 
-    await expect(
-      service.assignUserRole('org-1', 'user-1', 'admin')
-    ).rejects.toThrow('Cannot remove the only owner');
+    await expect(service.assignUserRole("org-1", "user-1", "admin")).rejects.toThrow(
+      "Cannot remove the only owner",
+    );
   });
 });
 ```
 
 **Route Handler Integration Test**:
+
 ```typescript
-it('should return 403 if user not admin', async () => {
+it("should return 403 if user not admin", async () => {
   // Arrange
   const event = createMockH3Event({
     context: {
-      user: { id: 'user-2' },
-      params: { orgId: 'org-1', userId: 'user-3' },
+      user: { id: "user-2" },
+      params: { orgId: "org-1", userId: "user-3" },
     },
-    body: { role: 'admin' },
+    body: { role: "admin" },
   });
 
   // Act
@@ -520,7 +517,7 @@ it('should return 403 if user not admin', async () => {
 
   // Assert
   expect(response.statusCode).toBe(403);
-  expect(response.message).toContain('Only organization admins');
+  expect(response.message).toContain("Only organization admins");
 });
 ```
 
@@ -550,24 +547,28 @@ When refactoring an endpoint, follow this pattern:
 ## 📈 Benefits Summary
 
 ### For Developer Experience
+
 - ✅ Clear code structure and responsibilities
 - ✅ Easy to find where logic lives
 - ✅ Business rules isolated in service
 - ✅ Easy to add features (extend service, not routes)
 
 ### For Testing
+
 - ✅ Service methods independently testable
 - ✅ Mock dependencies easily
 - ✅ No complex HTTP setup needed
 - ✅ Higher code coverage achievable
 
 ### For Maintenance
+
 - ✅ Bug fixes isolated to single layer
 - ✅ Reuse logic across multiple endpoints
 - ✅ Easier to refactor without breaking routes
 - ✅ Clear separation makes onboarding easier
 
 ### For Performance
+
 - ✅ Caching logic can live in service
 - ✅ Batch operations in repository
 - ✅ Optimize queries without changing routes
@@ -585,6 +586,7 @@ Apply this pattern to all 38 endpoints:
 4. **Tenancy Module** (9 endpoints) - Use OrganizationService
 
 Each endpoint follows the same pattern:
+
 - Extract → Validate → Authorize → Delegate → Format
 
 ---
