@@ -126,9 +126,9 @@ export async function generateQRCodeOnCanvas(
  * Embeds a logo on a canvas asynchronously (non-blocking)
  * This won't prevent the QR code from displaying if it fails
  * Properly centers the logo image while preserving aspect ratio
- * Clean modern design: semi-transparent circular background, no border
  * 
  * 🎯 CENTERING GUARANTEE: Logo is mathematically centered at (50%, 50%)
+ * ✅ QR READABLE: White square background is minimal (just padding around logo)
  */
 async function embedLogoOnCanvas(
   canvas: HTMLCanvasElement,
@@ -191,15 +191,22 @@ async function embedLogoOnCanvas(
       `→ centered at (${(logoX + displayWidth / 2).toFixed(1)}, ${(logoY + displayHeight / 2).toFixed(1)})`,
     );
 
-    // Draw semi-transparent circular background centered at exact center
-    const bgRadius = Math.max(displayWidth, displayHeight) / 2 + 6;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; // Increased opacity to 90%
-    ctx.beginPath();
-    ctx.arc(exactCenterX, exactCenterY, bgRadius, 0, 2 * Math.PI);
-    ctx.fill();
+    // Draw WHITE SQUARE background behind logo
+    // CRITICAL for QR readability: Use FULLY OPAQUE white with minimal padding
+    // Standard QR practice: logo maximum 20% of QR code, with white square background
+    const bgPadding = 3; // Minimal padding (3px) around logo
+    const bgWidth = displayWidth + bgPadding * 2;
+    const bgHeight = displayHeight + bgPadding * 2;
+    const bgX = exactCenterX - bgWidth / 2;
+    const bgY = exactCenterY - bgHeight / 2;
+
+    // Draw fully opaque white background square (NOT semi-transparent!)
+    ctx.fillStyle = "#FFFFFF"; // Pure white, 100% opaque
+    ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
 
     console.log(
-      `[QR] Background circle: center (${exactCenterX}, ${exactCenterY}), radius ${bgRadius.toFixed(1)}`,
+      `[QR] Background square: (${bgX.toFixed(1)}, ${bgY.toFixed(1)}) ` +
+      `${bgWidth.toFixed(0)}x${bgHeight.toFixed(0)} with ${bgPadding}px padding`,
     );
 
     // Draw logo image centered on the background
