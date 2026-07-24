@@ -17,6 +17,7 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
 ## Resource Models
 
 ### Organization DTO
+
 ```json
 {
   "id": "uuid",
@@ -31,6 +32,7 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
 ```
 
 ### Organization Detail DTO
+
 ```json
 {
   "id": "uuid",
@@ -44,7 +46,7 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
   "totalOwners": 1,
   "churchCount": 1,
   "eventCount": 12,
-  "contributionTotal": 125000.50,
+  "contributionTotal": 125000.5,
   "currency": "PHP",
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-07-24T10:00:00Z"
@@ -52,6 +54,7 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
 ```
 
 ### Organization Member DTO
+
 ```json
 {
   "userId": "uuid",
@@ -65,6 +68,7 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
 ```
 
 ### Organization Statistics DTO
+
 ```json
 {
   "organizationId": "uuid",
@@ -75,7 +79,7 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
   "memberJoinedThisMonth": 3,
   "activeChurches": 1,
   "totalEvents": 12,
-  "totalContributions": 125000.50,
+  "totalContributions": 125000.5,
   "generatedAt": "2026-07-24T10:30:00Z"
 }
 ```
@@ -93,26 +97,29 @@ The Tenancy Module API provides comprehensive RESTful endpoints for managing mul
 **Description**: Retrieve all organizations with pagination and filtering
 
 **Query Parameters**:
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `page` | integer | No | 1 | Page number |
-| `pageSize` | integer | No | 20 | Items per page (max: 100) |
-| `status` | string | No | - | Filter: active, inactive |
-| `sortBy` | string | No | name | Sort: name, createdAt, memberCount |
-| `order` | string | No | asc | Order: asc, desc |
+
+| Parameter  | Type    | Required | Default | Description                        |
+| ---------- | ------- | -------- | ------- | ---------------------------------- |
+| `page`     | integer | No       | 1       | Page number                        |
+| `pageSize` | integer | No       | 20      | Items per page (max: 100)          |
+| `status`   | string  | No       | -       | Filter: active, inactive           |
+| `sortBy`   | string  | No       | name    | Sort: name, createdAt, memberCount |
+| `order`    | string  | No       | asc     | Order: asc, desc                   |
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": [ /* OrganizationDTO array */ ],
-  "pagination": { /* pagination metadata */ },
+  "data": [/* OrganizationDTO array */],
+  "pagination": {/* pagination metadata */},
   "meta": { "timestamp": "...", "version": "v1" }
 }
 ```
 
 **cURL Example**:
+
 ```bash
 curl "http://localhost:5173/api/v1/organizations?page=1&pageSize=20&status=active"
 ```
@@ -126,6 +133,7 @@ curl "http://localhost:5173/api/v1/organizations?page=1&pageSize=20&status=activ
 **Description**: Create a new organization (admin only)
 
 **Request Body**:
+
 ```json
 {
   "name": "SGBC - New Branch",
@@ -134,12 +142,13 @@ curl "http://localhost:5173/api/v1/organizations?page=1&pageSize=20&status=activ
 ```
 
 **Response** (201 Created):
+
 ```json
 {
   "status": "success",
   "code": 201,
-  "data": { /* OrganizationDTO */ },
-  "meta": { /* ... */ }
+  "data": {/* OrganizationDTO */},
+  "meta": {/* ... */}
 }
 ```
 
@@ -166,6 +175,7 @@ curl "http://localhost:5173/api/v1/organizations?page=1&pageSize=20&status=activ
 **Description**: Update organization information (admin only)
 
 **Request Body** (partial):
+
 ```json
 {
   "name": "Updated Name",
@@ -200,17 +210,19 @@ curl "http://localhost:5173/api/v1/organizations?page=1&pageSize=20&status=activ
 **Description**: List all members in an organization
 
 **Query Parameters**:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `page` | integer | Page number |
-| `pageSize` | integer | Items per page |
-| `role` | string | Filter: owner, admin, member |
-| `sortBy` | string | Sort: name, joinedAt |
-| `order` | string | asc, desc |
+
+| Parameter  | Type    | Description                  |
+| ---------- | ------- | ---------------------------- |
+| `page`     | integer | Page number                  |
+| `pageSize` | integer | Items per page               |
+| `role`     | string  | Filter: owner, admin, member |
+| `sortBy`   | string  | Sort: name, joinedAt         |
+| `order`    | string  | asc, desc                    |
 
 **Response** (200 OK): Paginated OrganizationMemberDTO[]
 
 **cURL Example**:
+
 ```bash
 curl "http://localhost:5173/api/v1/organizations/{orgId}/members?role=admin"
 ```
@@ -224,6 +236,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?role=admin"
 **Description**: Assign or update a user's role in organization (admin only)
 
 **Request Body**:
+
 ```json
 {
   "role": "admin"
@@ -261,6 +274,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?role=admin"
 **Response** (200 OK): OrganizationStatisticsDTO
 
 **Example Response**:
+
 ```json
 {
   "status": "success",
@@ -274,7 +288,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?role=admin"
     "memberJoinedThisMonth": 3,
     "activeChurches": 1,
     "totalEvents": 12,
-    "totalContributions": 125000.50,
+    "totalContributions": 125000.5,
     "generatedAt": "2026-07-24T10:30:00Z"
   },
   "meta": { "timestamp": "...", "version": "v1" }
@@ -286,6 +300,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?role=admin"
 ## Common Workflows
 
 ### Create Organization and Invite Members
+
 ```bash
 # 1. Create organization
 curl -X POST "api/v1/organizations" \
@@ -302,6 +317,7 @@ curl "api/v1/organizations/{orgId}/members"
 ```
 
 ### Manage Organization Hierarchy
+
 ```bash
 # 1. List organizations
 curl "api/v1/organizations?status=active"
@@ -343,6 +359,7 @@ All errors follow this format:
 ```
 
 **Error Codes**:
+
 - `INVALID_NAME` - Organization name is required
 - `ORGANIZATION_NOT_FOUND` - Organization not found
 - `USER_NOT_FOUND` - User not found
@@ -356,43 +373,44 @@ All errors follow this format:
 
 ## Status Codes
 
-| Code | Meaning | When Used |
-|------|---------|-----------|
-| 200 | OK | Successful GET, PATCH |
-| 201 | Created | POST creates organization |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Invalid parameters or ID format |
-| 404 | Not Found | Organization/member not found |
-| 409 | Conflict | Invalid operation (e.g., last owner) |
-| 422 | Unprocessable Entity | Validation error |
-| 500 | Server Error | Unexpected error |
+| Code | Meaning              | When Used                            |
+| ---- | -------------------- | ------------------------------------ |
+| 200  | OK                   | Successful GET, PATCH                |
+| 201  | Created              | POST creates organization            |
+| 204  | No Content           | Successful DELETE                    |
+| 400  | Bad Request          | Invalid parameters or ID format      |
+| 404  | Not Found            | Organization/member not found        |
+| 409  | Conflict             | Invalid operation (e.g., last owner) |
+| 422  | Unprocessable Entity | Validation error                     |
+| 500  | Server Error         | Unexpected error                     |
 
 ---
 
 ## Integration Examples
 
 ### JavaScript/Fetch
+
 ```javascript
 // List organizations
-const response = await fetch('/api/v1/organizations?page=1&pageSize=20');
+const response = await fetch("/api/v1/organizations?page=1&pageSize=20");
 const { data, pagination } = await response.json();
 
 // Create organization
-const result = await fetch('/api/v1/organizations', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const result = await fetch("/api/v1/organizations", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: 'New Organization',
-    description: 'Description'
-  })
+    name: "New Organization",
+    description: "Description",
+  }),
 });
 const org = await result.json();
 
 // Assign member role
-await fetch('/api/v1/organizations/{orgId}/members/{userId}/assign-role', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ role: 'admin' })
+await fetch("/api/v1/organizations/{orgId}/members/{userId}/assign-role", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ role: "admin" }),
 });
 ```
 
@@ -423,5 +441,5 @@ await fetch('/api/v1/organizations/{orgId}/members/{userId}/assign-role', {
 
 ---
 
-*Tenancy Module RESTful API Documentation*  
-*Updated: 2026-07-24 | Role: Senior Backend Software Engineer*
+_Tenancy Module RESTful API Documentation_  
+_Updated: 2026-07-24 | Role: Senior Backend Software Engineer_

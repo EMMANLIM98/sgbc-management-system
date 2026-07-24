@@ -6,7 +6,9 @@
  */
 
 import { BaseRepository, IRepository } from './base.repository';
+import { supabase, addPagination, addSorting, executeQueryArray, executeQuery, executeCountQuery } from './supabase.client';
 import type { MemberDTO } from '@/lib/api/dto/membership.dto';
+import { toMemberDTO } from '@/lib/api/dto/membership.dto';
 
 export interface IMemberRepository extends IRepository<MemberDTO> {
   /**
@@ -78,15 +80,15 @@ export class MemberRepository
   }
 
   async findById(id: string): Promise<MemberDTO | null> {
-    // TODO: Implement Supabase query
-    // const { data, error } = await supabase
-    //   .from('members')
-    //   .select('*')
-    //   .eq('id', id)
-    //   .single();
-    // if (error) throw error;
-    // return data ? toMemberDTO(data) : null;
-    return null;
+    const data = await executeQuery(
+      supabase
+        .from('members')
+        .select('*')
+        .eq('id', id)
+        .single(),
+      `findMemberById(${id})`
+    );
+    return data ? toMemberDTO(data) : null;
   }
 
   async findAll(options?: {
@@ -95,53 +97,95 @@ export class MemberRepository
     orderBy?: string;
     order?: 'asc' | 'desc';
   }): Promise<MemberDTO[]> {
-    // TODO: Implement Supabase query
-    // const query = supabase
-    //   .from('members')
-    //   .select('*');
-    // if (options?.orderBy) {
-    //   query.order(options.orderBy, { ascending: options.order === 'asc' });
-    // }
-    // if (options?.limit) {
-    //   query.range(options.offset || 0, (options.offset || 0) + options.limit - 1);
-    // }
-    // const { data, error } = await query;
-    // if (error) throw error;
-    // return data?.map(toMemberDTO) ?? [];
-    return [];
+    let query = supabase.from('members').select('*');
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findAllMembers');
+    return data.map(toMemberDTO);
   }
 
   async count(filters?: Record<string, any>): Promise<number> {
-    // TODO: Implement Supabase count
-    return 0;
+    let query = supabase
+      .from('members')
+      .select('*', { count: 'exact', head: true });
+
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null) {
+          query = query.eq(key, value);
+        }
+      }
+    }
+
+    return executeCountQuery(query, 'countMembers');
   }
 
   async save(entity: MemberDTO): Promise<MemberDTO> {
-    // TODO: Implement Supabase upsert
-    return entity;
+    if (entity.id) {
+      return this.update(entity.id, entity) || entity;
+    }
+    return this.create(entity);
   }
 
   async create(data: Partial<MemberDTO>): Promise<MemberDTO> {
-    // TODO: Implement Supabase insert
-    return data as MemberDTO;
+    const result = await executeQuery(
+      supabase
+        .from('members')
+        .insert([
+          {
+            ...data,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ])
+        .select()
+        .single(),
+      'createMember'
+    );
+    return toMemberDTO(result);
   }
 
   async update(
     id: string,
     data: Partial<MemberDTO>
   ): Promise<MemberDTO | null> {
-    // TODO: Implement Supabase update
-    return null;
+    const result = await executeQuery(
+      supabase
+        .from('members')
+        .update({
+          ...data,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single(),
+      `updateMember(${id})`
+    );
+    return result ? toMemberDTO(result) : null;
   }
 
   async delete(id: string): Promise<boolean> {
-    // TODO: Implement Supabase delete
+    const { error } = await supabase
+      .from('members')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error(`Error deleting member ${id}:`, error);
+      return false;
+    }
     return true;
   }
 
   async softDelete(id: string): Promise<boolean> {
-    // TODO: Implement Supabase soft delete (is_active = false)
-    return true;
+    return this.update(id, { is_active: false }).then(Boolean);
   }
 
   async findByFilters(
@@ -153,13 +197,35 @@ export class MemberRepository
       order?: 'asc' | 'desc';
     }
   ): Promise<MemberDTO[]> {
-    // TODO: Implement Supabase filtered query
-    return [];
+    let query = supabase.from('members').select('*');
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null) {
+        query = query.eq(key, value);
+      }
+    }
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findMembersByFilters');
+    return data.map(toMemberDTO);
   }
 
   async exists(id: string): Promise<boolean> {
-    // TODO: Implement existence check
-    return false;
+    const count = await executeCountQuery(
+      supabase
+        .from('members')
+        .select('*', { count: 'exact', head: true })
+        .eq('id', id),
+      `existsMember(${id})`
+    );
+    return count > 0;
   }
 
   async findByOrganizationId(
@@ -171,18 +237,43 @@ export class MemberRepository
       order?: 'asc' | 'desc';
     }
   ): Promise<MemberDTO[]> {
-    // TODO: Implement Supabase query
-    return [];
+    let query = supabase
+      .from('members')
+      .select('*')
+      .eq('organization_id', orgId);
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, `findMembersByOrgId(${orgId})`);
+    return data.map(toMemberDTO);
   }
 
   async countByOrganizationId(orgId: string): Promise<number> {
-    // TODO: Implement Supabase count
-    return 0;
+    return executeCountQuery(
+      supabase
+        .from('members')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId),
+      `countByOrgId(${orgId})`
+    );
   }
 
   async findByEmail(email: string): Promise<MemberDTO | null> {
-    // TODO: Implement Supabase query
-    return null;
+    const data = await executeQuery(
+      supabase
+        .from('members')
+        .select('*')
+        .eq('email', email)
+        .single(),
+      `findMemberByEmail(${email})`
+    );
+    return data ? toMemberDTO(data) : null;
   }
 
   async findByStatus(
@@ -192,29 +283,53 @@ export class MemberRepository
       offset?: number;
     }
   ): Promise<MemberDTO[]> {
-    // TODO: Implement Supabase query
-    return [];
+    let query = supabase
+      .from('members')
+      .select('*')
+      .eq('is_active', status === 'active');
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(
+      query,
+      `findMembersByStatus(${status})`
+    );
+    return data.map(toMemberDTO);
   }
 
   async search(
-    query: string,
+    searchQuery: string,
     orgId?: string,
     options?: {
       limit?: number;
       offset?: number;
     }
   ): Promise<MemberDTO[]> {
-    // TODO: Implement Supabase full-text search
-    return [];
+    // Full-text search on name and email
+    let query = supabase
+      .from('members')
+      .select('*')
+      .or(`full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+
+    if (orgId) {
+      query = query.eq('organization_id', orgId);
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, `searchMembers(${searchQuery})`);
+    return data.map(toMemberDTO);
   }
 
   async activate(id: string): Promise<boolean> {
-    // TODO: Implement activation
-    return true;
+    return this.update(id, { is_active: true }).then(Boolean);
   }
 
   async deactivate(id: string): Promise<boolean> {
-    // TODO: Implement deactivation
-    return true;
+    return this.update(id, { is_active: false }).then(Boolean);
   }
 }

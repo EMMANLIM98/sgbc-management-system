@@ -6,7 +6,9 @@
  */
 
 import { BaseRepository, IRepository } from './base.repository';
+import { supabase, addPagination, addSorting, executeQueryArray, executeQuery, executeCountQuery } from './supabase.client';
 import type { OrganizationDTO } from '@/lib/api/dto/tenancy.dto';
+import { toOrganizationDTO } from '@/lib/api/dto/tenancy.dto';
 
 export interface IOrganizationRepository extends IRepository<OrganizationDTO> {
   /**
@@ -74,8 +76,15 @@ export class OrganizationRepository
   }
 
   async findById(id: string): Promise<OrganizationDTO | null> {
-    // TODO: Implement Supabase query
-    return null;
+    const data = await executeQuery(
+      supabase
+        .from('organizations')
+        .select('*')
+        .eq('id', id)
+        .single(),
+      `findOrganizationById(${id})`
+    );
+    return data ? toOrganizationDTO(data, 0, []) : null;
   }
 
   async findAll(options?: {
@@ -84,41 +93,97 @@ export class OrganizationRepository
     orderBy?: string;
     order?: 'asc' | 'desc';
   }): Promise<OrganizationDTO[]> {
-    // TODO: Implement Supabase query
-    return [];
+    let query = supabase.from('organizations').select('*');
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findAllOrganizations');
+    return data.map(org => toOrganizationDTO(org, 0, []));
   }
 
   async count(filters?: Record<string, any>): Promise<number> {
-    // TODO: Implement Supabase count
-    return 0;
+    let query = supabase
+      .from('organizations')
+      .select('*', { count: 'exact', head: true });
+
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null) {
+          query = query.eq(key, value);
+        }
+      }
+    }
+
+    return executeCountQuery(query, 'countOrganizations');
   }
 
   async save(entity: OrganizationDTO): Promise<OrganizationDTO> {
-    // TODO: Implement Supabase upsert
-    return entity;
+    if (entity.id) {
+      return this.update(entity.id, entity) || entity;
+    }
+    return this.create(entity);
   }
 
   async create(data: Partial<OrganizationDTO>): Promise<OrganizationDTO> {
-    // TODO: Implement Supabase insert
-    return data as OrganizationDTO;
+    const result = await executeQuery(
+      supabase
+        .from('organizations')
+        .insert([
+          {
+            name: data.name,
+            description: data.description,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ])
+        .select()
+        .single(),
+      'createOrganization'
+    );
+    return toOrganizationDTO(result, 0, []);
   }
 
   async update(
     id: string,
     data: Partial<OrganizationDTO>
   ): Promise<OrganizationDTO | null> {
-    // TODO: Implement Supabase update
-    return null;
+    const result = await executeQuery(
+      supabase
+        .from('organizations')
+        .update({
+          ...data,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single(),
+      `updateOrganization(${id})`
+    );
+    return result ? toOrganizationDTO(result, 0, []) : null;
   }
 
   async delete(id: string): Promise<boolean> {
-    // TODO: Implement Supabase delete
+    const { error } = await supabase
+      .from('organizations')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error(`Error deleting organization ${id}:`, error);
+      return false;
+    }
     return true;
   }
 
   async softDelete(id: string): Promise<boolean> {
-    // TODO: Implement soft delete (is_active = false)
-    return true;
+    return this.update(id, { is_active: false }).then(Boolean);
   }
 
   async findByFilters(
@@ -130,13 +195,35 @@ export class OrganizationRepository
       order?: 'asc' | 'desc';
     }
   ): Promise<OrganizationDTO[]> {
-    // TODO: Implement filtered query
-    return [];
+    let query = supabase.from('organizations').select('*');
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null) {
+        query = query.eq(key, value);
+      }
+    }
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findOrganizationsByFilters');
+    return data.map(org => toOrganizationDTO(org, 0, []));
   }
 
   async exists(id: string): Promise<boolean> {
-    // TODO: Implement existence check
-    return false;
+    const count = await executeCountQuery(
+      supabase
+        .from('organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('id', id),
+      `existsOrganization(${id})`
+    );
+    return count > 0;
   }
 
   async findActive(options?: {
@@ -145,38 +232,102 @@ export class OrganizationRepository
     orderBy?: string;
     order?: 'asc' | 'desc';
   }): Promise<OrganizationDTO[]> {
-    // TODO: Implement query for is_active = true
-    return [];
+    let query = supabase
+      .from('organizations')
+      .select('*')
+      .eq('is_active', true);
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findActiveOrganizations');
+    return data.map(org => toOrganizationDTO(org, 0, []));
   }
 
   async findByName(name: string): Promise<OrganizationDTO | null> {
-    // TODO: Implement Supabase query
-    return null;
+    const data = await executeQuery(
+      supabase
+        .from('organizations')
+        .select('*')
+        .eq('name', name)
+        .single(),
+      `findOrganizationByName(${name})`
+    );
+    return data ? toOrganizationDTO(data, 0, []) : null;
   }
 
   async countActive(): Promise<number> {
-    // TODO: Implement count where is_active = true
-    return 0;
+    return executeCountQuery(
+      supabase
+        .from('organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true),
+      'countActiveOrganizations'
+    );
   }
 
   async findByUserId(userId: string): Promise<OrganizationDTO[]> {
-    // TODO: Join user_organizations and select where user_id = userId
-    return [];
+    // Join with user_organizations to find orgs for user
+    const { data, error } = await supabase
+      .from('user_organizations')
+      .select('organization_id')
+      .eq('user_id', userId);
+
+    if (error || !data) {
+      console.error(`Error finding orgs for user ${userId}:`, error);
+      return [];
+    }
+
+    const orgIds = data.map(row => row.organization_id);
+    if (orgIds.length === 0) return [];
+
+    const orgs = await executeQueryArray(
+      supabase.from('organizations').select('*').in('id', orgIds),
+      `findOrganizationsByUserId(${userId})`
+    );
+
+    return orgs.map(org => toOrganizationDTO(org, 0, []));
   }
 
   async isUserAdmin(orgId: string, userId: string): Promise<boolean> {
-    // TODO: Check user_organizations where user_id and org_id and is_org_admin = true
-    return false;
+    const count = await executeCountQuery(
+      supabase
+        .from('user_organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId)
+        .eq('user_id', userId)
+        .eq('is_org_admin', true),
+      `isUserAdmin(${orgId}, ${userId})`
+    );
+    return count > 0;
   }
 
   async isUserOwner(orgId: string, userId: string): Promise<boolean> {
-    // TODO: Check user_organizations where user_id and org_id and is_owner = true
-    return false;
+    const count = await executeCountQuery(
+      supabase
+        .from('user_organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId)
+        .eq('user_id', userId)
+        .eq('is_owner', true),
+      `isUserOwner(${orgId}, ${userId})`
+    );
+    return count > 0;
   }
 
   async getMemberCount(orgId: string): Promise<number> {
-    // TODO: Count rows in user_organizations where org_id = orgId
-    return 0;
+    return executeCountQuery(
+      supabase
+        .from('user_organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId),
+      `getMemberCount(${orgId})`
+    );
   }
 
   async getStatistics(orgId: string): Promise<{
@@ -187,14 +338,64 @@ export class OrganizationRepository
     eventCount: number;
     contributionTotal: number;
   }> {
-    // TODO: Implement statistics aggregation
+    // Count members
+    const totalMembers = await this.getMemberCount(orgId);
+
+    // Count admins
+    const totalAdmins = await executeCountQuery(
+      supabase
+        .from('user_organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId)
+        .eq('is_org_admin', true),
+      `countAdmins(${orgId})`
+    );
+
+    // Count owners
+    const totalOwners = await executeCountQuery(
+      supabase
+        .from('user_organizations')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId)
+        .eq('is_owner', true),
+      `countOwners(${orgId})`
+    );
+
+    // Count churches (assuming relation through organization)
+    const churchCount = await executeCountQuery(
+      supabase
+        .from('churches')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId),
+      `countChurches(${orgId})`
+    );
+
+    // Count events
+    const eventCount = await executeCountQuery(
+      supabase
+        .from('events')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', orgId),
+      `countEvents(${orgId})`
+    );
+
+    // Sum contributions
+    const { data: contributions, error } = await supabase
+      .from('contributions')
+      .select('amount')
+      .eq('organization_id', orgId);
+
+    const contributionTotal = contributions
+      ? contributions.reduce((sum, c) => sum + (c.amount || 0), 0)
+      : 0;
+
     return {
-      totalMembers: 0,
-      totalAdmins: 0,
-      totalOwners: 0,
-      churchCount: 0,
-      eventCount: 0,
-      contributionTotal: 0,
+      totalMembers,
+      totalAdmins,
+      totalOwners,
+      churchCount,
+      eventCount,
+      contributionTotal,
     };
   }
 }

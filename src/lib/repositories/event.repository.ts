@@ -6,7 +6,9 @@
  */
 
 import { BaseRepository, IRepository } from './base.repository';
+import { supabase, addPagination, addSorting, executeQueryArray, executeQuery, executeCountQuery } from './supabase.client';
 import type { EventDTO } from '@/lib/api/dto/events.dto';
+import { toEventDTO } from '@/lib/api/dto/events.dto';
 
 export interface IEventRepository extends IRepository<EventDTO> {
   /**
@@ -70,8 +72,15 @@ export class EventRepository
   }
 
   async findById(id: string): Promise<EventDTO | null> {
-    // TODO: Implement Supabase query
-    return null;
+    const data = await executeQuery(
+      supabase
+        .from('events')
+        .select('*')
+        .eq('id', id)
+        .single(),
+      `findEventById(${id})`
+    );
+    return data ? toEventDTO(data) : null;
   }
 
   async findAll(options?: {
@@ -80,38 +89,92 @@ export class EventRepository
     orderBy?: string;
     order?: 'asc' | 'desc';
   }): Promise<EventDTO[]> {
-    // TODO: Implement Supabase query
-    return [];
+    let query = supabase.from('events').select('*');
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findAllEvents');
+    return data.map(toEventDTO);
   }
 
   async count(filters?: Record<string, any>): Promise<number> {
-    // TODO: Implement Supabase count
-    return 0;
+    let query = supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true });
+
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null) {
+          query = query.eq(key, value);
+        }
+      }
+    }
+
+    return executeCountQuery(query, 'countEvents');
   }
 
   async save(entity: EventDTO): Promise<EventDTO> {
-    // TODO: Implement Supabase upsert
-    return entity;
+    if (entity.id) {
+      return this.update(entity.id, entity) || entity;
+    }
+    return this.create(entity);
   }
 
   async create(data: Partial<EventDTO>): Promise<EventDTO> {
-    // TODO: Implement Supabase insert
-    return data as EventDTO;
+    const result = await executeQuery(
+      supabase
+        .from('events')
+        .insert([
+          {
+            ...data,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ])
+        .select()
+        .single(),
+      'createEvent'
+    );
+    return toEventDTO(result);
   }
 
   async update(id: string, data: Partial<EventDTO>): Promise<EventDTO | null> {
-    // TODO: Implement Supabase update
-    return null;
+    const result = await executeQuery(
+      supabase
+        .from('events')
+        .update({
+          ...data,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single(),
+      `updateEvent(${id})`
+    );
+    return result ? toEventDTO(result) : null;
   }
 
   async delete(id: string): Promise<boolean> {
-    // TODO: Implement Supabase delete
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error(`Error deleting event ${id}:`, error);
+      return false;
+    }
     return true;
   }
 
   async softDelete(id: string): Promise<boolean> {
-    // TODO: Implement soft delete
-    return true;
+    return this.update(id, { status: 'cancelled' }).then(Boolean);
   }
 
   async findByFilters(
@@ -123,13 +186,35 @@ export class EventRepository
       order?: 'asc' | 'desc';
     }
   ): Promise<EventDTO[]> {
-    // TODO: Implement filtered query
-    return [];
+    let query = supabase.from('events').select('*');
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null) {
+        query = query.eq(key, value);
+      }
+    }
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, 'findEventsByFilters');
+    return data.map(toEventDTO);
   }
 
   async exists(id: string): Promise<boolean> {
-    // TODO: Implement existence check
-    return false;
+    const count = await executeCountQuery(
+      supabase
+        .from('events')
+        .select('*', { count: 'exact', head: true })
+        .eq('id', id),
+      `existsEvent(${id})`
+    );
+    return count > 0;
   }
 
   async findByChurchId(
@@ -141,18 +226,53 @@ export class EventRepository
       order?: 'asc' | 'desc';
     }
   ): Promise<EventDTO[]> {
-    // TODO: Implement Supabase query
-    return [];
+    let query = supabase
+      .from('events')
+      .select('*')
+      .eq('church_id', churchId);
+
+    if (options?.orderBy) {
+      query = addSorting(query, options.orderBy, options?.order || 'asc');
+    }
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, `findEventsByChurchId(${churchId})`);
+    return data.map(toEventDTO);
   }
 
   async findUpcoming(limit?: number): Promise<EventDTO[]> {
-    // TODO: Implement query for events where date > now()
-    return [];
+    const now = new Date().toISOString();
+    let query = supabase
+      .from('events')
+      .select('*')
+      .gte('event_date', now)
+      .order('event_date', { ascending: true });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const data = await executeQueryArray(query, 'findUpcomingEvents');
+    return data.map(toEventDTO);
   }
 
   async findPast(limit?: number): Promise<EventDTO[]> {
-    // TODO: Implement query for events where date < now()
-    return [];
+    const now = new Date().toISOString();
+    let query = supabase
+      .from('events')
+      .select('*')
+      .lt('event_date', now)
+      .order('event_date', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const data = await executeQueryArray(query, 'findPastEvents');
+    return data.map(toEventDTO);
   }
 
   async findByStatus(
@@ -162,17 +282,36 @@ export class EventRepository
       offset?: number;
     }
   ): Promise<EventDTO[]> {
-    // TODO: Implement Supabase query
-    return [];
+    let query = supabase
+      .from('events')
+      .select('*')
+      .eq('status', status);
+
+    if (options?.limit) {
+      query = addPagination(query, options?.offset || 0, options.limit);
+    }
+
+    const data = await executeQueryArray(query, `findEventsByStatus(${status})`);
+    return data.map(toEventDTO);
   }
 
   async countAttendees(eventId: string): Promise<number> {
-    // TODO: Implement count from event_registrations
-    return 0;
+    return executeCountQuery(
+      supabase
+        .from('event_registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_id', eventId),
+      `countAttendees(${eventId})`
+    );
   }
 
   async hasCapacity(eventId: string, requestedSlots: number): Promise<boolean> {
-    // TODO: Check capacity >= count + requestedSlots
-    return true;
+    const event = await this.findById(eventId);
+    if (!event) return false;
+
+    const attendeeCount = await this.countAttendees(eventId);
+    const capacity = event.capacity || Infinity;
+    
+    return (attendeeCount + requestedSlots) <= capacity;
   }
 }

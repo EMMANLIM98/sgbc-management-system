@@ -5,6 +5,16 @@
  */
 
 export { BaseRepository, type IRepository } from './base.repository';
+export {
+  supabase,
+  addPagination,
+  addSorting,
+  executeQuery,
+  executeQueryArray,
+  executeCountQuery,
+  handleSupabaseError,
+  buildFilters,
+} from './supabase.client';
 export { MemberRepository, type IMemberRepository } from './member.repository';
 export { EventRepository, type IEventRepository } from './event.repository';
 export {
