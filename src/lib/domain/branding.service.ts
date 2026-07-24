@@ -24,7 +24,7 @@ export interface BrandingConfig {
  */
 const DEFAULT_BRANDING: BrandingConfig = {
   organizationName: "SGBC",
-  logoPath: "/SGBC_Logo.jpg",
+  logoPath: "/SGBC_Logo.png",
   logoSize: 256,
   colors: {
     primary: "#111827",
