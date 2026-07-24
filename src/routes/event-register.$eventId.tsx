@@ -11,7 +11,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { QRCodeCanvas } from "@/components/ui/qr-code-canvas";
+import { EventRegistrationQR } from "@/modules/events/ui/event-registration-qr";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -126,24 +126,15 @@ function PublicRegisterPage() {
             </p>
           </div>
 
-          <Card className="p-6">
-            <QRCodeCanvas
-              value={result.qrToken}
-              title={event.title}
-              subtitle={result.attendeeName}
-              size={300}
-              showDownload
-              showPrint
-              downloadFilename={`event-registration-${result.id}.png`}
-            />
-
-            <p className="text-xs text-gray-500 mt-4 font-mono break-all text-center">
-              {result.id}
-            </p>
-          </Card>
+          <EventRegistrationQR
+            qrToken={result.qrToken}
+            registrationId={result.id}
+            attendeeName={result.attendeeName}
+            eventName={event.title}
+          />
 
           <p className="text-xs text-gray-500 text-center">
-            ⚠️ Keep this QR code private — it is unique to your registration.
+            Keep this QR code private - it is unique to your registration.
           </p>
         </div>
       </div>
