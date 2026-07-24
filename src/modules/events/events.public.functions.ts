@@ -115,7 +115,7 @@ const publicRegisterSchema = z.object({
   attendeeLastName: z.string().min(1, "Last name is required").max(80),
   attendeeEmail: z.string().email("Valid email is required").max(200),
   attendeePhone: z.string().max(40).optional(),
-  ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
+  ageCategory: z.enum(["children", "high_school", "college", "career", "adults", "seniors"]).optional(),
   sex: z.enum(["male", "female"]).optional(),
   visitorStatus: z
     .enum(["member", "visitor", "first_time_guest"])

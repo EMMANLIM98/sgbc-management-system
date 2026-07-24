@@ -48,7 +48,7 @@ export const createEventRegistrationSchema = z.object({
   email: z.string().email("Valid email is required").max(200),
   phone: z.string().max(40).optional(),
   ageCategory: z
-    .enum(["children", "youth", "young_adults", "adults", "seniors"])
+    .enum(["children", "high_school", "college", "career", "adults", "seniors"])
     .optional(),
   sex: z.enum(["male", "female"]).optional(),
   visitorStatus: z

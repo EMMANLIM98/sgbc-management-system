@@ -61,7 +61,7 @@ const registerForEventSchema = z.object({
   attendeeEmail: z.string().email().nullable().optional(),
   attendeePhone: z.string().max(40).nullable().optional(),
   ageCategory: z
-    .enum(["children", "youth", "young_adults", "adults", "seniors"])
+    .enum(["children", "high_school", "college", "career", "adults", "seniors"])
     .nullable()
     .optional(),
   sex: z.enum(["male", "female"]).nullable().optional(),
@@ -83,7 +83,7 @@ const checkInSchema = z.object({
 
 const raffleFilterSchema = z.object({
   churchId: z.string().uuid().optional(),
-  ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
+  ageCategory: z.enum(["children", "high_school", "college", "career", "adults", "seniors"]).optional(),
   visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).optional(),
   leadershipRole: z.custom<LeadershipRoleType>((val) => leadershipRoles.isValid(val)).optional(),
   excludePreviousWinners: z.boolean().optional(),
@@ -485,7 +485,7 @@ export const drawRaffleWinner = createServerFn({ method: "POST" })
       .object({
         eventId: z.string().uuid(),
         prizeName: z.string().min(1).max(200),
-        ageCategory: z.enum(["children", "youth", "young_adults", "adults", "seniors"]).optional(),
+        ageCategory: z.enum(["children", "high_school", "college", "career", "adults", "seniors"]).optional(),
         visitorStatus: z.enum(["member", "visitor", "first_time_guest"]).optional(),
       })
       .parse(d),

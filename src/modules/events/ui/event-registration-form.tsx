@@ -36,7 +36,7 @@ const registrationSchema = z.object({
   attendeeEmail: z.string().email("Invalid email").nullable().optional(),
   attendeePhone: z.string().max(40).nullable().optional(),
   ageCategory: z
-    .enum(["children", "youth", "young_adults", "adults", "seniors"])
+    .enum(["children", "high_school", "college", "career", "adults", "seniors"])
     .nullable()
     .optional(),
   sex: z.enum(["male", "female"]).nullable().optional(),
@@ -189,11 +189,12 @@ export function EventRegistrationForm({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">Not specified</SelectItem>
-                    <SelectItem value="children">Children (0-12)</SelectItem>
-                    <SelectItem value="youth">Youth (13-17)</SelectItem>
-                    <SelectItem value="young_adults">Young Adults (18-30)</SelectItem>
-                    <SelectItem value="adults">Adults (31-65)</SelectItem>
-                    <SelectItem value="seniors">Seniors (65+)</SelectItem>
+                    <SelectItem value="children">Children</SelectItem>
+                    <SelectItem value="high_school">High School</SelectItem>
+                    <SelectItem value="college">College</SelectItem>
+                    <SelectItem value="career">Career</SelectItem>
+                    <SelectItem value="adults">Adults</SelectItem>
+                    <SelectItem value="seniors">Seniors</SelectItem>
                   </SelectContent>
                 </Select>
               )}

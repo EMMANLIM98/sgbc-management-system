@@ -6,7 +6,7 @@
  */
 
 export type RegistrationStatus = "registered" | "checked_in" | "cancelled" | "no_show";
-export type AttendanceCategory = "children" | "youth" | "young_adults" | "adults" | "seniors";
+export type AttendanceCategory = "children" | "high_school" | "college" | "career" | "adults" | "seniors";
 export type LeadershipRole =
   | "pastor"
   | "pastor_wife"

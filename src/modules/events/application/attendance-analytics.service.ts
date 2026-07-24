@@ -24,8 +24,9 @@ export interface EventAttendanceMetrics {
   visitorCount: number;
   memberCount: number;
   childrenCount: number;
-  youthCount: number;
-  youngAdultsCount: number;
+  highSchoolCount: number;
+  collegeCount: number;
+  careerCount: number;
   adultsCount: number;
   seniorsCount: number;
 }
@@ -129,8 +130,9 @@ export class AttendanceAnalyticsService {
       visitorCount: data.visitor_count || 0,
       memberCount: data.member_count || 0,
       childrenCount: data.children_count || 0,
-      youthCount: data.youth_count || 0,
-      youngAdultsCount: data.young_adults_count || 0,
+      highSchoolCount: data.high_school_count || 0,
+      collegeCount: data.college_count || 0,
+      careerCount: data.career_count || 0,
       adultsCount: data.adults_count || 0,
       seniorsCount: data.seniors_count || 0,
     };
@@ -142,7 +144,7 @@ export class AttendanceAnalyticsService {
   async getAttendanceByCategory(eventId: string): Promise<AttendanceByCategory[]> {
     const rows = await this.getCheckedInAggregateRows(eventId);
     const total = rows.length;
-    const categories = ["children", "youth", "young_adults", "adults", "seniors"];
+    const categories = ["children", "high_school", "college", "career", "adults", "seniors"];
 
     return categories.map((cat) => {
       const count = rows.filter((row) => row.age_category === cat).length;

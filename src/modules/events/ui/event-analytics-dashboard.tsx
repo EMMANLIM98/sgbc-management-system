@@ -111,7 +111,7 @@ export function EventAnalyticsDashboard({ eventId }: EventAnalyticsDashboardProp
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-8 gap-3">
         <Card className="p-3">
           <p className="text-xs text-gray-600">Visitors</p>
           <p className="text-xl font-semibold">{metrics.visitorCount}</p>
@@ -125,8 +125,16 @@ export function EventAnalyticsDashboard({ eventId }: EventAnalyticsDashboardProp
           <p className="text-xl font-semibold">{metrics.childrenCount}</p>
         </Card>
         <Card className="p-3">
-          <p className="text-xs text-gray-600">Youth</p>
-          <p className="text-xl font-semibold">{metrics.youthCount}</p>
+          <p className="text-xs text-gray-600">High School</p>
+          <p className="text-xl font-semibold">{metrics.highSchoolCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">College</p>
+          <p className="text-xl font-semibold">{metrics.collegeCount}</p>
+        </Card>
+        <Card className="p-3">
+          <p className="text-xs text-gray-600">Career</p>
+          <p className="text-xl font-semibold">{metrics.careerCount}</p>
         </Card>
         <Card className="p-3">
           <p className="text-xs text-gray-600">Adults</p>

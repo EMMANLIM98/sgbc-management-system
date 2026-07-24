@@ -5,7 +5,7 @@
 
 CREATE TYPE public.event_status AS ENUM ('draft', 'scheduled', 'active', 'completed', 'cancelled');
 CREATE TYPE public.registration_status AS ENUM ('registered', 'checked_in', 'cancelled', 'no_show');
-CREATE TYPE public.attendance_category AS ENUM ('children', 'youth', 'young_adults', 'adults', 'seniors');
+CREATE TYPE public.attendance_category AS ENUM ('children', 'high_school', 'college', 'career', 'adults', 'seniors');
 CREATE TYPE public.leadership_role AS ENUM (
   'pastor', 'pastor_wife', 'pastor_children', 'associate_pastor',
   'elder', 'deacon', 'preacher', 'evangelist',
@@ -303,8 +303,9 @@ SELECT
   COUNT(DISTINCT CASE WHEN er.visitor_status = 'visitor' THEN er.id END) as visitor_count,
   COUNT(DISTINCT CASE WHEN er.visitor_status = 'member' THEN er.id END) as member_count,
   COUNT(DISTINCT CASE WHEN er.age_category = 'children' THEN er.id END) as children_count,
-  COUNT(DISTINCT CASE WHEN er.age_category = 'youth' THEN er.id END) as youth_count,
-  COUNT(DISTINCT CASE WHEN er.age_category = 'young_adults' THEN er.id END) as young_adults_count,
+  COUNT(DISTINCT CASE WHEN er.age_category = 'high_school' THEN er.id END) as high_school_count,
+  COUNT(DISTINCT CASE WHEN er.age_category = 'college' THEN er.id END) as college_count,
+  COUNT(DISTINCT CASE WHEN er.age_category = 'career' THEN er.id END) as career_count,
   COUNT(DISTINCT CASE WHEN er.age_category = 'adults' THEN er.id END) as adults_count,
   COUNT(DISTINCT CASE WHEN er.age_category = 'seniors' THEN er.id END) as seniors_count
 FROM public.events e
