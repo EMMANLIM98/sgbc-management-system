@@ -195,6 +195,27 @@ export type InviteMemberRequest = z.infer<typeof inviteMemberSchema>;
 export type AssignRoleRequest = z.infer<typeof assignRoleSchema>;
 
 /**
+ * Dashboard API Schemas
+ */
+export const dashboardKpisQuerySchema = z.object({
+  churchId: z.string().uuid().optional()
+});
+
+export const membershipGrowthQuerySchema = z.object({
+  churchId: z.string().uuid().optional(),
+  months: z.coerce.number().int().min(3).max(24).default(6)
+});
+
+export const recentActivitiesQuerySchema = z.object({
+  churchId: z.string().uuid().optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(10)
+});
+
+export type DashboardKpisQuery = z.infer<typeof dashboardKpisQuerySchema>;
+export type MembershipGrowthQuery = z.infer<typeof membershipGrowthQuerySchema>;
+export type RecentActivitiesQuery = z.infer<typeof recentActivitiesQuerySchema>;
+
+/**
  * Validation Error Extractor
  *
  * Converts Zod validation errors to API error details

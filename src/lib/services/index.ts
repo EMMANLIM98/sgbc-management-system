@@ -10,3 +10,4 @@ export { OrganizationService, organizationService } from './organization.service
 export { ContributionService, contributionService } from './contribution.service';
 export { PledgeService, pledgeService } from './pledge.service';
 export { ExpenseService, expenseService } from './expense.service';
+export { DashboardService, dashboardService } from './dashboard.service';
