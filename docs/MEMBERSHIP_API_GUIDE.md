@@ -17,6 +17,7 @@ The Membership Module API provides complete RESTful endpoints for managing churc
 ## Resource Models
 
 ### Member DTO
+
 ```json
 {
   "id": "uuid",
@@ -37,6 +38,7 @@ The Membership Module API provides complete RESTful endpoints for managing churc
 ```
 
 ### Member Detail DTO (Extended)
+
 ```json
 {
   ...MemberDTO,
@@ -56,6 +58,7 @@ The Membership Module API provides complete RESTful endpoints for managing churc
 ```
 
 ### Member Summary DTO (Lightweight)
+
 ```json
 {
   "id": "uuid",
@@ -68,6 +71,7 @@ The Membership Module API provides complete RESTful endpoints for managing churc
 ```
 
 ### Member Document DTO
+
 ```json
 {
   "id": "uuid",
@@ -91,21 +95,23 @@ The Membership Module API provides complete RESTful endpoints for managing churc
 **Description**: Retrieve all members with pagination and filtering
 
 **Query Parameters**:
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `page` | integer | No | 1 | Page number (1-indexed) |
-| `pageSize` | integer | No | 20 | Items per page (max: 100) |
-| `status` | string | No | - | Filter: active, inactive, transferred, deceased |
-| `category` | string | No | - | Filter: member, visitor, prospect |
-| `sortBy` | string | No | name | Sort field: name, joinDate, createdAt |
-| `order` | string | No | asc | Sort order: asc, desc |
+
+| Parameter  | Type    | Required | Default | Description                                     |
+| ---------- | ------- | -------- | ------- | ----------------------------------------------- |
+| `page`     | integer | No       | 1       | Page number (1-indexed)                         |
+| `pageSize` | integer | No       | 20      | Items per page (max: 100)                       |
+| `status`   | string  | No       | -       | Filter: active, inactive, transferred, deceased |
+| `category` | string  | No       | -       | Filter: member, visitor, prospect               |
+| `sortBy`   | string  | No       | name    | Sort field: name, joinDate, createdAt           |
+| `order`    | string  | No       | asc     | Sort order: asc, desc                           |
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": [ /* MemberDTO array */ ],
+  "data": [/* MemberDTO array */],
   "pagination": {
     "total": 150,
     "count": 20,
@@ -123,10 +129,12 @@ The Membership Module API provides complete RESTful endpoints for managing churc
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Invalid query parameters
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl "http://localhost:5173/api/v1/organizations/{orgId}/members?page=1&pageSize=20&status=active"
 ```
@@ -140,6 +148,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?page=1&pageSize
 **Description**: Create a new member record
 
 **Request Body**:
+
 ```json
 {
   "name": "Jane Smith",
@@ -157,6 +166,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?page=1&pageSize
 ```
 
 **Validation Rules**:
+
 - `name` - Required, minimum 2 characters
 - `email` - Optional, must be valid email format
 - `phone` - Optional
@@ -165,27 +175,31 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members?page=1&pageSize
 - All date fields must be in ISO 8601 format
 
 **Response** (201 Created):
+
 ```json
 {
   "status": "success",
   "code": 201,
-  "data": { /* MemberDTO */ },
-  "meta": { /* ... */ }
+  "data": {/* MemberDTO */},
+  "meta": {/* ... */}
 }
 ```
 
 **Headers**:
+
 ```
 Location: /api/v1/organizations/{orgId}/members/{memberId}
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Missing required fields
 - `422 Unprocessable Entity` - Validation errors
 - `409 Conflict` - Duplicate email
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members" \
   -H "Content-Type: application/json" \
@@ -206,27 +220,31 @@ curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members" \
 **Description**: Retrieve detailed information for a specific member
 
 **Path Parameters**:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `orgId` | UUID | Organization ID |
-| `memberId` | UUID | Member ID |
+
+| Parameter  | Type | Description     |
+| ---------- | ---- | --------------- |
+| `orgId`    | UUID | Organization ID |
+| `memberId` | UUID | Member ID       |
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": { /* MemberDetailDTO */ },
-  "meta": { /* ... */ }
+  "data": {/* MemberDetailDTO */},
+  "meta": {/* ... */}
 }
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Invalid ID format
 - `404 Not Found` - Member not found
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}"
 ```
@@ -240,6 +258,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}"
 **Description**: Update member information (partial update)
 
 **Request Body** (all fields optional):
+
 ```json
 {
   "name": "John Smith",
@@ -253,16 +272,18 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}"
 ```
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": { /* Updated MemberDTO */ },
-  "meta": { /* ... */ }
+  "data": {/* Updated MemberDTO */},
+  "meta": {/* ... */}
 }
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Invalid ID format
 - `404 Not Found` - Member not found
 - `422 Unprocessable Entity` - Validation errors
@@ -270,6 +291,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}"
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X PATCH "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}" \
   -H "Content-Type: application/json" \
@@ -288,16 +310,19 @@ curl -X PATCH "http://localhost:5173/api/v1/organizations/{orgId}/members/{membe
 **Description**: Soft delete (deactivate) a member
 
 **Response** (204 No Content):
+
 ```
 No response body
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Invalid ID format
 - `404 Not Found` - Member not found
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X DELETE "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}"
 ```
@@ -313,22 +338,25 @@ curl -X DELETE "http://localhost:5173/api/v1/organizations/{orgId}/members/{memb
 **Request Body**: None required
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": { /* Reactivated MemberDTO */ },
-  "meta": { /* ... */ }
+  "data": {/* Reactivated MemberDTO */},
+  "meta": {/* ... */}
 }
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Invalid ID format
 - `404 Not Found` - Member not found
 - `409 Conflict` - Member already active
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}/activate"
 ```
@@ -342,12 +370,14 @@ curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/{member
 **Description**: Search members by name, email, or phone
 
 **Query Parameters**:
-| Parameter | Type | Required | Default |
-|-----------|------|----------|---------|
-| `page` | integer | No | 1 |
-| `pageSize` | integer | No | 20 |
+
+| Parameter  | Type    | Required | Default |
+| ---------- | ------- | -------- | ------- |
+| `page`     | integer | No       | 1       |
+| `pageSize` | integer | No       | 20      |
 
 **Request Body**:
+
 ```json
 {
   "searchTerm": "John"
@@ -355,24 +385,28 @@ curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/{member
 ```
 
 **Validation Rules**:
+
 - `searchTerm` - Required, minimum 2 characters, maximum 100
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": [ /* MemberSummaryDTO array */ ],
-  "pagination": { /* ... */ },
-  "meta": { /* ... */ }
+  "data": [/* MemberSummaryDTO array */],
+  "pagination": {/* ... */},
+  "meta": {/* ... */}
 }
 ```
 
 **Error Responses**:
+
 - `422 Unprocessable Entity` - Invalid search term
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/search?page=1&pageSize=20" \
   -H "Content-Type: application/json" \
@@ -388,20 +422,23 @@ curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/search?
 **Description**: Retrieve all documents for a member
 
 **Response** (200 OK):
+
 ```json
 {
   "status": "success",
   "code": 200,
-  "data": [ /* MemberDocumentDTO array */ ],
-  "meta": { /* ... */ }
+  "data": [/* MemberDocumentDTO array */],
+  "meta": {/* ... */}
 }
 ```
 
 **Error Responses**:
+
 - `404 Not Found` - Member not found
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}/documents"
 ```
@@ -415,6 +452,7 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}/docu
 **Description**: Upload a document for a member
 
 **Request Body**:
+
 ```json
 {
   "fileName": "ID_Card.pdf",
@@ -425,32 +463,37 @@ curl "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}/docu
 ```
 
 **Validation Rules**:
+
 - `fileName` - Required, max 255 characters
 - `fileType` - Required (MIME type)
 - `fileUrl` - Required, must be valid URL
 - `documentType` - Optional
 
 **Response** (201 Created):
+
 ```json
 {
   "status": "success",
   "code": 201,
-  "data": { /* MemberDocumentDTO */ },
-  "meta": { /* ... */ }
+  "data": {/* MemberDocumentDTO */},
+  "meta": {/* ... */}
 }
 ```
 
 **Headers**:
+
 ```
 Location: /api/v1/organizations/{orgId}/members/{memberId}/documents/{docId}
 ```
 
 **Error Responses**:
+
 - `404 Not Found` - Member not found
 - `422 Unprocessable Entity` - Validation errors
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}/documents" \
   -H "Content-Type: application/json" \
@@ -471,15 +514,18 @@ curl -X POST "http://localhost:5173/api/v1/organizations/{orgId}/members/{member
 **Description**: Delete a member document
 
 **Response** (204 No Content):
+
 ```
 No response body
 ```
 
 **Error Responses**:
+
 - `404 Not Found` - Member or document not found
 - `500 Internal Server Error` - Server error
 
 **cURL Example**:
+
 ```bash
 curl -X DELETE "http://localhost:5173/api/v1/organizations/{orgId}/members/{memberId}/documents/{docId}"
 ```
@@ -513,6 +559,7 @@ All error responses follow this standard format:
 ```
 
 **Error Types**:
+
 - `ValidationError` - Field validation failed (422)
 - `NotFoundError` - Resource not found (404)
 - `ConflictError` - Duplicate or business rule violation (409)
@@ -520,6 +567,7 @@ All error responses follow this standard format:
 - `InternalServerError` - Unexpected error (500)
 
 **Error Codes**:
+
 - `INVALID_EMAIL` - Email format is invalid
 - `INVALID_PHONE` - Phone format is invalid
 - `DUPLICATE_EMAIL` - Email already exists
@@ -532,23 +580,25 @@ All error responses follow this standard format:
 
 ## Status Codes
 
-| Code | Meaning | When Used |
-|------|---------|-----------|
-| 200 | OK | Successful GET, PATCH operations |
-| 201 | Created | Successful POST (resource created) |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Invalid parameters or ID format |
-| 404 | Not Found | Resource not found |
-| 409 | Conflict | Duplicate or business rule violation |
-| 422 | Unprocessable Entity | Validation error with details |
-| 500 | Server Error | Unexpected server error |
+| Code | Meaning              | When Used                            |
+| ---- | -------------------- | ------------------------------------ |
+| 200  | OK                   | Successful GET, PATCH operations     |
+| 201  | Created              | Successful POST (resource created)   |
+| 204  | No Content           | Successful DELETE                    |
+| 400  | Bad Request          | Invalid parameters or ID format      |
+| 404  | Not Found            | Resource not found                   |
+| 409  | Conflict             | Duplicate or business rule violation |
+| 422  | Unprocessable Entity | Validation error with details        |
+| 500  | Server Error         | Unexpected server error              |
 
 ---
 
 ## Best Practices
 
 ### 1. Pagination
+
 Always paginate large lists to avoid performance issues:
+
 ```bash
 # Good: Paginated
 curl "api/members?page=1&pageSize=20"
@@ -558,7 +608,9 @@ curl "api/members"
 ```
 
 ### 2. Filtering
+
 Filter on server side for better performance:
+
 ```bash
 # Good: Filtered on server
 curl "api/members?status=active&category=member"
@@ -568,7 +620,9 @@ curl "api/members"
 ```
 
 ### 3. Partial Updates
+
 Use PATCH for partial updates instead of PUT:
+
 ```bash
 # Good: PATCH for partial updates
 curl -X PATCH "api/members/{id}" -d '{"name": "New Name"}'
@@ -578,14 +632,18 @@ curl -X PUT "api/members/{id}" -d '{...all fields}'
 ```
 
 ### 4. Search
+
 Use POST for search with complex criteria:
+
 ```bash
 # Good: POST for search
 curl -X POST "api/members/search" -d '{"searchTerm": "John"}'
 ```
 
 ### 5. Error Handling
+
 Always check error type and code in responses:
+
 ```json
 if (error.type === "ValidationError") {
   // Handle validation errors with field-level details
@@ -602,6 +660,7 @@ if (error.type === "ValidationError") {
 ## Common Workflows
 
 ### Create and Verify Member
+
 ```bash
 # 1. Create member
 curl -X POST "api/members" \
@@ -617,6 +676,7 @@ curl "api/members?sortBy=joinDate&order=desc&pageSize=5"
 ```
 
 ### Update and Document
+
 ```bash
 # 1. Update member
 curl -X PATCH "api/members/{memberId}" \
@@ -630,6 +690,7 @@ curl -X POST "api/members/{memberId}/documents" \
 ```
 
 ### Search and Filter
+
 ```bash
 # 1. Search by name
 curl -X POST "api/members/search" \
@@ -642,6 +703,7 @@ curl "api/members?status=active&category=member&pageSize=50"
 ```
 
 ### Deactivate and Reactivate
+
 ```bash
 # 1. Deactivate member
 curl -X DELETE "api/members/{memberId}"
@@ -657,18 +719,21 @@ curl -X POST "api/members/{memberId}/activate"
 ## Performance Considerations
 
 ### Response Size
+
 - Use `pageSize=50` maximum for better performance
 - DTOs exclude unnecessary fields (response ~1.5KB per member)
 - Summary DTOs for lists (response ~0.5KB per member)
 - Detail DTOs only when needed (includes statistics)
 
 ### Database Queries
+
 - List endpoint: Single query with pagination
 - Search endpoint: Index on name/email/phone
 - Detail endpoint: Single query with joins for statistics
 - Documents endpoint: Single query per member
 
 ### Caching Strategy
+
 - Cache member list for 5 minutes
 - Cache detail view for 15 minutes
 - Invalidate cache on PATCH/POST/DELETE
@@ -679,38 +744,32 @@ curl -X POST "api/members/{memberId}/activate"
 ## Integration Examples
 
 ### Frontend (JavaScript)
+
 ```javascript
 // List members with pagination
-const response = await fetch(
-  '/api/v1/organizations/orgId/members?page=1&pageSize=20'
-);
+const response = await fetch("/api/v1/organizations/orgId/members?page=1&pageSize=20");
 const { data, pagination } = await response.json();
 
 // Create member
-const newMember = await fetch(
-  '/api/v1/organizations/orgId/members',
-  {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: 'Jane',
-      email: 'jane@example.com'
-    })
-  }
-);
+const newMember = await fetch("/api/v1/organizations/orgId/members", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: "Jane",
+    email: "jane@example.com",
+  }),
+});
 
 // Search members
-const search = await fetch(
-  '/api/v1/organizations/orgId/members/search?page=1',
-  {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ searchTerm: 'John' })
-  }
-);
+const search = await fetch("/api/v1/organizations/orgId/members/search?page=1", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ searchTerm: "John" }),
+});
 ```
 
 ### Mobile App (Swift)
+
 ```swift
 // List members
 let url = URL(string: "http://api.example.com/api/v1/organizations/\(orgId)/members")!
@@ -731,22 +790,24 @@ let (data, _) = try await URLSession.shared.data(for: request)
 ## Troubleshooting
 
 ### Issue: 422 Validation Error
+
 **Cause**: Invalid or missing fields  
 **Solution**: Check error details array for specific field errors
+
 ```json
 {
   "code": 422,
   "error": {
-    "details": [
-      { "field": "email", "message": "Invalid email format", "code": "INVALID_EMAIL" }
-    ]
+    "details": [{ "field": "email", "message": "Invalid email format", "code": "INVALID_EMAIL" }]
   }
 }
 ```
 
 ### Issue: 409 Conflict
+
 **Cause**: Duplicate email or invalid state transition  
 **Solution**: Check error code - either use different email or verify member state
+
 ```json
 {
   "code": 409,
@@ -758,8 +819,10 @@ let (data, _) = try await URLSession.shared.data(for: request)
 ```
 
 ### Issue: 404 Not Found
+
 **Cause**: Member doesn't exist in this organization  
 **Solution**: Verify memberId and orgId are correct
+
 ```bash
 # First verify member exists in org
 curl "api/members?pageSize=100" | grep memberId
@@ -773,6 +836,7 @@ curl "api/members/{memberId}"
 ## Changelog
 
 ### Version 1.0 (2026-07-24)
+
 - Initial release with full CRUD operations
 - Member search functionality
 - Document management
